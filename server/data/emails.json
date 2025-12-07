@@ -1,0 +1,20 @@
+[
+  {
+    "id": "email-001",
+    "label": "Primary Gmail",
+    "address": "james.mitchell@gmail.com",
+    "provider": "gmail",
+    "type": "personal",
+    "description": "Main personal email for banking, subscriptions, and important accounts",
+    "notes": "Recovery email for most services"
+  },
+  {
+    "id": "email-002",
+    "label": "Work Email",
+    "address": "j.mitchell@techcorp.io",
+    "provider": "outlook",
+    "type": "work",
+    "description": "Corporate Microsoft 365 account",
+    "notes": "Used for Slack, Jira, and work subscriptions"
+  }
+]

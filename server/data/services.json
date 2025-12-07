@@ -1,0 +1,90 @@
+[
+  {
+    "id": "svc-001",
+    "name": "Netflix",
+    "category": "Entertainment",
+    "emailId": "email-001",
+    "billingCycle": "monthly",
+    "cost": { "amount": 15.99, "currency": "GBP" },
+    "startDate": "2021-03-15",
+    "renewalDate": "2025-01-15",
+    "status": "active",
+    "loginUrl": "https://netflix.com/login",
+    "notes": "Premium 4K plan, shared with family"
+  },
+  {
+    "id": "svc-002",
+    "name": "Spotify",
+    "category": "Entertainment",
+    "emailId": "email-001",
+    "billingCycle": "monthly",
+    "cost": { "amount": 10.99, "currency": "GBP" },
+    "startDate": "2019-06-01",
+    "renewalDate": "2025-01-06",
+    "status": "active",
+    "loginUrl": "https://accounts.spotify.com",
+    "notes": "Premium individual plan"
+  },
+  {
+    "id": "svc-003",
+    "name": "Amazon Prime",
+    "category": "Shopping",
+    "emailId": "email-001",
+    "billingCycle": "yearly",
+    "cost": { "amount": 95.00, "currency": "GBP" },
+    "startDate": "2020-01-10",
+    "renewalDate": "2025-01-10",
+    "status": "active",
+    "loginUrl": "https://amazon.co.uk",
+    "notes": "Includes Prime Video, Music, and free delivery"
+  },
+  {
+    "id": "svc-004",
+    "name": "iCloud+",
+    "category": "Cloud Storage",
+    "emailId": "email-001",
+    "billingCycle": "monthly",
+    "cost": { "amount": 2.99, "currency": "GBP" },
+    "startDate": "2022-08-20",
+    "renewalDate": "2025-01-20",
+    "status": "active",
+    "loginUrl": "https://icloud.com",
+    "notes": "200GB storage plan for photos and backups"
+  },
+  {
+    "id": "svc-005",
+    "name": "EE Mobile",
+    "category": "Telecom",
+    "emailId": "email-001",
+    "billingCycle": "monthly",
+    "cost": { "amount": 45.00, "currency": "GBP" },
+    "startDate": "2023-04-01",
+    "renewalDate": "2025-01-01",
+    "status": "active",
+    "loginUrl": "https://ee.co.uk/myee",
+    "notes": "Unlimited data plan, 24-month contract ends April 2025"
+  },
+  {
+    "id": "svc-006",
+    "name": "Revolut",
+    "category": "Finance",
+    "emailId": "email-001",
+    "billingCycle": "monthly",
+    "cost": { "amount": 7.99, "currency": "GBP" },
+    "startDate": "2022-02-15",
+    "renewalDate": "2025-01-15",
+    "status": "active",
+    "loginUrl": "https://app.revolut.com",
+    "notes": "Premium plan with travel insurance and crypto trading"
+  },
+  {
+    "id": "svc-007",
+    "name": "Stripe",
+    "category": "Business",
+    "emailId": "email-002",
+    "billingCycle": "none",
+    "status": "active",
+    "loginUrl": "https://dashboard.stripe.com",
+    "notes": "Payment processor for side projects, 2.9% + 30p per transaction"
+  }
+]

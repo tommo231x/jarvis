@@ -57,6 +57,21 @@ For production deployment:
 2. The server serves static files from `client/dist` in production mode
 3. All routes run on port 5000 in production
 
+## Sample Data
+The system comes pre-loaded with realistic demo data:
+
+**Messages (12 emails):**
+- Netflix receipt, Apple subscription renewal, Gmail login alert
+- HMRC tax notice, Trust fund statement, Amazon marketing
+- Revolut bank transaction, Spotify payment decline, EE bill
+- PayPal password reset, TechCrunch newsletter, Stripe payout
+
+**Services (7):** Netflix, Spotify, Amazon Prime, iCloud+, EE Mobile, Revolut, Stripe
+
+**Identities (2):** Primary Gmail (personal), Work Email (corporate)
+
+**Projects (1):** Jarvis Identity Hub
+
 ## Recent Changes (December 7, 2025)
 - Configured for Replit environment
 - Updated Vite to run on port 5000 with host 0.0.0.0
@@ -68,3 +83,17 @@ For production deployment:
 - Fixed Vite proxy to use IPv6 address (::1) for backend connection
 - Added /status endpoints as public (no auth required) for API monitoring
 - Added API Connections monitoring card to Command Center dashboard
+- Added Message model and routes for inbox messages
+- Created 12 realistic sample emails with proper categories
+- Added 7 sample services with costs and billing info
+- Added 2 sample email identities and 1 project
+- Upgraded ChatWidget with enhanced UX:
+  - Violet/indigo gradient design matching Jarvis theme
+  - Chat history persistence in localStorage
+  - Clear conversation button (disabled when empty)
+  - Expand/minimize window toggle
+  - Copy message to clipboard
+  - Timestamps on all messages
+  - Quick action buttons for common queries
+  - Loading animation with bounce effect
+  - GPT-5.1 model indicator

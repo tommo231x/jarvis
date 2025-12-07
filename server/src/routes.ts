@@ -1,6 +1,6 @@
 import express from 'express';
 import { db } from './db';
-import { Email, Project, Service, User } from './models';
+import { Email, Project, Service, User, Message } from './models';
 import { IDENTITY_AGENT_SYSTEM_PROMPT } from './prompts/identityAgentSystemPrompt';
 import OpenAI from 'openai';
 import { hashPassword, comparePassword, generateToken } from './auth';
@@ -151,6 +151,27 @@ router.delete('/projects/:id', async (req, res) => {
     res.json({ success });
 });
 
+// --- Messages (Inbox) ---
+router.get('/messages', async (req, res) => {
+    const messages = await db.collection<Message>('messages').find();
+    res.json(messages);
+});
+
+router.post('/messages', async (req, res) => {
+    const newMessage = await db.collection<Message>('messages').add(req.body);
+    res.status(201).json(newMessage);
+});
+
+router.put('/messages/:id', async (req, res) => {
+    const updated = await db.collection<Message>('messages').update(req.params.id, req.body);
+    res.json(updated);
+});
+
+router.delete('/messages/:id', async (req, res) => {
+    const success = await db.collection<Message>('messages').delete(req.params.id);
+    res.json({ success });
+});
+
 // --- AI Query ---
 router.post('/ai/query', async (req, res) => {
     try {
@@ -160,17 +181,19 @@ router.post('/ai/query', async (req, res) => {
         }
 
         // 1. Fetch all data to provide context
-        const [emails, services, projects] = await Promise.all([
+        const [emails, services, projects, messages] = await Promise.all([
             db.collection<Email>('emails').find(),
             db.collection<Service>('services').find(),
-            db.collection<Project>('projects').find()
+            db.collection<Project>('projects').find(),
+            db.collection<Message>('messages').find()
         ]);
 
         // 2. Prepare Context
         const context = {
             emails,
             services,
-            projects
+            projects,
+            messages
         };
 
         // 3. Call LLM

@@ -42,3 +42,17 @@ export interface Project {
     description?: string;
     notes?: string;
 }
+
+export interface Message {
+    id: string;
+    from: string;
+    to: string;
+    subject: string;
+    body: string;
+    date: string;
+    category: 'transactional' | 'security' | 'financial' | 'marketing' | 'social' | 'work' | 'personal' | 'spam';
+    priority: 'high' | 'medium' | 'low';
+    read: boolean;
+    flags?: string[];
+    attachments?: string[];
+}
