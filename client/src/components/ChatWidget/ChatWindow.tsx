@@ -25,7 +25,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-24 right-6 w-80 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed bottom-24 right-6 w-80 z-[9999] bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[500px]">
       {/* Header */}
       <div className="px-4 py-3 bg-slate-800 text-white flex justify-between items-center">
         <span className="font-semibold">Jarvis Assistant</span>
