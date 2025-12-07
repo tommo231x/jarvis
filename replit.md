@@ -23,10 +23,47 @@ A personal "Internal Tools" application designed to manage digital identity, sub
 │   │   ├── routes.ts    # API routes
 │   │   ├── auth.ts      # Authentication middleware
 │   │   ├── db.ts        # Database utilities
+│   │   ├── models.ts    # TypeScript data models
 │   │   └── index.ts     # Server entry point
+│   ├── data/            # JSON data files
+│   │   ├── identities.json
+│   │   ├── emails.json
+│   │   ├── services.json
+│   │   ├── messages.json
+│   │   └── projects.json
 │   └── package.json
 └── package.json         # Root monorepo scripts
 ```
+
+## Data Architecture
+
+### Hierarchical Model
+The application uses a three-tier hierarchical structure:
+
+1. **Identity** (top-level entity)
+   - Categories: personal, work, business, project, alias
+   - Contains multiple email addresses, services, and projects
+   - Aggregates all digital presence under one umbrella
+
+2. **Email** (belongs to Identity)
+   - Represents email accounts (e.g., john@gmail.com)
+   - Links to an Identity via `identityId`
+   - Receives Messages
+
+3. **Message** (belongs to Email)
+   - Only stores "relevant" emails (bills, receipts, important notifications)
+   - Not a comprehensive inbox sync
+   - Categories: subscription, financial, security, marketing, notification, receipt
+
+4. **Service** (belongs to Identity)
+   - Tracks subscriptions with cost, billing cycle, status
+   - Links to Identity via `identityId`
+   - Optional email specification via `emailId`
+
+5. **Project** (belongs to Identity)
+   - Organizes work contexts
+   - Links to Identity via `identityId`
+   - Can have multiple linked services
 
 ## Development Setup
 
@@ -44,12 +81,14 @@ The application runs on:
 The frontend proxies API requests to the backend automatically.
 
 ### Key Features
-1. **Identity Hub**: Manage email identities and service credentials
-2. **Service Management**: Track subscription costs, billing cycles, and renewal dates
-3. **Project Association**: Group assets into project contexts
-4. **AI Search**: Natural language interface to query data (requires OpenAI API key)
-5. **Dashboard**: Live metrics on monthly costs and active projects
-6. **Authentication**: JWT-based login and registration
+1. **Identity Management**: Central hub for digital identities (personal, work, business)
+2. **Email Accounts**: Manage email addresses grouped by identity
+3. **Relevant Messages**: AI-filtered important emails only (not full inbox sync)
+4. **Service Tracking**: Subscriptions with costs, billing cycles, renewal dates
+5. **Project Organization**: Group assets into project contexts
+6. **AI Search**: Natural language interface to query data (requires OpenAI API key)
+7. **Dashboard**: Live metrics with clickable navigation cards
+8. **Authentication**: JWT-based login and registration
 
 ## Deployment
 For production deployment:
@@ -60,34 +99,42 @@ For production deployment:
 ## Sample Data
 The system comes pre-loaded with realistic demo data:
 
-**Messages (12 emails):**
-- Netflix receipt, Apple subscription renewal, Gmail login alert
-- HMRC tax notice, Trust fund statement, Amazon marketing
-- Revolut bank transaction, Spotify payment decline, EE bill
-- PayPal password reset, TechCrunch newsletter, Stripe payout
+**Identities (3):**
+- Personal (personal category) - personal accounts and subscriptions
+- Work (work category) - professional/employment related
+- Side Projects (project category) - hobby and side project assets
 
-**Services (7):** Netflix, Spotify, Amazon Prime, iCloud+, EE Mobile, Revolut, Stripe
+**Email Accounts (4):**
+- john.doe@gmail.com (Personal identity)
+- johnd@icloud.com (Personal identity)
+- john.doe@company.com (Work identity)
+- sidehustle@proton.me (Side Projects identity)
 
-**Identities (2):** Primary Gmail (personal), Work Email (corporate)
+**Services (8):**
+- Netflix, Spotify, iCloud+ (Personal)
+- Microsoft 365, Slack Pro (Work)
+- GitHub Pro, DigitalOcean (Side Projects)
+- AWS (Side Projects)
+
+**Relevant Messages (7):**
+- Subscription receipts, billing notifications, security alerts
+- Only important emails, not full inbox sync
 
 **Projects (1):** Jarvis Identity Hub
 
 ## Recent Changes (December 7, 2025)
-- Configured for Replit environment
-- Updated Vite to run on port 5000 with host 0.0.0.0
-- Changed backend port to 3001 to avoid conflicts
-- Added static file serving for production deployment
-- Set up deployment configuration for autoscale
-- Created workflow to run both frontend and backend concurrently
-- Configured JARVIS_OPENAI_API_KEY for custom OpenAI integration
-- Fixed Vite proxy to use IPv6 address (::1) for backend connection
-- Added /status endpoints as public (no auth required) for API monitoring
-- Added API Connections monitoring card to Command Center dashboard
-- Added Message model and routes for inbox messages
-- Created 12 realistic sample emails with proper categories
-- Added 7 sample services with costs and billing info
-- Added 2 sample email identities and 1 project
-- Upgraded ChatWidget with enhanced UX:
+- **Major Architecture Restructure:**
+  - Created Identity model as top-level entity
+  - Refactored Email model (accounts belong to identities)
+  - Updated Service and Project models to use identityId
+  - Added Message model with emailId and isRelevant flag
+- **UI Improvements:**
+  - Dashboard: Removed inbox widget, made all stat cards clickable
+  - Emails page: Groups accounts by identity with expandable sections
+  - ServiceForm: Identity-first workflow with optional email selection
+  - ProjectForm: Uses identityId instead of primaryEmailId
+  - Card component: Added onClick support for navigation
+- ChatWidget with enhanced UX:
   - Violet/indigo gradient design matching Jarvis theme
   - Chat history persistence in localStorage
   - Clear conversation button (disabled when empty)
@@ -95,5 +142,10 @@ The system comes pre-loaded with realistic demo data:
   - Copy message to clipboard
   - Timestamps on all messages
   - Quick action buttons for common queries
-  - Loading animation with bounce effect
   - GPT-5.1 model indicator
+
+## User Preferences
+- Dark "Jarvis" theme with violet/indigo gradients
+- Identity-centric workflow (Identity → Emails → Messages)
+- Clean, clickable dashboard for navigation
+- Only store "relevant" emails, not comprehensive inbox sync
