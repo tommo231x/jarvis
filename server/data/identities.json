@@ -1,0 +1,23 @@
+[
+  {
+    "id": "identity-personal",
+    "name": "Personal",
+    "category": "personal",
+    "description": "My personal digital identity for everyday use",
+    "notes": "Primary identity for personal subscriptions and communications"
+  },
+  {
+    "id": "identity-work",
+    "name": "Work",
+    "category": "work",
+    "description": "Professional work identity",
+    "notes": "Corporate communications and business services"
+  },
+  {
+    "id": "identity-side-projects",
+    "name": "Side Projects",
+    "category": "project",
+    "description": "Identity for personal development projects",
+    "notes": "Used for dev tools, APIs, and project-related services"
+  }
+]

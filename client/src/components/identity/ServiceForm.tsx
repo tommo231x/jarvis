@@ -1,37 +1,35 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { api, Service, EmailIdentity } from '../../api';
+import { api, Service, Identity, Email } from '../../api';
 import { Input } from '../Input';
 import { Button } from '../Button';
 import { X } from 'lucide-react';
 
 interface ServiceFormProps {
     initialData?: Service;
-    emails: EmailIdentity[];
+    identities: Identity[];
+    emails: Email[];
     onClose: () => void;
     onSubmit: () => void;
 }
 
-const defaultService: Omit<Service, 'id' | 'createdAt' | 'updatedAt'> = {
+const defaultService: Omit<Service, 'id'> = {
     name: '',
     category: '',
-    description: '',
     loginUrl: '',
-    username: '',
-    password: '',
+    identityId: '',
     emailId: '',
     cost: {
         amount: 0,
-        currency: 'USD',
-        period: 'monthly'
+        currency: 'GBP'
     },
     billingCycle: 'monthly',
     renewalDate: '',
     status: 'active',
-    icon: ''
+    notes: ''
 };
 
-export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceFormProps) => {
-    const [formData, setFormData] = useState<Omit<Service, 'id' | 'createdAt' | 'updatedAt'>>(defaultService);
+export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit }: ServiceFormProps) => {
+    const [formData, setFormData] = useState<Omit<Service, 'id'>>(defaultService);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -40,21 +38,19 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
             setFormData({
                 name: initialData.name,
                 category: initialData.category,
-                description: initialData.description || '',
                 loginUrl: initialData.loginUrl || '',
-                username: initialData.username || '',
-                password: initialData.password || '',
+                identityId: initialData.identityId || '',
                 emailId: initialData.emailId || '',
-                cost: initialData.cost || { amount: 0, currency: 'USD', period: 'monthly' },
+                cost: initialData.cost || { amount: 0, currency: 'GBP' },
                 billingCycle: initialData.billingCycle || 'monthly',
                 renewalDate: initialData.renewalDate || '',
                 status: initialData.status,
-                icon: initialData.icon || ''
+                notes: initialData.notes || ''
             });
         }
     }, [initialData]);
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         if (name.includes('.')) {
             const [parent, child] = name.split('.');
@@ -90,6 +86,10 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
         }
     };
 
+    const filteredEmails = formData.identityId 
+        ? emails.filter(e => e.identityId === formData.identityId)
+        : emails;
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-jarvis-card border border-jarvis-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
@@ -104,7 +104,7 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto">
                     {error && (
-                        <div className="p-3 bg-jarvis-danger/10 border border-jarvis-danger/20 text-jarvis-danger rounded-lg text-sm">
+                        <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm">
                             {error}
                         </div>
                     )}
@@ -116,6 +116,7 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
                             value={formData.name}
                             onChange={handleChange}
                             required
+                            placeholder="e.g. Netflix, Spotify"
                         />
                         <Input
                             label="Category"
@@ -123,6 +124,7 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
                             value={formData.category}
                             onChange={handleChange}
                             required
+                            placeholder="e.g. Entertainment, Finance"
                         />
                     </div>
 
@@ -132,39 +134,43 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
                         value={formData.loginUrl}
                         onChange={handleChange}
                         type="url"
+                        placeholder="https://..."
                     />
 
                     <div className="grid grid-cols-2 gap-4">
-                        <Input
-                            label="Username"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                        />
-                        <Input
-                            label="Password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            type="password"
-                        />
-                    </div>
-
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-jarvis-muted">Associated Email</label>
-                        <select
-                            name="emailId"
-                            value={formData.emailId}
-                            onChange={handleChange}
-                            className="w-full bg-black/20 border border-jarvis-border rounded-lg px-4 py-2 text-jarvis-text focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
-                        >
-                            <option value="">-- Select Email --</option>
-                            {emails.map(email => (
-                                <option key={email.id} value={email.id}>
-                                    {email.address}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-jarvis-muted">Identity</label>
+                            <select
+                                name="identityId"
+                                value={formData.identityId}
+                                onChange={handleChange}
+                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
+                                required
+                            >
+                                <option value="">-- Select Identity --</option>
+                                {identities.map(identity => (
+                                    <option key={identity.id} value={identity.id}>
+                                        {identity.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-jarvis-muted">Associated Email (Optional)</label>
+                            <select
+                                name="emailId"
+                                value={formData.emailId || ''}
+                                onChange={handleChange}
+                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
+                            >
+                                <option value="">-- No specific email --</option>
+                                {filteredEmails.map(email => (
+                                    <option key={email.id} value={email.id}>
+                                        {email.address}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
@@ -175,20 +181,28 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
                             value={formData.cost?.amount}
                             onChange={handleChange}
                             step="0.01"
+                            placeholder="0.00"
                         />
-                        <Input
-                            label="Currency"
-                            name="cost.currency"
-                            value={formData.cost?.currency}
-                            onChange={handleChange}
-                        />
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-jarvis-muted">Currency</label>
+                            <select
+                                name="cost.currency"
+                                value={formData.cost?.currency}
+                                onChange={handleChange}
+                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
+                            >
+                                <option value="GBP">GBP</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+                        </div>
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-jarvis-muted">Billing Cycle</label>
                             <select
                                 name="billingCycle"
                                 value={formData.billingCycle}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 bg-jarvis-bg/50 border border-jarvis-border rounded-lg text-sm text-white focus:outline-none focus:border-jarvis-accent/50 focus:ring-1 focus:ring-jarvis-accent/50 transition-all duration-200"
+                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
                             >
                                 <option value="monthly">Monthly</option>
                                 <option value="yearly">Yearly</option>
@@ -201,7 +215,7 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-jarvis-muted">Status</label>
                         <div className="flex gap-4">
-                            {['active', 'cancelled', 'paused'].map(status => (
+                            {['active', 'cancelled', 'trial', 'expired'].map(status => (
                                 <label key={status} className="flex items-center gap-2 cursor-pointer group">
                                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${formData.status === status
                                         ? 'border-jarvis-accent bg-jarvis-accent'
@@ -224,6 +238,17 @@ export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceF
                                 </label>
                             ))}
                         </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium text-jarvis-muted">Notes</label>
+                        <textarea
+                            name="notes"
+                            value={formData.notes || ''}
+                            onChange={handleChange}
+                            className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none resize-none h-20"
+                            placeholder="Any additional notes..."
+                        />
                     </div>
 
                     <div className="pt-4 border-t border-jarvis-border flex justify-end gap-3 shrink-0">

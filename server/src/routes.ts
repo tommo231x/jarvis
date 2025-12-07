@@ -1,6 +1,6 @@
 import express from 'express';
 import { db } from './db';
-import { Email, Project, Service, User, Message } from './models';
+import { Email, Project, Service, User, Message, Identity } from './models';
 import { IDENTITY_AGENT_SYSTEM_PROMPT } from './prompts/identityAgentSystemPrompt';
 import OpenAI from 'openai';
 import { hashPassword, comparePassword, generateToken } from './auth';
@@ -88,7 +88,28 @@ router.get('/status/openai', async (req, res) => {
     }
 });
 
-// --- Emails ---
+// --- Identities ---
+router.get('/identities', async (req, res) => {
+    const identities = await db.collection<Identity>('identities').find();
+    res.json(identities);
+});
+
+router.post('/identities', async (req, res) => {
+    const newIdentity = await db.collection<Identity>('identities').add(req.body);
+    res.status(201).json(newIdentity);
+});
+
+router.put('/identities/:id', async (req, res) => {
+    const updated = await db.collection<Identity>('identities').update(req.params.id, req.body);
+    res.json(updated);
+});
+
+router.delete('/identities/:id', async (req, res) => {
+    const success = await db.collection<Identity>('identities').delete(req.params.id);
+    res.json({ success });
+});
+
+// --- Emails (Email Accounts) ---
 router.get('/emails', async (req, res) => {
     const emails = await db.collection<Email>('emails').find();
     res.json(emails);
@@ -181,7 +202,8 @@ router.post('/ai/query', async (req, res) => {
         }
 
         // 1. Fetch all data to provide context
-        const [emails, services, projects, messages] = await Promise.all([
+        const [identities, emails, services, projects, messages] = await Promise.all([
+            db.collection<Identity>('identities').find(),
             db.collection<Email>('emails').find(),
             db.collection<Service>('services').find(),
             db.collection<Project>('projects').find(),
@@ -190,6 +212,7 @@ router.post('/ai/query', async (req, res) => {
 
         // 2. Prepare Context
         const context = {
+            identities,
             emails,
             services,
             projects,

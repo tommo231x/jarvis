@@ -3,7 +3,7 @@
     "id": "proj-001",
     "name": "Jarvis Identity Hub",
     "status": "active",
-    "primaryEmailId": "email-001",
+    "identityId": "identity-side-projects",
     "serviceIds": ["svc-007"],
     "startDate": "2024-11-01",
     "description": "Personal command center for managing digital identity and subscriptions",

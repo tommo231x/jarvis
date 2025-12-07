@@ -8,11 +8,13 @@ export interface CardProps {
     icon?: LucideIcon;
     hover?: boolean;
     action?: ReactNode;
+    onClick?: () => void;
 }
 
-export const Card = ({ children, className = '', title, icon: Icon, hover, action }: CardProps) => {
+export const Card = ({ children, className = '', title, icon: Icon, hover, action, onClick }: CardProps) => {
     return (
         <div
+            onClick={onClick}
             className={`
                 glass-panel p-5 rounded-xl transition-all duration-300 relative group
                 ${hover ? 'hover:scale-[1.01] hover:bg-jarvis-card/80 cursor-pointer' : ''}

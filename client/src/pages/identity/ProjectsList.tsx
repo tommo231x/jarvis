@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
-import { api, Project } from '../../api';
+import { api, Project, Service, Identity } from '../../api';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
 import { Input } from '../../components/Input';
-import { Search, Plus, ExternalLink, MoreHorizontal, Github, Folder, Trash2 } from 'lucide-react';
+import { Search, Plus, MoreHorizontal, Folder, Trash2 } from 'lucide-react';
 import { ProjectForm } from '../../components/identity/ProjectForm';
-import { Service, EmailIdentity } from '../../api';
 
 export const ProjectsList = () => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [services, setServices] = useState<Service[]>([]);
-    const [emails, setEmails] = useState<EmailIdentity[]>([]);
+    const [identities, setIdentities] = useState<Identity[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState<Project | undefined>(undefined);
     const [search, setSearch] = useState('');
@@ -19,14 +18,14 @@ export const ProjectsList = () => {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const [projectsData, servicesData, emailsData] = await Promise.all([
+            const [projectsData, servicesData, identitiesData] = await Promise.all([
                 api.projects.list(),
                 api.services.list(),
-                api.emails.list()
+                api.identities.list()
             ]);
             setProjects(projectsData);
             setServices(servicesData);
-            setEmails(emailsData);
+            setIdentities(identitiesData);
         } catch (error) {
             console.error('Failed to fetch data:', error);
         } finally {
@@ -114,27 +113,16 @@ export const ProjectsList = () => {
                                 key={project.id}
                                 className="group grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors duration-200"
                             >
-                                {/* Name & Repo */}
+                                {/* Name & Description */}
                                 <div className="col-span-4 flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg bg-jarvis-bg/50 border border-jarvis-border flex items-center justify-center text-jarvis-accent group-hover:text-white transition-colors">
                                         <Folder className="w-5 h-5" />
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-semibold text-white group-hover:text-jarvis-accent transition-colors">{project.name}</h3>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            {project.repoUrl && (
-                                                <a href={project.repoUrl} target="_blank" rel="noreferrer" className="text-xs text-jarvis-muted hover:text-white flex items-center gap-1 transition-colors">
-                                                    <Github className="w-3 h-3" />
-                                                    Repo
-                                                </a>
-                                            )}
-                                            {project.docUrl && (
-                                                <a href={project.docUrl} target="_blank" rel="noreferrer" className="text-xs text-jarvis-muted hover:text-white flex items-center gap-1 transition-colors">
-                                                    <ExternalLink className="w-3 h-3" />
-                                                    Docs
-                                                </a>
-                                            )}
-                                        </div>
+                                        {project.description && (
+                                            <p className="text-xs text-jarvis-muted truncate max-w-[200px]">{project.description}</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -181,7 +169,7 @@ export const ProjectsList = () => {
                     onClose={() => setIsFormOpen(false)}
                     initialData={selectedProject}
                     services={services}
-                    emails={emails}
+                    identities={identities}
                 />
             )}
         </div>

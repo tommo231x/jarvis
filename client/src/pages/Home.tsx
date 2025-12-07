@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { api, Message, Email, Service } from '../api';
+import { api, Identity, Email, Service } from '../api';
 import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { 
     Shield, CreditCard, Folder, ArrowRight, LayoutGrid, Bot, Zap, 
-    CheckCircle, XCircle, AlertCircle, RefreshCw, Mail, Inbox,
-    AlertTriangle, User, Building2, Globe
+    CheckCircle, XCircle, AlertCircle, RefreshCw, Mail,
+    User, Building2, Globe, Briefcase, Code
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface ApiConnection {
     name: string;
@@ -20,17 +20,19 @@ interface ApiConnection {
 }
 
 export const HomePage = () => {
+    const navigate = useNavigate();
     const [stats, setStats] = useState({
         monthlyCost: 0,
         activeProjects: 0,
         serviceCount: 0,
-        unreadMessages: 0,
+        identityCount: 0,
+        emailCount: 0,
         isLoading: true
     });
 
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [identities, setIdentities] = useState<Identity[]>([]);
+    const [emails, setEmails] = useState<Email[]>([]);
     const [services, setServices] = useState<Service[]>([]);
-    const [identities, setIdentities] = useState<Email[]>([]);
 
     const [apiConnections, setApiConnections] = useState<ApiConnection[]>([
         { name: 'OpenAI', status: 'loading' }
@@ -62,16 +64,16 @@ export const HomePage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [servicesData, projects, messagesData, emailsData] = await Promise.all([
+                const [identitiesData, emailsData, servicesData, projects] = await Promise.all([
+                    api.identities.list(),
+                    api.emails.list(),
                     api.services.list(),
-                    api.projects.list(),
-                    api.messages.list(),
-                    api.emails.list()
+                    api.projects.list()
                 ]);
 
+                setIdentities(identitiesData);
+                setEmails(emailsData);
                 setServices(servicesData);
-                setMessages(messagesData);
-                setIdentities(emailsData);
 
                 const monthlyCost = servicesData.reduce((total, service) => {
                     if (!service.cost || service.status === 'cancelled') return total;
@@ -81,13 +83,13 @@ export const HomePage = () => {
                 }, 0);
 
                 const activeProjects = projects.filter(p => p.status === 'active').length;
-                const unreadMessages = messagesData.filter(m => !m.read).length;
 
                 setStats({
                     monthlyCost,
                     activeProjects,
                     serviceCount: servicesData.length,
-                    unreadMessages,
+                    identityCount: identitiesData.length,
+                    emailCount: emailsData.length,
                     isLoading: false
                 });
             } catch (error) {
@@ -100,33 +102,30 @@ export const HomePage = () => {
         fetchApiConnections();
     }, []);
 
-    const getPriorityColor = (priority: string) => {
-        switch (priority) {
-            case 'high': return 'text-red-400 bg-red-500/10';
-            case 'medium': return 'text-amber-400 bg-amber-500/10';
-            default: return 'text-slate-400 bg-slate-500/10';
-        }
-    };
-
-    const getCategoryColor = (category: string) => {
+    const getIdentityIcon = (category: string) => {
         switch (category) {
-            case 'security': return 'danger';
-            case 'financial': return 'warning';
-            case 'transactional': return 'default';
-            case 'marketing': return 'outline';
-            default: return 'default';
+            case 'work': return <Briefcase className="w-5 h-5" />;
+            case 'business': return <Building2 className="w-5 h-5" />;
+            case 'project': return <Code className="w-5 h-5" />;
+            default: return <User className="w-5 h-5" />;
         }
     };
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const getIdentityColor = (category: string) => {
+        switch (category) {
+            case 'work': return 'bg-blue-500/10 text-blue-400';
+            case 'business': return 'bg-emerald-500/10 text-emerald-400';
+            case 'project': return 'bg-amber-500/10 text-amber-400';
+            default: return 'bg-violet-500/10 text-violet-400';
+        }
+    };
+
+    const getEmailsForIdentity = (identityId: string) => {
+        return emails.filter(e => e.identityId === identityId);
+    };
+
+    const getServicesForIdentity = (identityId: string) => {
+        return services.filter(s => s.identityId === identityId);
     };
 
     return (
@@ -141,9 +140,13 @@ export const HomePage = () => {
                 </div>
             </div>
 
-            {/* Summary Stats */}
+            {/* Summary Stats - Clickable Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="p-5 flex items-center justify-between">
+                <Card 
+                    hover 
+                    className="p-5 flex items-center justify-between cursor-pointer"
+                    onClick={() => navigate('/apps/identity/services')}
+                >
                     <div>
                         <p className="text-sm text-jarvis-muted mb-1">Monthly Spend</p>
                         <p className="text-2xl font-bold text-white">
@@ -155,19 +158,27 @@ export const HomePage = () => {
                     </div>
                 </Card>
 
-                <Card className="p-5 flex items-center justify-between">
+                <Card 
+                    hover 
+                    className="p-5 flex items-center justify-between cursor-pointer"
+                    onClick={() => navigate('/apps/identity/emails')}
+                >
                     <div>
-                        <p className="text-sm text-jarvis-muted mb-1">Unread Messages</p>
+                        <p className="text-sm text-jarvis-muted mb-1">Identities</p>
                         <p className="text-2xl font-bold text-white">
-                            {stats.isLoading ? '...' : stats.unreadMessages}
+                            {stats.isLoading ? '...' : stats.identityCount}
                         </p>
                     </div>
-                    <div className="p-3 bg-red-500/10 rounded-lg text-red-400">
-                        <Mail className="w-5 h-5" />
+                    <div className="p-3 bg-violet-500/10 rounded-lg text-violet-400">
+                        <User className="w-5 h-5" />
                     </div>
                 </Card>
 
-                <Card className="p-5 flex items-center justify-between">
+                <Card 
+                    hover 
+                    className="p-5 flex items-center justify-between cursor-pointer"
+                    onClick={() => navigate('/apps/identity/services')}
+                >
                     <div>
                         <p className="text-sm text-jarvis-muted mb-1">Services Tracked</p>
                         <p className="text-2xl font-bold text-white">
@@ -179,7 +190,11 @@ export const HomePage = () => {
                     </div>
                 </Card>
 
-                <Card className="p-5 flex items-center justify-between">
+                <Card 
+                    hover 
+                    className="p-5 flex items-center justify-between cursor-pointer"
+                    onClick={() => navigate('/apps/identity/projects')}
+                >
                     <div>
                         <p className="text-sm text-jarvis-muted mb-1">Active Projects</p>
                         <p className="text-2xl font-bold text-white">
@@ -192,66 +207,63 @@ export const HomePage = () => {
                 </Card>
             </div>
 
-            {/* Inbox Section */}
-            <div className="border-t border-jarvis-border pt-6">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                        <Inbox className="w-5 h-5 text-jarvis-accent" />
-                        <h2 className="text-lg font-semibold text-white">Recent Inbox</h2>
-                        {stats.unreadMessages > 0 && (
-                            <Badge variant="danger">{stats.unreadMessages} unread</Badge>
-                        )}
-                    </div>
-                    <Link to="/apps/identity/emails">
-                        <Button variant="ghost" size="sm" className="gap-2">
-                            View All <ArrowRight className="w-4 h-4" />
-                        </Button>
-                    </Link>
-                </div>
-                <Card className="divide-y divide-jarvis-border">
-                    {messages.length === 0 ? (
-                        <div className="p-8 text-center text-jarvis-muted">
-                            <Inbox className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                            <p>No messages yet</p>
+            {/* Identities & Services Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Identities Section */}
+                <div>
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                            <User className="w-5 h-5 text-violet-400" />
+                            <h2 className="text-lg font-semibold text-white">Identities</h2>
                         </div>
-                    ) : (
-                        [...messages].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5).map((message) => (
-                            <div key={message.id} className={`p-4 flex items-start gap-4 hover:bg-jarvis-border/20 transition ${!message.read ? 'bg-jarvis-accent/5' : ''}`}>
-                                <div className={`p-2 rounded-lg flex-shrink-0 ${getPriorityColor(message.priority)}`}>
-                                    {message.priority === 'high' ? (
-                                        <AlertTriangle className="w-4 h-4" />
-                                    ) : (
-                                        <Mail className="w-4 h-4" />
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div className="min-w-0">
-                                            <p className={`text-sm truncate ${!message.read ? 'font-semibold text-white' : 'text-jarvis-muted'}`}>
-                                                {message.subject}
-                                            </p>
-                                            <p className="text-xs text-jarvis-muted truncate mt-0.5">
-                                                {message.from}
-                                            </p>
+                        <Link to="/apps/identity/emails">
+                            <Button variant="ghost" size="sm" className="gap-2">
+                                Manage <ArrowRight className="w-4 h-4" />
+                            </Button>
+                        </Link>
+                    </div>
+                    <Card className="divide-y divide-jarvis-border">
+                        {identities.length === 0 ? (
+                            <div className="p-8 text-center text-jarvis-muted">
+                                <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                                <p>No identities configured yet</p>
+                            </div>
+                        ) : (
+                            identities.map((identity) => {
+                                const identityEmails = getEmailsForIdentity(identity.id);
+                                const identityServices = getServicesForIdentity(identity.id);
+                                return (
+                                    <div 
+                                        key={identity.id} 
+                                        className="p-4 flex items-center justify-between hover:bg-jarvis-border/20 transition cursor-pointer"
+                                        onClick={() => navigate('/apps/identity/emails')}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIdentityColor(identity.category)}`}>
+                                                {getIdentityIcon(identity.category)}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium text-white">{identity.name}</p>
+                                                <p className="text-xs text-jarvis-muted">{identity.description}</p>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2 flex-shrink-0">
-                                            <Badge variant={getCategoryColor(message.category) as any} className="text-xs">
-                                                {message.category}
+                                        <div className="flex items-center gap-2">
+                                            <Badge variant="outline" className="text-xs">
+                                                <Mail className="w-3 h-3 mr-1" />
+                                                {identityEmails.length}
                                             </Badge>
-                                            <span className="text-xs text-jarvis-muted whitespace-nowrap">
-                                                {formatDate(message.date)}
-                                            </span>
+                                            <Badge variant="outline" className="text-xs">
+                                                <Globe className="w-3 h-3 mr-1" />
+                                                {identityServices.length}
+                                            </Badge>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </Card>
-            </div>
+                                );
+                            })
+                        )}
+                    </Card>
+                </div>
 
-            {/* Services & Identities Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Services Section */}
                 <div>
                     <div className="flex items-center justify-between mb-4">
@@ -273,7 +285,11 @@ export const HomePage = () => {
                             </div>
                         ) : (
                             services.slice(0, 5).map((service) => (
-                                <div key={service.id} className="p-4 flex items-center justify-between hover:bg-jarvis-border/20 transition">
+                                <div 
+                                    key={service.id} 
+                                    className="p-4 flex items-center justify-between hover:bg-jarvis-border/20 transition cursor-pointer"
+                                    onClick={() => navigate('/apps/identity/services')}
+                                >
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-jarvis-accent/20 to-purple-500/20 flex items-center justify-center text-jarvis-accent font-bold text-sm">
                                             {service.name.charAt(0)}
@@ -299,62 +315,6 @@ export const HomePage = () => {
                                             className="text-xs mt-1"
                                         >
                                             {service.status}
-                                        </Badge>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </Card>
-                </div>
-
-                {/* Identities Section */}
-                <div>
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                            <User className="w-5 h-5 text-violet-400" />
-                            <h2 className="text-lg font-semibold text-white">Identities</h2>
-                        </div>
-                        <Link to="/apps/identity/emails">
-                            <Button variant="ghost" size="sm" className="gap-2">
-                                View All <ArrowRight className="w-4 h-4" />
-                            </Button>
-                        </Link>
-                    </div>
-                    <Card className="divide-y divide-jarvis-border">
-                        {identities.length === 0 ? (
-                            <div className="p-8 text-center text-jarvis-muted">
-                                <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                                <p>No identities configured yet</p>
-                            </div>
-                        ) : (
-                            identities.map((identity) => (
-                                <div key={identity.id} className="p-4 flex items-center justify-between hover:bg-jarvis-border/20 transition">
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                            identity.type === 'work' 
-                                                ? 'bg-blue-500/10 text-blue-400' 
-                                                : 'bg-violet-500/10 text-violet-400'
-                                        }`}>
-                                            {identity.type === 'work' ? (
-                                                <Building2 className="w-5 h-5" />
-                                            ) : (
-                                                <User className="w-5 h-5" />
-                                            )}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-white">{identity.label}</p>
-                                            <p className="text-xs text-jarvis-muted">{identity.address}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Badge variant="outline" className="text-xs capitalize">
-                                            {identity.provider}
-                                        </Badge>
-                                        <Badge 
-                                            variant={identity.type === 'work' ? 'default' : 'success'}
-                                            className="text-xs capitalize"
-                                        >
-                                            {identity.type}
                                         </Badge>
                                     </div>
                                 </div>
@@ -453,71 +413,52 @@ export const HomePage = () => {
             <div className="border-t border-jarvis-border pt-6">
                 <h2 className="text-lg font-semibold text-white mb-4">Applications</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Identity App Card */}
-                    <Card hover className="group relative overflow-hidden text-left bg-gradient-to-br from-jarvis-card to-jarvis-bg border-jarvis-accent/20">
+                    {/* Identity App Card - Fully Clickable */}
+                    <Card 
+                        hover 
+                        className="group relative overflow-hidden text-left bg-gradient-to-br from-jarvis-card to-jarvis-bg border-jarvis-accent/20 cursor-pointer"
+                        onClick={() => navigate('/apps/identity/services')}
+                    >
                         <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
-                            <Shield className="w-24 h-24 text-jarvis-accent/5 -rotate-12 transform translate-x-8 -translate-y-8" />
+                            <LayoutGrid className="w-16 h-16 text-jarvis-accent/20" />
                         </div>
-
-                        <div className="relative z-10 space-y-4">
-                            <div className="w-12 h-12 bg-jarvis-accent/10 rounded-xl flex items-center justify-center text-jarvis-accent mb-2">
-                                <Shield className="w-6 h-6" />
+                        <div className="p-6 relative z-10">
+                            <div className="p-3 bg-jarvis-accent/10 rounded-lg w-fit mb-4">
+                                <Shield className="w-6 h-6 text-jarvis-accent" />
                             </div>
-
                             <div>
                                 <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-jarvis-accent transition-colors">Identity & Services</h3>
-                                <p className="text-sm text-jarvis-muted line-clamp-2">
-                                    Manage email identities, subscriptions, and project infrastructure.
+                                <p className="text-sm text-jarvis-muted mb-4">
+                                    Manage your digital identities, email accounts, subscriptions, and projects.
                                 </p>
-                            </div>
-
-                            <div className="flex items-center gap-2 pt-2">
-                                <Badge variant="outline">{stats.isLoading ? '...' : stats.serviceCount} Services</Badge>
-                                <Badge variant="outline">{stats.isLoading ? '...' : stats.activeProjects} Projects</Badge>
-                            </div>
-
-                            <div className="pt-2">
-                                <Link to="/apps/identity">
-                                    <Button variant="ghost" className="pl-0 gap-2 hover:bg-transparent group-hover:text-jarvis-accent">
-                                        Open App <ArrowRight className="w-4 h-4" />
-                                    </Button>
-                                </Link>
+                                <div className="flex items-center text-jarvis-accent text-sm font-medium gap-1">
+                                    Open App <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </div>
                             </div>
                         </div>
                     </Card>
 
-                    {/* Fina Admin Placeholder */}
-                    <Card className="opacity-75 border-dashed">
-                        <div className="space-y-4">
-                            <div className="w-12 h-12 bg-jarvis-border/30 rounded-xl flex items-center justify-center text-jarvis-muted mb-2">
-                                <LayoutGrid className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-jarvis-muted mb-1">Fina Admin</h3>
-                                <p className="text-sm text-jarvis-muted/70">
-                                    Content management and analytics for FinaFeels.
-                                </p>
-                            </div>
-                            <div className="pt-4">
-                                <Badge variant="default" className="bg-jarvis-border/50">Coming Soon</Badge>
-                            </div>
+                    {/* AI Assistant Card - Fully Clickable */}
+                    <Card 
+                        hover 
+                        className="group relative overflow-hidden text-left bg-gradient-to-br from-jarvis-card to-jarvis-bg border-purple-500/20 cursor-pointer"
+                        onClick={() => navigate('/apps/identity/ai-query')}
+                    >
+                        <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                            <Bot className="w-16 h-16 text-purple-500/20" />
                         </div>
-                    </Card>
-
-                    {/* Automation Placeholder */}
-                    <Card className="opacity-75 border-dashed">
-                        <div className="space-y-4">
-                            <div className="w-12 h-12 bg-jarvis-border/30 rounded-xl flex items-center justify-center text-jarvis-muted mb-2">
-                                <Bot className="w-6 h-6" />
+                        <div className="p-6 relative z-10">
+                            <div className="p-3 bg-purple-500/10 rounded-lg w-fit mb-4">
+                                <Bot className="w-6 h-6 text-purple-400" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-semibold text-jarvis-muted mb-1">Automation Hub</h3>
-                                <p className="text-sm text-jarvis-muted/70">
-                                    Bot control and scheduled task management.
+                                <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-purple-400 transition-colors">AI Assistant</h3>
+                                <p className="text-sm text-jarvis-muted mb-4">
+                                    Query your data using natural language. Ask about costs, renewals, and more.
                                 </p>
-                            </div>
-                            <div className="pt-4">
-                                <Badge variant="default" className="bg-jarvis-border/50">Coming Soon</Badge>
+                                <div className="flex items-center text-purple-400 text-sm font-medium gap-1">
+                                    Open App <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </div>
                             </div>
                         </div>
                     </Card>

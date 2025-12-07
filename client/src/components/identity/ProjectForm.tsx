@@ -1,5 +1,5 @@
 import { useState, FormEvent, useEffect, ChangeEvent } from 'react';
-import { Project, Service, EmailIdentity, api } from '../../api';
+import { Project, Service, Identity, api } from '../../api';
 import { Button } from '../Button';
 import { Input } from '../Input';
 import { X, Search } from 'lucide-react';
@@ -7,23 +7,21 @@ import { X, Search } from 'lucide-react';
 interface ProjectFormProps {
     initialData?: Project;
     services: Service[];
-    emails: EmailIdentity[];
+    identities: Identity[];
     onClose: () => void;
     onSubmit: () => void;
 }
 
-const defaultProject: Omit<Project, 'id' | 'createdAt' | 'updatedAt'> = {
+const defaultProject: Omit<Project, 'id'> = {
     name: '',
     description: '',
     status: 'active',
-    repoUrl: '',
-    docUrl: '',
     serviceIds: [],
-    primaryEmailId: ''
+    identityId: ''
 };
 
-export const ProjectForm = ({ initialData, services, emails, onClose, onSubmit }: ProjectFormProps) => {
-    const [formData, setFormData] = useState<Omit<Project, 'id' | 'createdAt' | 'updatedAt'>>(defaultProject);
+export const ProjectForm = ({ initialData, services, identities, onClose, onSubmit }: ProjectFormProps) => {
+    const [formData, setFormData] = useState<Omit<Project, 'id'>>(defaultProject);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [serviceSearch, setServiceSearch] = useState('');
@@ -34,10 +32,11 @@ export const ProjectForm = ({ initialData, services, emails, onClose, onSubmit }
                 name: initialData.name,
                 description: initialData.description || '',
                 status: initialData.status,
-                repoUrl: initialData.repoUrl || '',
-                docUrl: initialData.docUrl || '',
                 serviceIds: initialData.serviceIds || [],
-                primaryEmailId: initialData.primaryEmailId || ''
+                identityId: initialData.identityId || '',
+                startDate: initialData.startDate,
+                endDate: initialData.endDate,
+                notes: initialData.notes
             });
         }
     }, [initialData]);
@@ -96,7 +95,7 @@ export const ProjectForm = ({ initialData, services, emails, onClose, onSubmit }
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto">
                     {error && (
-                        <div className="bg-jarvis-danger/10 border border-jarvis-danger/20 text-jarvis-danger px-4 py-3 rounded-lg text-sm">
+                        <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
                             {error}
                         </div>
                     )}
@@ -117,7 +116,7 @@ export const ProjectForm = ({ initialData, services, emails, onClose, onSubmit }
                                     name="status"
                                     value={formData.status}
                                     onChange={handleChange}
-                                    className="w-full bg-black/20 border border-jarvis-border rounded-lg px-4 py-2 text-jarvis-text focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
+                                    className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
                                 >
                                     <option value="active">Active</option>
                                     <option value="planning">Planning</option>
@@ -134,40 +133,23 @@ export const ProjectForm = ({ initialData, services, emails, onClose, onSubmit }
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
-                                className="w-full px-4 py-2 bg-jarvis-bg/50 border border-jarvis-border rounded-lg text-sm text-white focus:outline-none focus:border-jarvis-accent/50 focus:ring-1 focus:ring-jarvis-accent/50 transition-all duration-200 min-h-[80px]"
+                                className="w-full px-4 py-2.5 bg-jarvis-bg border border-jarvis-border rounded-lg text-sm text-white focus:outline-none focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent transition-all min-h-[80px] resize-none"
                                 placeholder="Brief description of the project..."
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <Input
-                                label="Repository URL"
-                                name="repoUrl"
-                                value={formData.repoUrl}
-                                onChange={handleChange}
-                                placeholder="https://github.com/..."
-                            />
-                            <Input
-                                label="Documentation URL"
-                                name="docUrl"
-                                value={formData.docUrl}
-                                onChange={handleChange}
-                                placeholder="https://..."
-                            />
-                        </div>
-
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-jarvis-muted">Primary Email Identity</label>
+                            <label className="text-sm font-medium text-jarvis-muted">Identity</label>
                             <select
-                                name="primaryEmailId"
-                                value={formData.primaryEmailId}
+                                name="identityId"
+                                value={formData.identityId || ''}
                                 onChange={handleChange}
-                                className="w-full bg-black/20 border border-jarvis-border rounded-lg px-4 py-2 text-jarvis-text focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
+                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
                             >
-                                <option value="">-- No Direct Email Association --</option>
-                                {emails.map(email => (
-                                    <option key={email.id} value={email.id}>
-                                        {email.address}
+                                <option value="">-- Select Identity --</option>
+                                {identities.map(identity => (
+                                    <option key={identity.id} value={identity.id}>
+                                        {identity.name}
                                     </option>
                                 ))}
                             </select>
@@ -175,7 +157,7 @@ export const ProjectForm = ({ initialData, services, emails, onClose, onSubmit }
 
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-jarvis-muted">Linked Services</label>
-                            <div className="border border-jarvis-border rounded-lg bg-black/20 p-4">
+                            <div className="border border-jarvis-border rounded-lg bg-jarvis-bg/50 p-4">
                                 <div className="relative mb-3">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-jarvis-muted" />
                                     <input
@@ -183,7 +165,7 @@ export const ProjectForm = ({ initialData, services, emails, onClose, onSubmit }
                                         placeholder="Filter services..."
                                         value={serviceSearch}
                                         onChange={(e) => setServiceSearch(e.target.value)}
-                                        className="w-full bg-jarvis-bg border border-jarvis-border rounded-md pl-9 pr-3 py-1.5 text-sm text-jarvis-text focus:ring-1 focus:ring-jarvis-accent outline-none"
+                                        className="w-full bg-jarvis-bg border border-jarvis-border rounded-md pl-9 pr-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-jarvis-accent outline-none"
                                     />
                                 </div>
                                 <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api, Service, EmailIdentity } from '../../api';
+import { api, Service, Identity, Email } from '../../api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Badge } from '../../components/Badge';
@@ -8,7 +8,8 @@ import { ServiceForm } from '../../components/identity/ServiceForm';
 
 export const ServicesList = () => {
     const [services, setServices] = useState<Service[]>([]);
-    const [emails, setEmails] = useState<EmailIdentity[]>([]);
+    const [identities, setIdentities] = useState<Identity[]>([]);
+    const [emails, setEmails] = useState<Email[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -17,11 +18,13 @@ export const ServicesList = () => {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const [servicesData, emailsData] = await Promise.all([
+            const [servicesData, identitiesData, emailsData] = await Promise.all([
                 api.services.list(),
+                api.identities.list(),
                 api.emails.list()
             ]);
             setServices(servicesData);
+            setIdentities(identitiesData);
             setEmails(emailsData);
         } catch (error) {
             console.error('Failed to fetch data:', error);
@@ -179,6 +182,7 @@ export const ServicesList = () => {
                     onSubmit={handleFormSubmit}
                     onClose={() => setIsFormOpen(false)}
                     initialData={selectedService}
+                    identities={identities}
                     emails={emails}
                 />
             )}

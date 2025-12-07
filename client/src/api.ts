@@ -1,14 +1,21 @@
 const API_BASE = '/api';
 
-// Alias Email to EmailIdentity for consistency
-export type EmailIdentity = Email;
+export interface Identity {
+    id: string;
+    name: string;
+    category: 'personal' | 'work' | 'business' | 'project' | 'alias';
+    description?: string;
+    avatar?: string;
+    notes?: string;
+}
 
 export interface Email {
     id: string;
-    label?: string; // Optional now as we might just use address
+    identityId: string;
+    label: string;
     address: string;
     provider: 'gmail' | 'outlook' | 'yahoo' | 'proton' | 'icloud' | 'aws' | 'other';
-    type: 'personal' | 'work' | 'burner' | 'project';
+    isPrimary: boolean;
     description?: string;
     notes?: string;
 }
@@ -17,42 +24,46 @@ export interface Service {
     id: string;
     name: string;
     category: string;
-    emailId: string;
+    identityId: string;
+    emailId?: string;
     billingCycle: 'monthly' | 'yearly' | 'none' | 'one-time';
     cost?: {
         amount: number;
         currency: string;
-        period?: 'monthly' | 'yearly' | 'one-time'; // Added period for consistency
     };
     startDate?: string;
     renewalDate?: string;
-    status: 'active' | 'cancelled' | 'paused' | 'trial' | 'past_due'; // Added paused
+    status: 'active' | 'cancelled' | 'trial' | 'past_due' | 'expired';
     loginUrl?: string;
-    username?: string; // Added
-    password?: string; // Added
-    description?: string; // Added
-    icon?: string; // Added
     notes?: string;
-    createdAt?: string; // Added (mock)
-    updatedAt?: string; // Added (mock)
 }
 
 export interface Project {
     id: string;
     name: string;
     status: 'active' | 'archived' | 'planning' | 'completed' | 'paused';
-    primaryEmailId?: string;
+    identityId?: string;
     serviceIds: string[];
     startDate?: string;
     endDate?: string;
     description?: string;
     notes?: string;
-    repoUrl?: string; // Added
-    docUrl?: string; // Added
-    createdAt?: string; // Added
-    updatedAt?: string; // Added
 }
 
+export interface Message {
+    id: string;
+    emailId: string;
+    from: string;
+    subject: string;
+    body: string;
+    date: string;
+    category: 'transactional' | 'security' | 'financial' | 'marketing' | 'social' | 'work' | 'personal' | 'spam';
+    priority: 'high' | 'medium' | 'low';
+    read: boolean;
+    isRelevant: boolean;
+    flags?: string[];
+    attachments?: string[];
+}
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const token = localStorage.getItem('token');
@@ -77,36 +88,28 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     return response.json();
 }
 
-export interface Message {
-    id: string;
-    from: string;
-    to: string;
-    subject: string;
-    body: string;
-    date: string;
-    category: 'transactional' | 'security' | 'financial' | 'marketing' | 'social' | 'work' | 'personal' | 'spam';
-    priority: 'high' | 'medium' | 'low';
-    read: boolean;
-    flags?: string[];
-    attachments?: string[];
-}
-
 export const api = {
     auth: {
         login: (data: any) => request<any>('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
         register: (data: any) => request<any>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
     },
-    messages: {
-        list: () => request<Message[]>('/messages'),
-        create: (data: Omit<Message, 'id'>) => request<Message>('/messages', { method: 'POST', body: JSON.stringify(data) }),
-        update: (id: string, data: Partial<Message>) => request<Message>(`/messages/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-        delete: (id: string) => request<{ success: boolean }>(`/messages/${id}`, { method: 'DELETE' }),
+    identities: {
+        list: () => request<Identity[]>('/identities'),
+        create: (data: Omit<Identity, 'id'>) => request<Identity>('/identities', { method: 'POST', body: JSON.stringify(data) }),
+        update: (id: string, data: Partial<Identity>) => request<Identity>(`/identities/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+        delete: (id: string) => request<{ success: boolean }>(`/identities/${id}`, { method: 'DELETE' }),
     },
     emails: {
         list: () => request<Email[]>('/emails'),
         create: (data: Omit<Email, 'id'>) => request<Email>('/emails', { method: 'POST', body: JSON.stringify(data) }),
         update: (id: string, data: Partial<Email>) => request<Email>(`/emails/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
         delete: (id: string) => request<{ success: boolean }>(`/emails/${id}`, { method: 'DELETE' }),
+    },
+    messages: {
+        list: () => request<Message[]>('/messages'),
+        create: (data: Omit<Message, 'id'>) => request<Message>('/messages', { method: 'POST', body: JSON.stringify(data) }),
+        update: (id: string, data: Partial<Message>) => request<Message>(`/messages/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+        delete: (id: string) => request<{ success: boolean }>(`/messages/${id}`, { method: 'DELETE' }),
     },
     services: {
         list: () => request<Service[]>('/services'),
