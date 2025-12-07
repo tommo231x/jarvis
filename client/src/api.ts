@@ -101,6 +101,6 @@ export const api = {
         delete: (id: string) => request<{ success: boolean }>(`/projects/${id}`, { method: 'DELETE' }),
     },
     ai: {
-        query: (query: string) => request<{ answer: string }>('/ai/query', { method: 'POST', body: JSON.stringify({ query }) }),
+        query: (query: string) => request<{ answer: string; commands?: import('./types/aiCommands').AICommand[] }>('/ai/query', { method: 'POST', body: JSON.stringify({ query }) }),
     }
 };

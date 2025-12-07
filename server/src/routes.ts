@@ -142,9 +142,26 @@ router.post('/ai/query', async (req, res) => {
         const systemPrompt = `
       You are an intelligent assistant for a personal "Identity & Services Command Center".
       You have access to the user's data (Emails, Services, Projects) in JSON format.
-      Answer the user's question based strictly on this data.
-      If you cannot find the answer in the data, say so.
-      Be concise and direct.
+      
+      Your goal is to:
+      1. Answer the user's question based strictly on this data if applicable.
+      2. If the user asks to perform an action (create, add, update, etc.), generate a structured command object.
+      
+      Supported Commands:
+      - create_identity: { name, type, description }
+      - add_task: { title, dueDate, notes }
+      - add_subscription: { name, amount, currency, frequency, nextBillingDate }
+      - add_service: { name, category, url, notes }
+      - add_admin_link: { label, url, category, notes }
+      - complete_task: { taskTitle, taskId }
+
+      Respond with a JSON object ONLY:
+      {
+        "answer": "Natural language response here",
+        "commands": [ ...list of command objects or empty array... ]
+      }
+      
+      For commands, always try to infer 'identityName' if mentioned (e.g. "for my Studio identity").
       
       Data Context:
       ${JSON.stringify(context, null, 2)}
@@ -156,10 +173,22 @@ router.post('/ai/query', async (req, res) => {
                 { role: 'user', content: query }
             ],
             model: 'gpt-3.5-turbo', // Or gpt-4 if preferred/available
+            response_format: { type: "json_object" }
         });
 
-        const answer = completion.choices[0].message.content;
-        res.json({ answer });
+        const content = completion.choices[0].message.content;
+        let responseData = { answer: "Failed to parse response", commands: [] };
+
+        try {
+            if (content) {
+                responseData = JSON.parse(content);
+            }
+        } catch (e) {
+            console.error("Failed to parse LLM JSON", e);
+            responseData = { answer: content || "Error processing", commands: [] };
+        }
+
+        res.json(responseData);
 
     } catch (error: any) {
         console.error('AI Error:', error);
