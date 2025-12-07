@@ -70,18 +70,17 @@ router.get('/status/openai', async (req, res) => {
 
     try {
         const start = Date.now();
-        // the newest OpenAI model is "gpt-5.1" which was released after gpt-5
         const testCompletion = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: 'gpt-5.1',
             messages: [{ role: 'user', content: 'Hello' }],
-            max_tokens: 5
+            max_completion_tokens: 50
         });
         const latency = Date.now() - start;
         res.json({ 
             status: 'connected', 
             latency, 
             provider,
-            model: 'gpt-4o-mini'
+            model: testCompletion.model || 'gpt-5.1'
         });
     } catch (error: any) {
         console.error('OpenAI Status Check Failed:', error.message);
@@ -183,15 +182,14 @@ router.post('/ai/query', async (req, res) => {
 
         const finalPrompt = IDENTITY_AGENT_SYSTEM_PROMPT + `\n\nData Context:\n${JSON.stringify(context, null, 2)}`;
 
-        // Use gpt-4o-mini for AI queries (fast and cost-effective)
         const completion = await openai.chat.completions.create({
             messages: [
                 { role: 'system', content: finalPrompt },
                 { role: 'user', content: query }
             ],
-            model: 'gpt-4o-mini',
+            model: 'gpt-5.1',
             response_format: { type: "json_object" },
-            max_tokens: 4096
+            max_completion_tokens: 4096
         });
 
         const content = completion.choices[0].message.content;

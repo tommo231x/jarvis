@@ -34,7 +34,7 @@ A personal "Internal Tools" application designed to manage digital identity, sub
 The server requires the following environment variables:
 - `PORT`: Server port (default: 3001 in dev, 5000 in production)
 - `JWT_SECRET`: Secret key for JWT authentication
-- `JARVIS_OPENAI_API_KEY`: Custom OpenAI API key for AI features (uses gpt-4o-mini model)
+- `JARVIS_OPENAI_API_KEY`: Custom OpenAI API key for AI features (uses gpt-5.1 model)
 
 ### Running Locally
 The application runs on:

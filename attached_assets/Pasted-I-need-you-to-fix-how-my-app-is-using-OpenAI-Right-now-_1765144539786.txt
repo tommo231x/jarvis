@@ -1,0 +1,55 @@
+I need you to fix how my app is using OpenAI.
+
+Right now, the Command Center shows:
+
+Provider: OpenAI Direct (Jarvis)
+Model: gpt-4o-mini
+Latency: ~xxx ms
+
+I don’t want to use gpt-4o-mini as the default model. I want this app to use gpt-5.1 as the main model everywhere it talks to OpenAI.
+
+Please do ALL of the following:
+
+Backend – force GPT-5.1 as the model
+
+Find every place in the server code where we call the OpenAI client (chat/completions or similar).
+
+Explicitly set the model field to "gpt-5.1" in those requests.
+
+Do NOT rely on any Replit default. I want the model name hard-set to "gpt-5.1" in our code, not implied.
+
+Make sure it still uses process.env.OPENAI_API_KEY for the key (I’ve set this in Replit Secrets already).
+
+Backend – expose the actual model in the health/status API
+
+In whatever route the Command Center is using to display the API status (the one that shows Provider / Model / Latency), update the response so it includes the actual model name returned by OpenAI, not a hardcoded string.
+
+The JSON returned by the API should contain a model field that reflects "gpt-5.1" (or whatever model is actually being used by the OpenAI client).
+
+Frontend – update the Command Center card
+
+Update the Command Center “OpenAI connection” card so that the Model line is rendered from the backend response (the model field), not hardcoded.
+
+Keep the same visual design and style that is already there. Just change where the model text comes from.
+
+After your changes, the card should show something like:
+
+Provider: OpenAI Direct (Jarvis)
+
+Model: gpt-5.1
+
+Latency: ~XXX ms
+
+Don’t break anything else
+
+Do not change any other behaviour of the app.
+
+Keep the existing Connected APIs / Command Center layout and styles as they are, just wire it to GPT-5.1 and the correct model label.
+
+When you’re done, please:
+
+Confirm which files you changed (server + client).
+
+Confirm the exact model string being used (it should be "gpt-5.1").
+
+Confirm that the Command Center now shows the correct model name from the backend.
