@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Identity } from '../types/identity';
+import { Identity, IdentityModule } from '../types/identity';
 import { v4 as uuidv4 } from 'uuid';
-import { DEFAULT_MODULE_CONFIGS } from '../constants/moduleRegistry';
+import { CORE_MODULE_DEFINITIONS } from '../config/identityModules';
 
 interface IdentityContextType {
     identities: Identity[];
@@ -22,6 +22,16 @@ export const useIdentity = () => {
 interface IdentityProviderProps {
     children: ReactNode;
 }
+
+// Helper to generate full module objects for a new identity
+const buildDefaultModulesForIdentity = (): IdentityModule[] => {
+    return Object.values(CORE_MODULE_DEFINITIONS)
+        .sort((a, b) => a.order - b.order)
+        .map(def => ({
+            ...def,
+            id: uuidv4(),
+        }));
+};
 
 export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) => {
     const [identities, setIdentities] = useState<Identity[]>([]);
@@ -44,7 +54,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) 
                 description: 'My personal identity space',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-                modules: DEFAULT_MODULE_CONFIGS
+                modules: buildDefaultModulesForIdentity()
             };
             setIdentities([defaultIdentity]);
             localStorage.setItem('jarvis_identities', JSON.stringify([defaultIdentity]));
@@ -64,7 +74,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) 
             id: uuidv4(),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            modules: DEFAULT_MODULE_CONFIGS,
+            modules: buildDefaultModulesForIdentity(),
         };
         setIdentities((prev) => [...prev, newIdentity]);
     };

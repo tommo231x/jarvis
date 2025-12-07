@@ -1,7 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useIdentity } from '../../context/IdentityContext';
 import { ArrowLeft, Settings } from 'lucide-react';
-import { MODULE_REGISTRY } from '../../constants/moduleRegistry';
 import ModuleCard from '../../components/identity/ModuleCard';
 
 const IdentityDashboard = () => {
@@ -17,6 +16,8 @@ const IdentityDashboard = () => {
             </div>
         );
     }
+
+    const activeModules = identity.modules ? [...identity.modules].sort((a, b) => a.order - b.order) : [];
 
     return (
         <div className="p-8 max-w-7xl mx-auto">
@@ -52,25 +53,18 @@ const IdentityDashboard = () => {
             {/* Dynamic Module Grid */}
             <h2 className="text-xl font-semibold text-white mb-6">Active Modules</h2>
 
-            {(!identity.modules || identity.modules.length === 0) ? (
+            {activeModules.length === 0 ? (
                 <div className="p-12 text-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/20">
-                    <p className="text-gray-500">No modules configured for this identity.</p>
+                    <p className="text-gray-500">No modules configured for this identity. Core modules will see appear here.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {identity.modules
-                        .sort((a, b) => a.order - b.order)
-                        .map((config) => {
-                            const definition = MODULE_REGISTRY[config.key];
-                            if (!definition) return null;
-                            return (
-                                <ModuleCard
-                                    key={config.key}
-                                    definition={definition}
-                                    config={config}
-                                />
-                            );
-                        })}
+                    {activeModules.map((module) => (
+                        <ModuleCard
+                            key={module.id}
+                            module={module}
+                        />
+                    ))}
                 </div>
             )}
         </div>

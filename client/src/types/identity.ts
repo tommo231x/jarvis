@@ -1,18 +1,15 @@
 export type IdentityType = 'personal' | 'business' | 'project' | 'other';
-export type ModuleStatus = 'planned' | 'active' | 'beta' | 'deprecated';
+export type IdentityModuleStatus = 'planned' | 'active' | 'disabled';
 
-export interface ModuleDefinition {
-    key: string;
-    name: string;
-    category: 'communication' | 'billing' | 'productivity' | 'admin' | 'other';
-    description: string;
-    defaultStatus: ModuleStatus;
-}
-
-export interface IdentityModuleConfig {
-    key: string; // References ModuleDefinition.key
+export interface IdentityModule {
+    id: string;              // unique per identity
+    key: string;             // stable key, e.g. "email", "subscriptions", "services", "tasks", "adminLinks"
+    name: string;            // human label for the card
+    category: 'communication' | 'billing' | 'productivity' | 'navigation' | 'other';
+    description?: string;    // short text shown in the UI
+    status: IdentityModuleStatus;
     enabled: boolean;
-    order: number;
+    order: number;           // for layout ordering
 }
 
 export interface Identity {
@@ -23,5 +20,5 @@ export interface Identity {
     type: IdentityType;
     createdAt: string; // ISO Date string
     updatedAt: string; // ISO Date string
-    modules: IdentityModuleConfig[];
+    modules: IdentityModule[];
 }
