@@ -1,6 +1,8 @@
 import { useParams, Link } from 'react-router-dom';
 import { useIdentity } from '../../context/IdentityContext';
-import { ArrowLeft, Settings, LayoutGrid, Mail, Calendar } from 'lucide-react';
+import { ArrowLeft, Settings } from 'lucide-react';
+import { MODULE_REGISTRY } from '../../constants/moduleRegistry';
+import ModuleCard from '../../components/identity/ModuleCard';
 
 const IdentityDashboard = () => {
     const { id } = useParams<{ id: string }>();
@@ -47,29 +49,30 @@ const IdentityDashboard = () => {
                 </div>
             </div>
 
-            {/* Placeholder Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Dynamic Module Grid */}
+            <h2 className="text-xl font-semibold text-white mb-6">Active Modules</h2>
 
-                {/* Placeholder Module Blocks */}
-                <div className="col-span-1 md:col-span-2 lg:col-span-2 p-8 rounded-2xl border border-dashed border-gray-800 bg-gray-900/20 min-h-[300px] flex flex-col items-center justify-center text-gray-600">
-                    <LayoutGrid size={48} className="mb-4 opacity-50" />
-                    <h3 className="text-lg font-medium mb-2">Main Activity Feed</h3>
-                    <p className="text-sm">Future module injection point</p>
+            {(!identity.modules || identity.modules.length === 0) ? (
+                <div className="p-12 text-center rounded-2xl border border-dashed border-gray-800 bg-gray-900/20">
+                    <p className="text-gray-500">No modules configured for this identity.</p>
                 </div>
-
-                <div className="p-8 rounded-2xl border border-dashed border-gray-800 bg-gray-900/20 min-h-[200px] flex flex-col items-center justify-center text-gray-600">
-                    <Mail size={32} className="mb-3 opacity-50" />
-                    <h3 className="text-base font-medium">Messages / Email</h3>
-                    <p className="text-xs mt-1">Future module</p>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {identity.modules
+                        .sort((a, b) => a.order - b.order)
+                        .map((config) => {
+                            const definition = MODULE_REGISTRY[config.key];
+                            if (!definition) return null;
+                            return (
+                                <ModuleCard
+                                    key={config.key}
+                                    definition={definition}
+                                    config={config}
+                                />
+                            );
+                        })}
                 </div>
-
-                <div className="p-8 rounded-2xl border border-dashed border-gray-800 bg-gray-900/20 min-h-[200px] flex flex-col items-center justify-center text-gray-600">
-                    <Calendar size={32} className="mb-3 opacity-50" />
-                    <h3 className="text-base font-medium">Calendar / Tasks</h3>
-                    <p className="text-xs mt-1">Future module</p>
-                </div>
-
-            </div>
+            )}
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Identity } from '../types/identity';
 import { v4 as uuidv4 } from 'uuid';
+import { DEFAULT_MODULE_CONFIGS } from '../constants/moduleRegistry';
 
 interface IdentityContextType {
     identities: Identity[];
@@ -43,7 +44,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) 
                 description: 'My personal identity space',
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-                modules: []
+                modules: DEFAULT_MODULE_CONFIGS
             };
             setIdentities([defaultIdentity]);
             localStorage.setItem('jarvis_identities', JSON.stringify([defaultIdentity]));
@@ -63,7 +64,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) 
             id: uuidv4(),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            modules: [],
+            modules: DEFAULT_MODULE_CONFIGS,
         };
         setIdentities((prev) => [...prev, newIdentity]);
     };
