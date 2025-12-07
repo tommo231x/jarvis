@@ -77,10 +77,30 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     return response.json();
 }
 
+export interface Message {
+    id: string;
+    from: string;
+    to: string;
+    subject: string;
+    body: string;
+    date: string;
+    category: 'transactional' | 'security' | 'financial' | 'marketing' | 'social' | 'work' | 'personal' | 'spam';
+    priority: 'high' | 'medium' | 'low';
+    read: boolean;
+    flags?: string[];
+    attachments?: string[];
+}
+
 export const api = {
     auth: {
         login: (data: any) => request<any>('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
         register: (data: any) => request<any>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+    },
+    messages: {
+        list: () => request<Message[]>('/messages'),
+        create: (data: Omit<Message, 'id'>) => request<Message>('/messages', { method: 'POST', body: JSON.stringify(data) }),
+        update: (id: string, data: Partial<Message>) => request<Message>(`/messages/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+        delete: (id: string) => request<{ success: boolean }>(`/messages/${id}`, { method: 'DELETE' }),
     },
     emails: {
         list: () => request<Email[]>('/emails'),
