@@ -54,6 +54,28 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: false
 });
 
+// --- Status Checks ---
+router.get('/status/openai', async (req, res) => {
+    // 1. Check for configuration first
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey || apiKey === 'mock-key') {
+        return res.json({ status: 'not_configured' });
+    }
+
+    try {
+        const start = Date.now();
+        // Lightweight check: list models (limit 1 to be fast if possible, or just list)
+        await openai.models.list();
+        const latency = Date.now() - start;
+        res.json({ status: 'connected', latency });
+    } catch (error: any) {
+        console.error('OpenAI Status Check Failed:', error.message);
+        // Distinguish between auth errors (configured but wrong key) and other errors if needed, 
+        // but for now any failure with a present key is 'error' (Configured but failing).
+        res.json({ status: 'error', error: error.message });
+    }
+});
+
 // --- Emails ---
 router.get('/emails', async (req, res) => {
     const emails = await db.collection<Email>('emails').find();
