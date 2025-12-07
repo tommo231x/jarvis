@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { IdentityProvider } from './context/IdentityContext';
+import { ModuleDataProvider } from './context/ModuleDataContext';
 import { Login } from './pages/Login';
 import { Layout } from './components/Layout';
 import { HomePage } from './pages/Home';
@@ -23,33 +24,35 @@ function App() {
     return (
         <AuthProvider>
             <IdentityProvider>
-                <Router>
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
+                <ModuleDataProvider>
+                    <Router>
+                        <Routes>
+                            <Route path="/login" element={<Login />} />
 
-                        <Route path="/*" element={
-                            <PrivateRoute>
-                                <Layout>
-                                    <Routes>
-                                        <Route path="/" element={<HomePage />} />
+                            <Route path="/*" element={
+                                <PrivateRoute>
+                                    <Layout>
+                                        <Routes>
+                                            <Route path="/" element={<HomePage />} />
 
-                                        {/* Identity System Routes */}
-                                        <Route path="/identities" element={<IdentityHome />} />
-                                        <Route path="/identities/create" element={<CreateIdentity />} />
-                                        <Route path="/identities/:id" element={<IdentityDashboard />} />
+                                            {/* Identity System Routes */}
+                                            <Route path="/identities" element={<IdentityHome />} />
+                                            <Route path="/identities/create" element={<CreateIdentity />} />
+                                            <Route path="/identities/:id" element={<IdentityDashboard />} />
 
-                                        {/* Legacy/Existing Routes - Keeping /apps/identity as alias to IdentityHome if needed, or removing if replaced */}
-                                        <Route path="/apps/identity" element={<IdentityHome />} />
-                                        <Route path="/apps/identity/emails" element={<EmailsList />} />
-                                        <Route path="/apps/identity/services" element={<ServicesList />} />
-                                        <Route path="/apps/identity/projects" element={<ProjectsList />} />
-                                        <Route path="/apps/identity/ai" element={<AIQuery />} />
-                                    </Routes>
-                                </Layout>
-                            </PrivateRoute>
-                        } />
-                    </Routes>
-                </Router>
+                                            {/* Legacy/Existing Routes - Keeping /apps/identity as alias to IdentityHome if needed, or removing if replaced */}
+                                            <Route path="/apps/identity" element={<IdentityHome />} />
+                                            <Route path="/apps/identity/emails" element={<EmailsList />} />
+                                            <Route path="/apps/identity/services" element={<ServicesList />} />
+                                            <Route path="/apps/identity/projects" element={<ProjectsList />} />
+                                            <Route path="/apps/identity/ai" element={<AIQuery />} />
+                                        </Routes>
+                                    </Layout>
+                                </PrivateRoute>
+                            } />
+                        </Routes>
+                    </Router>
+                </ModuleDataProvider>
             </IdentityProvider>
         </AuthProvider>
     );

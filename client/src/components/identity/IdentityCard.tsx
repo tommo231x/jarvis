@@ -18,30 +18,30 @@ const IdentityCard: React.FC<IdentityCardProps> = ({ identity }) => {
     };
 
     return (
-        <Link to={`/identities/${identity.id}`} className="block">
-            <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 hover:bg-gray-800/80 hover:border-gray-600 transition-all duration-300 group">
-                <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-gray-900/50 rounded-lg group-hover:scale-105 transition-transform duration-300">
+        <Link to={`/identities/${identity.id}`} className="block h-full">
+            <div className="bg-[#111] border border-white/5 rounded-2xl p-6 hover:bg-[#161616] hover:border-white/10 transition-all duration-300 group h-full flex flex-col shadow-lg">
+                <div className="flex items-start justify-between mb-6">
+                    <div className="p-3 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-white/5 group-hover:scale-105 transition-transform duration-300 shadow-inner">
                         {identity.avatarUrl ? (
-                            <img src={identity.avatarUrl} alt={identity.name} className="w-6 h-6 rounded-full object-cover" />
+                            <img src={identity.avatarUrl} alt={identity.name} className="w-8 h-8 rounded-full object-cover" />
                         ) : (
                             getIcon()
                         )}
                     </div>
-                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{identity.type}</span>
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest border border-gray-800 rounded-full px-2 py-1">{identity.type}</span>
                 </div>
 
-                <h3 className="text-lg font-semibold text-white mb-2">{identity.name}</h3>
+                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">{identity.name}</h3>
 
                 {identity.description && (
-                    <p className="text-sm text-gray-400 line-clamp-2 mb-4">
+                    <p className="text-sm text-gray-400 line-clamp-2 mb-6 leading-relaxed flex-1">
                         {identity.description}
                     </p>
                 )}
 
-                <div className="mt-4 pt-4 border-t border-gray-700/30 flex items-center justify-between text-xs text-gray-500">
+                <div className="pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500 mt-auto">
                     <span>Updated {new Date(identity.updatedAt).toLocaleDateString()}</span>
-                    <span className="group-hover:text-blue-400 transition-colors">Open Dashboard →</span>
+                    <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
                 </div>
             </div>
         </Link>

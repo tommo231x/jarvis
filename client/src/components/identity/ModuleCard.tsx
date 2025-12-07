@@ -1,54 +1,61 @@
 import React from 'react';
 import { IdentityModule } from '../../types/identity';
 import { Mail, Briefcase, Calendar, Shield, CreditCard, LayoutGrid } from 'lucide-react';
+import EmailModule from './modules/EmailModule';
+import ServicesModule from './modules/ServicesModule';
+import SubscriptionsModule from './modules/SubscriptionsModule';
+import TasksModule from './modules/TasksModule';
+import AdminLinksModule from './modules/AdminLinksModule';
 
 interface ModuleCardProps {
     module: IdentityModule;
+    identityId: string;
 }
 
-const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
+const ModuleCard: React.FC<ModuleCardProps> = ({ module, identityId }) => {
     const getIcon = () => {
         switch (module.key) {
-            case 'email': return <Mail size={24} className="text-blue-400" />;
-            case 'services': return <Briefcase size={24} className="text-orange-400" />;
-            case 'subscriptions': return <CreditCard size={24} className="text-green-400" />;
-            case 'tasks': return <Calendar size={24} className="text-purple-400" />;
-            case 'adminLinks': return <Shield size={24} className="text-red-400" />;
-            default: return <LayoutGrid size={24} className="text-gray-400" />;
+            case 'email': return <Mail size={20} className="text-blue-400" />;
+            case 'services': return <Briefcase size={20} className="text-orange-400" />;
+            case 'subscriptions': return <CreditCard size={20} className="text-green-400" />;
+            case 'tasks': return <Calendar size={20} className="text-purple-400" />;
+            case 'adminLinks': return <Shield size={20} className="text-red-400" />;
+            default: return <LayoutGrid size={20} className="text-gray-400" />;
         }
     };
 
-    const statusColors = {
-        planned: 'bg-gray-800 text-gray-500 border-gray-700',
-        active: 'bg-green-900/30 text-green-400 border-green-800',
-        disabled: 'bg-red-900/30 text-red-400 border-red-800',
+    const renderModuleContent = () => {
+        switch (module.key) {
+            case 'email': return <EmailModule identityId={identityId} />;
+            case 'services': return <ServicesModule identityId={identityId} />;
+            case 'subscriptions': return <SubscriptionsModule identityId={identityId} />;
+            case 'tasks': return <TasksModule identityId={identityId} />;
+            case 'adminLinks': return <AdminLinksModule identityId={identityId} />;
+            default: return <p className="text-gray-500">Module content not found.</p>;
+        }
     };
 
     return (
         <div className={`
-      relative rounded-xl overflow-hidden border transition-all duration-300
+      relative rounded-xl overflow-hidden border transition-all duration-300 flex flex-col h-full
       ${module.enabled
-                ? 'bg-gray-900/40 border-gray-800 hover:border-gray-700'
+                ? 'bg-[#0a0a0a] border-white/5 hover:border-white/10 shadow-lg shadow-black/50'
                 : 'bg-gray-950/20 border-gray-800/50 opacity-60'}
     `}>
-            <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-gray-900 rounded-lg border border-gray-800">
+            <div className="p-5 flex-1 flex flex-col">
+                <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/5">
+                    <div className="p-2 bg-white/5 rounded-lg border border-white/5">
                         {getIcon()}
                     </div>
-
-                    <div className={`px-2 py-0.5 rounded text-xs font-medium border uppercase tracking-wider ${statusColors[module.status]}`}>
-                        {module.status}
+                    <div>
+                        <h3 className="text-base font-semibold text-gray-200 leading-tight">{module.name}</h3>
+                        <p className="text-xs text-gray-500">{module.category}</p>
                     </div>
                 </div>
 
-                <h3 className="text-lg font-bold text-gray-200 mb-2">{module.name}</h3>
-                <p className="text-sm text-gray-500 mb-6 min-h-[40px]">{module.description}</p>
-
                 {module.enabled ? (
-                    <div className="p-4 rounded-lg bg-gray-950/50 border border-dashed border-gray-800/50 text-center">
-                        <span className="text-xs text-gray-600 block mb-1">Module Content</span>
-                        <span className="text-sm text-gray-500 font-medium">Coming Soon in Stage 3</span>
+                    <div className="flex-1">
+                        {renderModuleContent()}
                     </div>
                 ) : (
                     <div className="p-4 text-center">
