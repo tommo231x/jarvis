@@ -13,6 +13,7 @@ import { ProjectsList } from './pages/identity/ProjectsList';
 import { AIQuery } from './pages/identity/AIQuery';
 import CreateIdentity from './pages/identity/CreateIdentity';
 import IdentityDashboard from './pages/identity/IdentityDashboard';
+import ChatWidget from './components/ChatWidget/ChatWidget';
 import './App.css'
 
 const PrivateRoute = ({ children }: { children: ReactNode }) => {
@@ -51,6 +52,7 @@ function App() {
                                 </PrivateRoute>
                             } />
                         </Routes>
+                        <ChatWidget />
                     </Router>
                 </ModuleDataProvider>
             </IdentityProvider>

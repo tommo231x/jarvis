@@ -1,0 +1,213 @@
+please do the following exactly:
+
+1. Create a new folder:
+client/src/components/ChatWidget/
+
+2. Create the file
+
+client/src/components/ChatWidget/ChatBubble.tsx
+with this content:
+
+import React from "react";
+
+interface ChatBubbleProps {
+  onClick: () => void;
+}
+
+const ChatBubble: React.FC<ChatBubbleProps> = ({ onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-500 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all"
+      aria-label="Open Jarvis Chat"
+    >
+      💬
+    </button>
+  );
+};
+
+export default ChatBubble;
+
+3. Create the file
+
+client/src/components/ChatWidget/ChatWindow.tsx
+with this content:
+
+import React from "react";
+
+interface Message {
+  sender: "user" | "jarvis";
+  text: string;
+}
+
+interface ChatWindowProps {
+  isOpen: boolean;
+  onClose: () => void;
+  messages: Message[];
+  input: string;
+  onInputChange: (v: string) => void;
+  onSend: () => void;
+}
+
+const ChatWindow: React.FC<ChatWindowProps> = ({
+  isOpen,
+  onClose,
+  messages,
+  input,
+  onInputChange,
+  onSend,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed bottom-24 right-6 w-80 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="px-4 py-3 bg-slate-800 text-white flex justify-between items-center">
+        <span className="font-semibold">Jarvis Assistant</span>
+        <button
+          onClick={onClose}
+          className="text-white hover:text-slate-300 transition"
+        >
+          ▾
+        </button>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 p-4 overflow-y-auto space-y-3">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`max-w-[85%] px-3 py-2 rounded-xl ${
+              msg.sender === "user"
+                ? "ml-auto bg-blue-600 text-white"
+                : "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white"
+            }`}
+          >
+            {msg.text}
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="p-3 border-t border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => onInputChange(e.target.value)}
+          className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
+          placeholder="Ask Jarvis something…"
+        />
+        <button
+          onClick={onSend}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition"
+        >
+          Send
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ChatWindow;
+
+4. Create the file
+
+client/src/components/ChatWidget/ChatWidget.tsx
+with this content:
+
+import React, { useState } from "react";
+import ChatBubble from "./ChatBubble";
+import ChatWindow from "./ChatWindow";
+
+interface Message {
+  sender: "user" | "jarvis";
+  text: string;
+}
+
+const ChatWidget: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    const userMsg: Message = { sender: "user", text: input };
+    setMessages((prev) => [...prev, userMsg]);
+
+    const query = input;
+    setInput("");
+
+    try {
+      const response = await fetch("/api/ai/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+
+      const data = await response.json();
+      const answer = data?.answer || "I didn't understand that.";
+
+      const jarvisMsg: Message = { sender: "jarvis", text: answer };
+      setMessages((prev) => [...prev, jarvisMsg]);
+
+    } catch (err) {
+      const errorMsg: Message = {
+        sender: "jarvis",
+        text: "There was an error contacting the Jarvis AI service.",
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    }
+  };
+
+  return (
+    <>
+      <ChatBubble onClick={() => setIsOpen(true)} />
+
+      <ChatWindow
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        messages={messages}
+        input={input}
+        onInputChange={setInput}
+        onSend={handleSend}
+      />
+    </>
+  );
+};
+
+export default ChatWidget;
+
+5. Now insert the widget into the global UI
+
+Open the file:
+
+client/src/main.tsx
+
+
+OR (if the layout is separate):
+
+client/src/App.tsx
+
+
+Add this line inside the main component’s return:
+
+import ChatWidget from "./components/ChatWidget/ChatWidget";
+
+
+And add the component at the bottom of the layout:
+
+<ChatWidget />
+
+6. Save everything and rebuild.
+
+This creates:
+
+A floating chat bubble
+
+A minimisable Jarvis chat window
+
+Tailwind-styled UI matching your app
+
+Full GPT-5.1 integration
+
+A consistent, app-wide assistant
