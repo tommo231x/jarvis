@@ -20,7 +20,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api', (req, res, next) => {
-    if (req.path.startsWith('/auth')) {
+    if (req.path.startsWith('/auth') || req.path.startsWith('/status')) {
         return next();
     }
     authenticateToken(req, res, next);

@@ -31,10 +31,10 @@ A personal "Internal Tools" application designed to manage digital identity, sub
 ## Development Setup
 
 ### Environment Variables
-The server requires the following environment variables in `server/.env`:
-- `PORT`: Server port (default: 3001)
+The server requires the following environment variables:
+- `PORT`: Server port (default: 3001 in dev, 5000 in production)
 - `JWT_SECRET`: Secret key for JWT authentication
-- `OPENAI_API_KEY`: OpenAI API key (optional, only needed for AI features)
+- `JARVIS_OPENAI_API_KEY`: Custom OpenAI API key for AI features (uses gpt-4o-mini model)
 
 ### Running Locally
 The application runs on:
@@ -64,3 +64,7 @@ For production deployment:
 - Added static file serving for production deployment
 - Set up deployment configuration for autoscale
 - Created workflow to run both frontend and backend concurrently
+- Configured JARVIS_OPENAI_API_KEY for custom OpenAI integration
+- Fixed Vite proxy to use IPv6 address (::1) for backend connection
+- Added /status endpoints as public (no auth required) for API monitoring
+- Added API Connections monitoring card to Command Center dashboard

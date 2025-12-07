@@ -35,7 +35,7 @@ export default defineConfig({
         strictPort: true,
         allowedHosts: true,
         proxy: {
-            '/api': 'http://localhost:3001'
+            '/api': 'http://[::1]:3001'
         }
     }
 })
