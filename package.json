@@ -10,5 +10,8 @@
         "build:server": "cd server && npm run build",
         "build": "npm run build:client && npm run build:server",
         "start": "cd server && NODE_ENV=production node dist/index.js"
+    },
+    "dependencies": {
+        "openai": "^6.10.0"
     }
 }
