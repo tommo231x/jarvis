@@ -1,6 +1,7 @@
 
 import { useIdentity } from '../../context/IdentityContext';
 import IdentityCard from '../../components/identity/IdentityCard';
+import IdentityGlobalWidgets from '../../components/identity/IdentityGlobalWidgets';
 import { Plus, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -33,6 +34,9 @@ const IdentityHome = () => {
                         <span>New Identity</span>
                     </Link>
                 </div>
+
+                {/* NEW: Global widgets */}
+                <IdentityGlobalWidgets />
 
                 {identities.length === 0 ? (
                     <div className="text-center py-32 bg-gray-900/20 rounded-3xl border border-dashed border-white/10">
