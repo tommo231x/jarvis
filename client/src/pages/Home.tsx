@@ -3,8 +3,17 @@ import { api } from '../api';
 import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
-import { Shield, CreditCard, Folder, ArrowRight, LayoutGrid, Bot } from 'lucide-react';
+import { Shield, CreditCard, Folder, ArrowRight, LayoutGrid, Bot, Zap, CheckCircle, XCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+interface ApiConnection {
+    name: string;
+    status: 'connected' | 'not_configured' | 'error' | 'loading';
+    latency?: number;
+    provider?: string;
+    model?: string;
+    error?: string;
+}
 
 export const HomePage = () => {
     const [stats, setStats] = useState({
@@ -13,6 +22,33 @@ export const HomePage = () => {
         serviceCount: 0,
         isLoading: true
     });
+
+    const [apiConnections, setApiConnections] = useState<ApiConnection[]>([
+        { name: 'OpenAI', status: 'loading' }
+    ]);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const fetchApiConnections = async () => {
+        setIsRefreshing(true);
+        try {
+            const openaiStatus = await api.status.openai();
+            setApiConnections([{
+                name: 'OpenAI',
+                status: openaiStatus.status,
+                latency: openaiStatus.latency,
+                provider: openaiStatus.provider,
+                model: openaiStatus.model,
+                error: openaiStatus.error
+            }]);
+        } catch (error) {
+            setApiConnections([{
+                name: 'OpenAI',
+                status: 'error',
+                error: 'Failed to check connection'
+            }]);
+        }
+        setIsRefreshing(false);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,6 +80,7 @@ export const HomePage = () => {
         };
 
         fetchData();
+        fetchApiConnections();
     }, []);
 
     return (
@@ -95,6 +132,92 @@ export const HomePage = () => {
                         <Shield className="w-5 h-5" />
                     </div>
                 </Card>
+            </div>
+
+            {/* API Connections Card */}
+            <div className="border-t border-jarvis-border pt-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-white">API Connections</h2>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={fetchApiConnections}
+                        disabled={isRefreshing}
+                        className="gap-2"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {apiConnections.map((connection) => (
+                        <Card key={connection.name} className="p-5">
+                            <div className="flex items-start justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-2 rounded-lg ${
+                                        connection.status === 'connected' 
+                                            ? 'bg-emerald-500/10 text-emerald-400' 
+                                            : connection.status === 'error' 
+                                            ? 'bg-red-500/10 text-red-400'
+                                            : connection.status === 'loading'
+                                            ? 'bg-blue-500/10 text-blue-400'
+                                            : 'bg-amber-500/10 text-amber-400'
+                                    }`}>
+                                        <Zap className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-semibold text-white">{connection.name}</h3>
+                                        {connection.provider && (
+                                            <p className="text-xs text-jarvis-muted">{connection.provider}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    {connection.status === 'connected' && (
+                                        <CheckCircle className="w-5 h-5 text-emerald-400" />
+                                    )}
+                                    {connection.status === 'error' && (
+                                        <XCircle className="w-5 h-5 text-red-400" />
+                                    )}
+                                    {connection.status === 'not_configured' && (
+                                        <AlertCircle className="w-5 h-5 text-amber-400" />
+                                    )}
+                                    {connection.status === 'loading' && (
+                                        <RefreshCw className="w-5 h-5 text-blue-400 animate-spin" />
+                                    )}
+                                </div>
+                            </div>
+                            <div className="mt-4 pt-3 border-t border-jarvis-border">
+                                <div className="flex items-center justify-between">
+                                    <Badge 
+                                        variant={
+                                            connection.status === 'connected' ? 'success' 
+                                            : connection.status === 'error' ? 'danger'
+                                            : connection.status === 'loading' ? 'default'
+                                            : 'outline'
+                                        }
+                                    >
+                                        {connection.status === 'connected' ? 'Connected' 
+                                         : connection.status === 'error' ? 'Error'
+                                         : connection.status === 'loading' ? 'Checking...'
+                                         : 'Not Configured'}
+                                    </Badge>
+                                    {connection.latency && (
+                                        <span className="text-xs text-jarvis-muted">{connection.latency}ms</span>
+                                    )}
+                                </div>
+                                {connection.model && (
+                                    <p className="text-xs text-jarvis-muted mt-2">Model: {connection.model}</p>
+                                )}
+                                {connection.error && (
+                                    <p className="text-xs text-red-400 mt-2 truncate" title={connection.error}>
+                                        {connection.error}
+                                    </p>
+                                )}
+                            </div>
+                        </Card>
+                    ))}
+                </div>
             </div>
 
             <div className="border-t border-jarvis-border pt-6">

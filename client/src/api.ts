@@ -104,6 +104,12 @@ export const api = {
         query: (query: string) => request<{ answer: string; commands?: import('./types/aiCommands').AICommand[] }>('/ai/query', { method: 'POST', body: JSON.stringify({ query }) }),
     },
     status: {
-        openai: () => request<{ status: 'connected' | 'not_configured' | 'error'; latency?: number; error?: string }>('/status/openai'),
+        openai: () => request<{ 
+            status: 'connected' | 'not_configured' | 'error'; 
+            latency?: number; 
+            error?: string;
+            provider?: string;
+            model?: string;
+        }>('/status/openai'),
     }
 };

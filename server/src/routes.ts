@@ -47,32 +47,45 @@ router.post('/auth/login', async (req, res) => {
     }
 });
 
-// Initialize OpenAI
-// Note: Client should ensure OPENAI_API_KEY is in .env
+// Initialize OpenAI - supports both user's own API key or Replit AI Integrations
+// Priority: User's OPENAI_API_KEY > Replit AI Integrations
+const useOwnApiKey = !!process.env.OPENAI_API_KEY;
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'mock-key',
-    dangerouslyAllowBrowser: false
+    baseURL: useOwnApiKey ? undefined : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+    apiKey: useOwnApiKey ? process.env.OPENAI_API_KEY : process.env.AI_INTEGRATIONS_OPENAI_API_KEY
 });
 
 // --- Status Checks ---
 router.get('/status/openai', async (req, res) => {
-    // 1. Check for configuration first
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey || apiKey === 'mock-key') {
-        return res.json({ status: 'not_configured' });
+    const ownApiKey = process.env.OPENAI_API_KEY;
+    const integrationBaseUrl = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+    const integrationApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+    
+    const provider = ownApiKey ? 'OpenAI Direct' : 'Replit AI Integrations';
+    const isConfigured = ownApiKey || (integrationBaseUrl && integrationApiKey);
+    
+    if (!isConfigured) {
+        return res.json({ status: 'not_configured', provider: 'None' });
     }
 
     try {
         const start = Date.now();
-        // Lightweight check: list models (limit 1 to be fast if possible, or just list)
-        await openai.models.list();
+        // the newest OpenAI model is "gpt-5.1" which was released after gpt-5
+        const testCompletion = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [{ role: 'user', content: 'Hello' }],
+            max_tokens: 5
+        });
         const latency = Date.now() - start;
-        res.json({ status: 'connected', latency });
+        res.json({ 
+            status: 'connected', 
+            latency, 
+            provider,
+            model: 'gpt-4o-mini'
+        });
     } catch (error: any) {
         console.error('OpenAI Status Check Failed:', error.message);
-        // Distinguish between auth errors (configured but wrong key) and other errors if needed, 
-        // but for now any failure with a present key is 'error' (Configured but failing).
-        res.json({ status: 'error', error: error.message });
+        res.json({ status: 'error', error: error.message, provider });
     }
 });
 
@@ -170,13 +183,15 @@ router.post('/ai/query', async (req, res) => {
 
         const finalPrompt = IDENTITY_AGENT_SYSTEM_PROMPT + `\n\nData Context:\n${JSON.stringify(context, null, 2)}`;
 
+        // Use gpt-4o-mini for AI queries (fast and cost-effective)
         const completion = await openai.chat.completions.create({
             messages: [
                 { role: 'system', content: finalPrompt },
                 { role: 'user', content: query }
             ],
-            model: 'gpt-3.5-turbo',
-            response_format: { type: "json_object" }
+            model: 'gpt-4o-mini',
+            response_format: { type: "json_object" },
+            max_tokens: 4096
         });
 
         const content = completion.choices[0].message.content;
