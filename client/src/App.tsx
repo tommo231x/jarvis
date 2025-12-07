@@ -49,10 +49,10 @@ function App() {
                                             <Route path="/apps/identity/ai" element={<AIQuery />} />
                                         </Routes>
                                     </Layout>
+                                    <ChatWidget />
                                 </PrivateRoute>
                             } />
                         </Routes>
-                        <ChatWidget />
                     </Router>
                 </ModuleDataProvider>
             </IdentityProvider>
