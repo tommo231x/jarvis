@@ -3,3 +3,15 @@ dist
 .env
 .DS_Store
 *.log
+
+# Build outputs
+client/dist
+server/dist
+
+# Dependencies
+client/node_modules
+server/node_modules
+
+# Environment
+server/.env
+client/.env
