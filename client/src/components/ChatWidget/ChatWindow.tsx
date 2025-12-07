@@ -12,6 +12,7 @@ interface ChatWindowProps {
   input: string;
   onInputChange: (v: string) => void;
   onSend: () => void;
+  isLoading?: boolean;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -21,6 +22,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   input,
   onInputChange,
   onSend,
+  isLoading = false,
 }) => {
   if (!isOpen) return null;
 
@@ -58,14 +60,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         <input
           value={input}
           onChange={(e) => onInputChange(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && !isLoading && onSend()}
           className="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white"
           placeholder="Ask Jarvis something…"
+          disabled={isLoading}
         />
         <button
           onClick={onSend}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition"
+          disabled={isLoading}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed text-white rounded-xl transition"
         >
-          Send
+          {isLoading ? '...' : 'Send'}
         </button>
       </div>
     </div>

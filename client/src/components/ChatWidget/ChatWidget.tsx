@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ChatBubble from "./ChatBubble";
 import ChatWindow from "./ChatWindow";
+import { api } from "../../api";
 
 interface Message {
   sender: "user" | "jarvis";
@@ -11,35 +12,35 @@ const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
     const userMsg: Message = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
 
     const query = input;
     setInput("");
+    setIsLoading(true);
 
     try {
-      const response = await fetch("/api/ai/query", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
-      });
-
-      const data = await response.json();
+      const data = await api.ai.query(query);
       const answer = data?.answer || "I didn't understand that.";
 
       const jarvisMsg: Message = { sender: "jarvis", text: answer };
       setMessages((prev) => [...prev, jarvisMsg]);
 
-    } catch (err) {
+    } catch (err: any) {
       const errorMsg: Message = {
         sender: "jarvis",
-        text: "There was an error contacting the Jarvis AI service.",
+        text: err?.message?.includes("Unauthorized") 
+          ? "Please log in to use the Jarvis AI assistant."
+          : "There was an error contacting the Jarvis AI service.",
       };
       setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -54,6 +55,7 @@ const ChatWidget: React.FC = () => {
         input={input}
         onInputChange={setInput}
         onSend={handleSend}
+        isLoading={isLoading}
       />
     </>
   );
