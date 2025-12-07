@@ -1,6 +1,7 @@
 import express from 'express';
 import { db } from './db';
 import { Email, Project, Service, User } from './models';
+import { IDENTITY_AGENT_SYSTEM_PROMPT } from './prompts/identityAgentSystemPrompt';
 import OpenAI from 'openai';
 import { hashPassword, comparePassword, generateToken } from './auth';
 
@@ -139,73 +140,17 @@ router.post('/ai/query', async (req, res) => {
         };
 
         // 3. Call LLM
-        const systemPrompt = `
-      You are the Identity & Services Intelligence Agent.
-      Your job is to read, classify, map and understand all information the user gives you — especially emails, accounts, services, subscriptions, billing events, providers, login sources and identity details.
-      
-      You create a Unified Identity Map: dynamic, expandable, and self-updating.
-      You ALWAYS prioritise correctness, clarity, and accuracy.
-      
-      CORE PURPOSE:
-      - Detect Accounts, Subscriptions, Services, Providers, Billing sources, Payment cards, Identity links.
-      - Map connections between Email ↔ Provider ↔ Service ↔ Billing ↔ Identity.
-      - Create or update Identity Cards in the user’s Identity Map.
-      - Answer natural-language questions related to this data.
-      
-      THE IDENTITY MAP MODEL (DYNAMIC):
-      - Identity Name
-      - Primary Email(s)
-      - Providers (e.g. Google, Netflix, Amazon)
-      - Services (link to Provider)
-      - Payment Methods
-      - Billing Records
-      
-      DYNAMIC DISPLAY RULES:
-      - NEVER show empty categories.
-      - Show only categories that contain real data.
-      
-      COMMANDS & ACTIONS:
-      If the user requests an action, you must generate structured commands.
-      Supported Commands (generate these in the 'commands' JSON array):
-      - create_identity: { name, type, description }
-      - add_task: { title, dueDate, notes, identityName }
-      - add_subscription: { name, amount, currency, frequency, nextBillingDate, identityName }
-      - add_service: { name, category, url, notes, identityName }
-      - add_admin_link: { label, url, category, notes, identityName }
-      - complete_task: { taskTitle, taskId, identityName }
-      
-      SELF-CORRECTION LOOP:
-      - Start by reasoning about connections.
-      - Check for missing links or contradictions.
-      - Match identities by email or username.
-      
-      OUTPUT FORMAT:
-      You must return a single JSON object:
-      {
-        "answer": "Your natural language response here, formatted as requested below",
-        "commands": [ ...array of command objects... ]
-      }
-      
-      Structure the "answer" string as follows (use Markdown):
-      
-      ACTION SUMMARY:
-      (What you did / analysis)
-      
-      UPDATED IDENTITY MAP:
-      (Only sections that changed or are relevant to the query. Use correct format: Identity Card > Provider > Service)
-      
-      NOTES:
-      (Clarifications, uncertainty, or 'No updates required' if consistent)
-      
-      Now, process the user query based on the Data Context provided below.
-      
-      Data Context:
-      ${JSON.stringify(context, null, 2)}
-    `;
+        const systemPrompt = IDENTITY_AGENT_SYSTEM_PROMPT.replace('${JSON.stringify(context, null, 2)}', JSON.stringify(context, null, 2)) + `\n\nData Context:\n${JSON.stringify(context, null, 2)}`;
+        // Note: The prompt file doesn't have the context placeholder at the bottom by default in the user text, so we append it.
+        // Actually, looking at the user text, it ends with "Never hide uncertainty — always ask."
+        // And my technical override ends with "...return an empty 'commands' array."
+        // I need to make sure the Data Context is appended.
+
+        const finalPrompt = IDENTITY_AGENT_SYSTEM_PROMPT + `\n\nData Context:\n${JSON.stringify(context, null, 2)}`;
 
         const completion = await openai.chat.completions.create({
             messages: [
-                { role: 'system', content: systemPrompt },
+                { role: 'system', content: finalPrompt },
                 { role: 'user', content: query }
             ],
             model: 'gpt-3.5-turbo',
