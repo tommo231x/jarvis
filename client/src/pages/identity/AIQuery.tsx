@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Send, Sparkles } from 'lucide-react';
 import { api } from '../../api';
 import { Button } from '../../components/Button';
@@ -10,7 +10,7 @@ export const AIQuery = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleAsk = async (e: React.FormEvent) => {
+    const handleAsk = async (e: FormEvent) => {
         e.preventDefault();
         if (!query.trim()) return;
 

@@ -34,7 +34,7 @@ export interface Service {
 export interface Project {
     id: string;
     name: string;
-    status: 'active' | 'archived' | 'planning' | 'completed';
+    status: 'active' | 'archived' | 'planning' | 'completed' | 'paused';
     primaryEmailId?: string; // Foreign Key to Email
     serviceIds: string[]; // Foreign Keys to Service
     startDate?: string;

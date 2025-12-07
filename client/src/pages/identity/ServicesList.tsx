@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { Plus, Search, Trash2, Edit2, ExternalLink } from 'lucide-react';
 import { api, Service, Email } from '../../api';
 import { Button } from '../../components/Button';
@@ -6,7 +6,7 @@ import { Input } from '../../components/Input';
 import { clsx } from 'clsx';
 
 // Type guard or default values help with Partial state
-const defaultService: Partial<Service> = { name: '', category: '', subscription: 'none' };
+const defaultService: Partial<Service> = { name: '', category: '', billingCycle: 'none' };
 
 export const ServicesList = () => {
     const [services, setServices] = useState<Service[]>([]);
@@ -43,7 +43,7 @@ export const ServicesList = () => {
         s.category.toLowerCase().includes(search.toLowerCase())
     );
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         try {
             if (editingId) {
@@ -111,8 +111,8 @@ export const ServicesList = () => {
                             <label className="block text-sm font-medium text-slate-400 mb-1">Subscription</label>
                             <select
                                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white"
-                                value={formData.subscription || 'none'}
-                                onChange={e => setFormData({ ...formData, subscription: e.target.value as any })}
+                                value={formData.billingCycle || 'none'}
+                                onChange={e => setFormData({ ...formData, billingCycle: e.target.value as any })}
                             >
                                 <option value="none">None / Free</option>
                                 <option value="monthly">Monthly</option>
@@ -174,9 +174,9 @@ export const ServicesList = () => {
                                 <span className="text-slate-500">Plan</span>
                                 <span className={clsx(
                                     "font-medium",
-                                    service.subscription === 'none' ? 'text-slate-400' : 'text-emerald-400'
+                                    service.billingCycle === 'none' ? 'text-slate-400' : 'text-emerald-400'
                                 )}>
-                                    {service.subscription}
+                                    {service.billingCycle}
                                 </span>
                             </div>
                         </div>

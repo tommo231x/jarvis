@@ -30,7 +30,7 @@ export interface Service {
 export interface Project {
     id: string;
     name: string;
-    status: 'active' | 'archived' | 'planning' | 'completed';
+    status: 'active' | 'archived' | 'planning' | 'completed' | 'paused';
     primaryEmailId?: string;
     serviceIds: string[];
     startDate?: string;

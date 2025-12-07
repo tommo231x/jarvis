@@ -1,9 +1,9 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Shield, Home, Mail, Box, Folder, Search, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-export const Layout = ({ children }: { children: React.ReactNode }) => {
+export const Layout = ({ children }: { children: ReactNode }) => {
     const location = useLocation();
     const { logout, user } = useAuth();
 

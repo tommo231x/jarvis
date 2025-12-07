@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { Plus, Search, Trash2, Edit2 } from 'lucide-react';
 import { api, Project, Service, Email } from '../../api';
 import { Button } from '../../components/Button';
@@ -43,7 +43,7 @@ export const ProjectsList = () => {
         p.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         try {
             if (editingId) {

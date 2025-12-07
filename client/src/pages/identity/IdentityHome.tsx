@@ -1,7 +1,38 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Database, CreditCard, Folder, Search } from 'lucide-react';
+import { api } from '../../api';
 
 export const IdentityHome = () => {
+    const [stats, setStats] = useState({
+        serviceCount: 0,
+        activeProjectCount: 0,
+        monthlyCost: 0
+    });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            const [services, projects] = await Promise.all([
+                api.services.list(),
+                api.projects.list()
+            ]);
+
+            const monthlyCost = services.reduce((total, service) => {
+                if (!service.cost || service.status === 'cancelled') return total;
+                if (service.billingCycle === 'monthly') return total + service.cost.amount;
+                if (service.billingCycle === 'yearly') return total + (service.cost.amount / 12);
+                return total;
+            }, 0);
+
+            setStats({
+                serviceCount: services.length,
+                activeProjectCount: projects.filter(p => p.status === 'active').length,
+                monthlyCost
+            });
+        };
+        fetchStats();
+    }, []);
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -32,15 +63,15 @@ export const IdentityHome = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="p-4 bg-slate-800/50 rounded-lg">
                         <div className="text-sm text-slate-500 uppercase tracking-wider mb-1">Total Services</div>
-                        <div className="text-2xl font-bold text-white">--</div>
+                        <div className="text-2xl font-bold text-white">{stats.serviceCount}</div>
                     </div>
                     <div className="p-4 bg-slate-800/50 rounded-lg">
                         <div className="text-sm text-slate-500 uppercase tracking-wider mb-1">Active Projects</div>
-                        <div className="text-2xl font-bold text-white">--</div>
+                        <div className="text-2xl font-bold text-white">{stats.activeProjectCount}</div>
                     </div>
                     <div className="p-4 bg-slate-800/50 rounded-lg">
                         <div className="text-sm text-slate-500 uppercase tracking-wider mb-1">Monthly Cost</div>
-                        <div className="text-2xl font-bold text-emerald-400">$0.00</div>
+                        <div className="text-2xl font-bold text-emerald-400">${stats.monthlyCost.toFixed(2)}</div>
                     </div>
                 </div>
             </div>
