@@ -1,17 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cinematic Color Palette */
+  --color-jarvis-bg: #030014;
+  /* Deep space black/purple */
+  --color-jarvis-card: rgba(13, 13, 30, 0.6);
+  /* Glassy dark panel */
+  --color-jarvis-border: rgba(255, 255, 255, 0.08);
+  /* Subtle glass border */
+
+  --color-jarvis-text: #E2E8F0;
+  /* Slate-200 */
+  --color-jarvis-muted: #94A3B8;
+  /* Slate-400 */
+
+  --color-jarvis-accent: #6366f1;
+  /* Indigo-500 (Primary Brand) */
+  --color-jarvis-secondary: #a855f7;
+  /* Purple-500 (Secondary Brand) */
+
+  --color-jarvis-success: #10B981;
+  --color-jarvis-warning: #F59E0B;
+  --color-jarvis-danger: #EF4444;
+
+  --font-sans: 'Inter', 'system-ui', 'sans-serif';
+
+  --animate-fade-in: fadeIn 0.5s ease-out;
+  --animate-slide-up: slideUp 0.5s ease-out;
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-jarvis-card backdrop-blur-xl border border-jarvis-border shadow-2xl;
+  }
+
+  .glass-button {
+    @apply bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 transition-all duration-200 backdrop-blur-sm;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+
+  .spotlight-gradient {
+    background: radial-gradient(circle at top center, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 50%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Global Reset & Body */
 :root {
-  --primary: #2563eb;
-  --bg-dark: #0f172a;
-  --text-light: #f8fafc;
+  color-scheme: dark;
 }
 
 body {
-  margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-dark);
-  color: var(--text-light);
-  -webkit-font-smoothing: antialiased;
+  @apply bg-jarvis-bg text-jarvis-text font-sans antialiased h-screen overflow-hidden;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.08), transparent 25%);
 }
 
-* {
-  box-sizing: border-box;
+/* Thin Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
 }

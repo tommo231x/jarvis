@@ -1,8 +1,11 @@
 const API_BASE = '/api';
 
+// Alias Email to EmailIdentity for consistency
+export type EmailIdentity = Email;
+
 export interface Email {
     id: string;
-    label: string;
+    label?: string; // Optional now as we might just use address
     address: string;
     provider: 'gmail' | 'outlook' | 'yahoo' | 'proton' | 'icloud' | 'aws' | 'other';
     type: 'personal' | 'work' | 'burner' | 'project';
@@ -19,12 +22,19 @@ export interface Service {
     cost?: {
         amount: number;
         currency: string;
+        period?: 'monthly' | 'yearly' | 'one-time'; // Added period for consistency
     };
     startDate?: string;
     renewalDate?: string;
-    status: 'active' | 'cancelled' | 'trial' | 'past_due';
+    status: 'active' | 'cancelled' | 'paused' | 'trial' | 'past_due'; // Added paused
     loginUrl?: string;
+    username?: string; // Added
+    password?: string; // Added
+    description?: string; // Added
+    icon?: string; // Added
     notes?: string;
+    createdAt?: string; // Added (mock)
+    updatedAt?: string; // Added (mock)
 }
 
 export interface Project {
@@ -37,7 +47,12 @@ export interface Project {
     endDate?: string;
     description?: string;
     notes?: string;
+    repoUrl?: string; // Added
+    docUrl?: string; // Added
+    createdAt?: string; // Added
+    updatedAt?: string; // Added
 }
+
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const token = localStorage.getItem('token');

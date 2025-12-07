@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { LoginPage } from './pages/Login';
+import { Login } from './pages/Login';
 import { Layout } from './components/Layout';
 import { HomePage } from './pages/Home';
 import { IdentityHome } from './pages/identity/IdentityHome';
@@ -21,7 +21,7 @@ function App() {
         <AuthProvider>
             <Router>
                 <Routes>
-                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/login" element={<Login />} />
 
                     <Route path="/*" element={
                         <PrivateRoute>

@@ -1,0 +1,12 @@
+
+> jarvis-client@0.0.0 build
+> tsc && vite build
+
+src/components/Layout.tsx(3,43): error TS6133: 'Search' is declared but its value is never read.
+src/pages/Home.tsx(2,15): error TS6133: 'Service' is declared but its value is never read.
+src/pages/Home.tsx(2,24): error TS6133: 'Project' is declared but its value is never read.
+src/pages/Home.tsx(6,38): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/pages/identity/IdentityHome.tsx(2,33): error TS6133: 'EmailIdentity' is declared but its value is never read.
+src/pages/identity/ProjectsList.tsx(7,85): error TS6133: 'Archive' is declared but its value is never read.
+src/pages/identity/ServicesList.tsx(9,1): error TS6133: 'format' is declared but its value is never read.
+src/pages/identity/ServicesList.tsx(69,11): error TS6133: 'getEmailAddress' is declared but its value is never read.

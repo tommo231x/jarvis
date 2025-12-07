@@ -1,15 +1,20 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+// GLOBAL DEV FLAG
+const DEV_MODE = true;
 
 interface User {
     id: string;
     username: string;
+    email?: string; // Added
+    name?: string; // Added
 }
 
 interface AuthContextType {
     user: User | null;
     token: string | null;
     login: (token: string, user: User) => void;
+    register: (token: string, user: User) => void; // Added for consistency
     logout: () => void;
     isAuthenticated: boolean;
 }
@@ -17,16 +22,18 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(DEV_MODE ? { id: 'dev-admin', username: 'Developer', name: 'Developer', email: 'dev@jarvis.local' } : null);
+    const [token, setToken] = useState<string | null>(DEV_MODE ? 'dev-token-bypass' : null);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        if (!DEV_MODE) {
+            const storedToken = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
 
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+            if (storedToken && storedUser) {
+                setToken(storedToken);
+                setUser(JSON.parse(storedUser));
+            }
         }
     }, []);
 
@@ -37,6 +44,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('user', JSON.stringify(newUser));
     };
 
+    const register = (newToken: string, newUser: User) => {
+        login(newToken, newUser);
+    };
+
     const logout = () => {
         setToken(null);
         setUser(null);
@@ -45,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!token }}>
+        <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated: !!token }}>
             {children}
         </AuthContext.Provider>
     );
@@ -58,3 +69,4 @@ export const useAuth = () => {
     }
     return context;
 };
+

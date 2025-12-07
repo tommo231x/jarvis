@@ -1,32 +1,34 @@
 import { InputHTMLAttributes, forwardRef } from 'react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, label, error, ...props }, ref) => {
+    ({ className = '', label, error, ...props }, ref) => {
         return (
             <div className="w-full">
                 {label && (
-                    <label className="block text-sm font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-jarvis-muted mb-1.5 uppercase tracking-wider">
                         {label}
                     </label>
                 )}
                 <input
                     ref={ref}
-                    className={twMerge(clsx(
-                        "w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
-                        error && "border-red-500 focus:ring-red-500",
-                        className
-                    ))}
+                    className={`
+                        w-full px-4 py-2 bg-jarvis-bg/50 border border-jarvis-border rounded-lg text-sm text-white 
+                        placeholder:text-jarvis-muted/50 focus:outline-none focus:border-jarvis-accent/50 focus:ring-1 focus:ring-jarvis-accent/50 
+                        transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
+                        ${error ? 'border-jarvis-danger focus:border-jarvis-danger focus:ring-jarvis-danger' : ''}
+                        ${className}
+                    `}
                     {...props}
                 />
-                {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+                {error && <p className="mt-1 text-xs text-jarvis-danger">{error}</p>}
             </div>
         );
     }
 );
+
+Input.displayName = 'Input';

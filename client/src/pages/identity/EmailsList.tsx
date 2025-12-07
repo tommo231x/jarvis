@@ -32,7 +32,7 @@ export const EmailsList = () => {
 
     const filtered = emails.filter(e =>
         e.address.toLowerCase().includes(search.toLowerCase()) ||
-        e.label.toLowerCase().includes(search.toLowerCase())
+        (e.label && e.label.toLowerCase().includes(search.toLowerCase()))
     );
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -120,7 +120,7 @@ export const EmailsList = () => {
                         <div>
                             <div className="flex items-start justify-between mb-2">
                                 <span className="text-xs font-semibold px-2 py-1 rounded bg-blue-500/10 text-blue-400">
-                                    {email.label}
+                                    {email.label || 'Unlabeled'}
                                 </span>
                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button onClick={() => startEdit(email)} className="text-slate-400 hover:text-white"><Edit2 size={16} /></button>

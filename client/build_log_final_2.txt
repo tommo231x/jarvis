@@ -1,0 +1,6 @@
+
+> jarvis-client@0.0.0 build
+> tsc && vite build
+
+src/pages/identity/ServicesList.tsx(9,1): error TS6133: 'format' is declared but its value is never read.
+src/pages/identity/ServicesList.tsx(69,11): error TS6133: 'getEmailAddress' is declared but its value is never read.

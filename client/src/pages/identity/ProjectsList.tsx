@@ -1,37 +1,36 @@
-import { useEffect, useState, FormEvent } from 'react';
-import { Plus, Search, Trash2, Edit2 } from 'lucide-react';
-import { api, Project, Service, Email } from '../../api';
+import { useEffect, useState } from 'react';
+import { api, Project } from '../../api';
 import { Button } from '../../components/Button';
+import { Badge } from '../../components/Badge';
 import { Input } from '../../components/Input';
-import { clsx } from 'clsx';
+import { Search, Plus, ExternalLink, MoreHorizontal, Github, Folder, Trash2 } from 'lucide-react';
+import { ProjectForm } from '../../components/identity/ProjectForm';
+import { Service, EmailIdentity } from '../../api';
 
 export const ProjectsList = () => {
     const [projects, setProjects] = useState<Project[]>([]);
-    const [emails, setEmails] = useState<Email[]>([]);
     const [services, setServices] = useState<Service[]>([]);
-
+    const [emails, setEmails] = useState<EmailIdentity[]>([]);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [selectedProject, setSelectedProject] = useState<Project | undefined>(undefined);
     const [search, setSearch] = useState('');
-    const [loading, setLoading] = useState(true);
-
-    const [isEditing, setIsEditing] = useState(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [formData, setFormData] = useState<Partial<Project>>({ name: '', status: 'active', serviceIds: [] });
+    const [isLoading, setIsLoading] = useState(true);
 
     const fetchData = async () => {
-        setLoading(true);
+        setIsLoading(true);
         try {
-            const [pData, eData, sData] = await Promise.all([
+            const [projectsData, servicesData, emailsData] = await Promise.all([
                 api.projects.list(),
-                api.emails.list(),
-                api.services.list()
+                api.services.list(),
+                api.emails.list()
             ]);
-            setProjects(pData);
-            setEmails(eData);
-            setServices(sData);
-        } catch (e) {
-            console.error(e);
+            setProjects(projectsData);
+            setServices(servicesData);
+            setEmails(emailsData);
+        } catch (error) {
+            console.error('Failed to fetch data:', error);
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
@@ -39,170 +38,152 @@ export const ProjectsList = () => {
         fetchData();
     }, []);
 
-    const filtered = projects.filter(p =>
-        p.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const handleEdit = (project: Project) => {
+        setSelectedProject(project);
+        setIsFormOpen(true);
+    };
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        try {
-            if (editingId) {
-                await api.projects.update(editingId, formData);
-            } else {
-                await api.projects.create(formData as Omit<Project, 'id'>);
+    const handleDelete = async (project: Project) => {
+        if (!project.id) return;
+        if (window.confirm('Are you sure you want to delete this project?')) {
+            try {
+                await api.projects.delete(project.id);
+                fetchData();
+            } catch (error) {
+                console.error('Failed to delete project:', error);
             }
-            fetchData();
-            setIsEditing(false);
-            setEditingId(null);
-            setFormData({ name: '', status: 'active', serviceIds: [] });
-        } catch (error) {
-            console.error(error);
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure?')) return;
-        await api.projects.delete(id);
+    const handleFormSubmit = async () => {
+        setIsFormOpen(false);
         fetchData();
     };
 
-    const startEdit = (project: Project) => {
-        setFormData(project);
-        setEditingId(project.id);
-        setIsEditing(true);
-    };
-
-    const toggleService = (serviceId: string) => {
-        const current = formData.serviceIds || [];
-        if (current.includes(serviceId)) {
-            setFormData({ ...formData, serviceIds: current.filter(id => id !== serviceId) });
-        } else {
-            setFormData({ ...formData, serviceIds: [...current, serviceId] });
-        }
-    };
-
-    const getEmailAddress = (id?: string) => emails.find(e => e.id === id)?.address;
+    const filteredProjects = projects.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        p.description?.toLowerCase().includes(search.toLowerCase())
+    );
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Projects</h2>
-                <Button onClick={() => { setIsEditing(!isEditing); setEditingId(null); setFormData({ serviceIds: [] }); }}>
-                    {isEditing ? 'Cancel' : <><Plus size={18} className="mr-2" /> Add Project</>}
-                </Button>
-            </div>
-
-            {isEditing && (
-                <form onSubmit={handleSubmit} className="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-white tracking-tight">Projects</h1>
+                    <p className="text-jarvis-muted">Manage your software initiatives.</p>
+                </div>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-jarvis-muted" />
                         <Input
-                            label="Name"
-                            value={formData.name || ''}
-                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                            placeholder="Search projects..."
+                            className="pl-9 h-9 text-sm bg-jarvis-card/50"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
-                        <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-1">Status</label>
-                            <select
-                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white"
-                                value={formData.status}
-                                onChange={e => setFormData({ ...formData, status: e.target.value as any })}
-                            >
-                                <option value="active">Active</option>
-                                <option value="paused">Paused</option>
-                                <option value="archived">Archived</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-1">Primary Email</label>
-                            <select
-                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white"
-                                value={formData.primaryEmailId || ''}
-                                onChange={e => setFormData({ ...formData, primaryEmailId: e.target.value })}
-                            >
-                                <option value="">None / Select...</option>
-                                {emails.map(e => <option key={e.id} value={e.id}>{e.address}</option>)}
-                            </select>
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-slate-400 mb-2">Connected Services</label>
-                            <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2 bg-slate-900 rounded-lg border border-slate-700">
-                                {services.map(s => (
-                                    <button
-                                        key={s.id}
-                                        type="button"
-                                        onClick={() => toggleService(s.id)}
-                                        className={clsx(
-                                            "px-3 py-1 rounded-full text-xs font-medium transition-colors",
-                                            formData.serviceIds?.includes(s.id)
-                                                ? "bg-blue-600 text-white"
-                                                : "bg-slate-800 text-slate-400 hover:bg-slate-700"
-                                        )}
-                                    >
-                                        {s.name}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
                     </div>
-                    <div className="flex justify-end">
-                        <Button type="submit">Save Project</Button>
-                    </div>
-                </form>
-            )}
-
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                <Input
-                    className="pl-10"
-                    placeholder="Search projects..."
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                />
+                    <Button
+                        size="sm"
+                        onClick={() => { setSelectedProject(undefined); setIsFormOpen(true); }}
+                        icon={<Plus className="w-4 h-4" />}
+                        className="shrink-0"
+                    >
+                        New Project
+                    </Button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-                {loading ? <div className="text-slate-500">Loading...</div> : filtered.map(project => (
-                    <div key={project.id} className="bg-slate-800 rounded-lg p-5 border border-slate-700 flex flex-col md:flex-row md:items-center justify-between group hover:border-blue-500/50 transition-colors">
-                        <div className="mb-4 md:mb-0">
-                            <div className="flex items-center gap-3 mb-1">
-                                <h3 className="font-bold text-lg text-white">{project.name}</h3>
-                                <span className={clsx(
-                                    "px-2 py-0.5 rounded text-xs uppercase font-bold",
-                                    project.status === 'active' && "bg-emerald-500/20 text-emerald-400",
-                                    project.status === 'paused' && "bg-amber-500/20 text-amber-400",
-                                    project.status === 'archived' && "bg-slate-500/20 text-slate-400",
-                                )}>
-                                    {project.status}
-                                </span>
-                            </div>
-                            <div className="text-sm text-slate-400 flex items-center gap-2">
-                                {getEmailAddress(project.primaryEmailId) && (
-                                    <span>{getEmailAddress(project.primaryEmailId)}</span>
-                                )}
-                            </div>
-                            {project.serviceIds && project.serviceIds.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-3">
-                                    {project.serviceIds.map(sid => {
-                                        const s = services.find(x => x.id === sid);
-                                        if (!s) return null;
-                                        return (
-                                            <span key={sid} className="text-xs text-slate-300 bg-slate-700 px-2 py-1 rounded">
-                                                {s.name}
-                                            </span>
-                                        );
-                                    })}
+            <div className="bg-jarvis-card/50 backdrop-blur-sm border border-jarvis-border/50 rounded-xl overflow-hidden">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-jarvis-border/50 text-xs font-medium text-jarvis-muted uppercase tracking-wider bg-white/5">
+                    <div className="col-span-4">Project</div>
+                    <div className="col-span-4">Stack / Services</div>
+                    <div className="col-span-3">Status</div>
+                    <div className="col-span-1 text-right">Actions</div>
+                </div>
+
+                {/* Table Body */}
+                <div className="divide-y divide-jarvis-border/30">
+                    {isLoading ? (
+                        <div className="p-8 text-center text-jarvis-muted">Loading projects...</div>
+                    ) : filteredProjects.length === 0 ? (
+                        <div className="p-8 text-center text-jarvis-muted">No projects found.</div>
+                    ) : (
+                        filteredProjects.map((project) => (
+                            <div
+                                key={project.id}
+                                className="group grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors duration-200"
+                            >
+                                {/* Name & Repo */}
+                                <div className="col-span-4 flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-jarvis-bg/50 border border-jarvis-border flex items-center justify-center text-jarvis-accent group-hover:text-white transition-colors">
+                                        <Folder className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-semibold text-white group-hover:text-jarvis-accent transition-colors">{project.name}</h3>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            {project.repoUrl && (
+                                                <a href={project.repoUrl} target="_blank" rel="noreferrer" className="text-xs text-jarvis-muted hover:text-white flex items-center gap-1 transition-colors">
+                                                    <Github className="w-3 h-3" />
+                                                    Repo
+                                                </a>
+                                            )}
+                                            {project.docUrl && (
+                                                <a href={project.docUrl} target="_blank" rel="noreferrer" className="text-xs text-jarvis-muted hover:text-white flex items-center gap-1 transition-colors">
+                                                    <ExternalLink className="w-3 h-3" />
+                                                    Docs
+                                                </a>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
 
-                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button variant="secondary" size="sm" onClick={() => startEdit(project)}><Edit2 size={16} /></Button>
-                            <Button variant="danger" size="sm" onClick={() => handleDelete(project.id)}><Trash2 size={16} /></Button>
-                        </div>
-                    </div>
-                ))}
+                                {/* Stack & Services (Simplified) */}
+                                <div className="col-span-4">
+                                    <div className="flex flex-wrap gap-1">
+                                        {/* Placeholder for tech stack if we had it, or connected services count */}
+                                        {project.serviceIds && project.serviceIds.length > 0 ? (
+                                            <Badge variant="outline" className="text-[10px] bg-jarvis-bg/30">
+                                                {project.serviceIds.length} Services
+                                            </Badge>
+                                        ) : (
+                                            <span className="text-jarvis-muted text-xs">-</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Status */}
+                                <div className="col-span-3">
+                                    <Badge variant={project.status === 'active' ? 'success' : 'outline'} className="text-[10px] capitalize">
+                                        {project.status}
+                                    </Badge>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="col-span-1 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(project)} className="h-8 w-8 text-jarvis-muted hover:text-white">
+                                        <MoreHorizontal className="w-4 h-4" /> {/* Or Edit2 */}
+                                        <span className="sr-only">Edit</span>
+                                    </Button>
+                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(project)} className="h-8 w-8 text-jarvis-muted hover:text-red-400">
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
+
+            {isFormOpen && (
+                <ProjectForm
+                    onSubmit={handleFormSubmit}
+                    onClose={() => setIsFormOpen(false)}
+                    initialData={selectedProject}
+                    services={services}
+                    emails={emails}
+                />
+            )}
         </div>
     );
 };

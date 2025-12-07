@@ -1,36 +1,32 @@
-import { useEffect, useState, FormEvent } from 'react';
-import { Plus, Search, Trash2, Edit2, ExternalLink } from 'lucide-react';
-import { api, Service, Email } from '../../api';
+import { useState, useEffect } from 'react';
+import { api, Service, EmailIdentity } from '../../api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
-import { clsx } from 'clsx';
-
-// Type guard or default values help with Partial state
-const defaultService: Partial<Service> = { name: '', category: '', billingCycle: 'none' };
+import { Badge } from '../../components/Badge';
+import { Search, Plus, ExternalLink, Globe, Edit2, Trash2 } from 'lucide-react';
+import { ServiceForm } from '../../components/identity/ServiceForm';
 
 export const ServicesList = () => {
     const [services, setServices] = useState<Service[]>([]);
-    const [emails, setEmails] = useState<Email[]>([]);
+    const [emails, setEmails] = useState<EmailIdentity[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [loading, setLoading] = useState(true);
-
-    const [isEditing, setIsEditing] = useState(false);
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [formData, setFormData] = useState<Partial<Service>>(defaultService);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [selectedService, setSelectedService] = useState<Service | undefined>(undefined);
 
     const fetchData = async () => {
-        setLoading(true);
+        setIsLoading(true);
         try {
-            const [sData, eData] = await Promise.all([
+            const [servicesData, emailsData] = await Promise.all([
                 api.services.list(),
                 api.emails.list()
             ]);
-            setServices(sData);
-            setEmails(eData);
-        } catch (e) {
-            console.error(e);
+            setServices(servicesData);
+            setEmails(emailsData);
+        } catch (error) {
+            console.error('Failed to fetch data:', error);
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
@@ -38,151 +34,154 @@ export const ServicesList = () => {
         fetchData();
     }, []);
 
-    const filtered = services.filter(s =>
+    const handleEdit = (service: Service) => {
+        setSelectedService(service);
+        setIsFormOpen(true);
+    };
+
+    const handleDelete = async (service: Service) => {
+        if (!service.id) return;
+        if (window.confirm(`Are you sure you want to delete ${service.name}?`)) {
+            try {
+                await api.services.delete(service.id);
+                fetchData();
+            } catch (error) {
+                console.error('Failed to delete service:', error);
+            }
+        }
+    };
+
+    const handleFormSubmit = () => {
+        setIsFormOpen(false);
+        fetchData();
+    };
+
+    const filteredServices = services.filter(s =>
         s.name.toLowerCase().includes(search.toLowerCase()) ||
         s.category.toLowerCase().includes(search.toLowerCase())
     );
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        try {
-            if (editingId) {
-                await api.services.update(editingId, formData);
-            } else {
-                await api.services.create(formData as Omit<Service, 'id'>);
-            }
-            fetchData();
-            setIsEditing(false);
-            setEditingId(null);
-            setFormData(defaultService);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleDelete = async (id: string) => {
-        if (!confirm('Are you sure?')) return;
-        await api.services.delete(id);
-        fetchData();
-    };
-
-    const startEdit = (service: Service) => {
-        setFormData(service);
-        setEditingId(service.id);
-        setIsEditing(true);
-    };
-
-    const getEmailAddress = (id?: string) => emails.find(e => e.id === id)?.address || 'Unknown';
-
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white">Services & Logins</h2>
-                <Button onClick={() => { setIsEditing(!isEditing); setEditingId(null); setFormData(defaultService); }}>
-                    {isEditing ? 'Cancel' : <><Plus size={18} className="mr-2" /> Add Service</>}
-                </Button>
-            </div>
-
-            {isEditing && (
-                <form onSubmit={handleSubmit} className="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-6 animate-fade-in">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-white tracking-tight">Services</h1>
+                    <p className="text-jarvis-muted">Manage your subscription stack.</p>
+                </div>
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-jarvis-muted" />
                         <Input
-                            label="Name"
-                            value={formData.name || ''}
-                            onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        />
-                        <Input
-                            label="Category"
-                            value={formData.category || ''}
-                            onChange={e => setFormData({ ...formData, category: e.target.value })}
-                        />
-                        <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-1">Email Used</label>
-                            <select
-                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white"
-                                value={formData.emailId || ''}
-                                onChange={e => setFormData({ ...formData, emailId: e.target.value })}
-                            >
-                                <option value="">Select Email...</option>
-                                {emails.map(e => <option key={e.id} value={e.id}>{e.address} ({e.label})</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-1">Subscription</label>
-                            <select
-                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white"
-                                value={formData.billingCycle || 'none'}
-                                onChange={e => setFormData({ ...formData, billingCycle: e.target.value as any })}
-                            >
-                                <option value="none">None / Free</option>
-                                <option value="monthly">Monthly</option>
-                                <option value="yearly">Yearly</option>
-                                <option value="one-time">One-Time</option>
-                            </select>
-                        </div>
-                        <Input
-                            label="Login URL (Optional)"
-                            value={formData.loginUrl || ''}
-                            onChange={e => setFormData({ ...formData, loginUrl: e.target.value })}
+                            placeholder="Search services..."
+                            className="pl-9 h-9 text-sm bg-jarvis-card/50"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
-                    <div className="flex justify-end">
-                        <Button type="submit">Save Service</Button>
-                    </div>
-                </form>
-            )}
-
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                <Input
-                    className="pl-10"
-                    placeholder="Search services..."
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                />
+                    <Button
+                        size="sm"
+                        onClick={() => { setSelectedService(undefined); setIsFormOpen(true); }}
+                        icon={<Plus className="w-4 h-4" />}
+                        className="shrink-0"
+                    >
+                        New Service
+                    </Button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {loading ? <div className="text-slate-500">Loading...</div> : filtered.map(service => (
-                    <div key={service.id} className="bg-slate-800 rounded-lg p-4 border border-slate-700 flex flex-col group hover:border-blue-500/50 transition-colors">
-                        <div className="flex items-start justify-between mb-3">
-                            <div>
-                                <h3 className="font-semibold text-white">{service.name}</h3>
-                                <span className="text-xs text-slate-500">{service.category}</span>
-                            </div>
-                            <div className="flex gap-2">
-                                {service.loginUrl && (
-                                    <a href={service.loginUrl} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-blue-400">
-                                        <ExternalLink size={16} />
-                                    </a>
-                                )}
-                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => startEdit(service)} className="text-slate-400 hover:text-white"><Edit2 size={16} /></button>
-                                    <button onClick={() => handleDelete(service.id)} className="text-slate-400 hover:text-red-400"><Trash2 size={16} /></button>
+            {/* List View */}
+            <div className="bg-jarvis-card/50 backdrop-blur-sm border border-jarvis-border/50 rounded-xl overflow-hidden">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-jarvis-border/50 text-xs font-medium text-jarvis-muted uppercase tracking-wider bg-white/5">
+                    <div className="col-span-4">Service</div>
+                    <div className="col-span-3">Details</div>
+                    <div className="col-span-2">Cost</div>
+                    <div className="col-span-2">Status</div>
+                    <div className="col-span-1 text-right">Actions</div>
+                </div>
+
+                {/* Table Body */}
+                <div className="divide-y divide-jarvis-border/30">
+                    {isLoading ? (
+                        <div className="p-8 text-center text-jarvis-muted">Loading services...</div>
+                    ) : filteredServices.length === 0 ? (
+                        <div className="p-8 text-center text-jarvis-muted">No services found.</div>
+                    ) : (
+                        filteredServices.map((service) => (
+                            <div
+                                key={service.id}
+                                className="group grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors duration-200"
+                            >
+                                {/* Name & Category */}
+                                <div className="col-span-4 flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-jarvis-bg/50 border border-jarvis-border flex items-center justify-center text-jarvis-accent group-hover:text-white transition-colors">
+                                        <Globe className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-semibold text-white group-hover:text-jarvis-accent transition-colors">{service.name}</h3>
+                                        <span className="text-xs text-jarvis-muted">{service.category}</span>
+                                    </div>
+                                </div>
+
+                                {/* Details (Link/Email) */}
+                                <div className="col-span-3 flex flex-col justify-center gap-1">
+                                    {service.loginUrl && (
+                                        <a href={service.loginUrl} target="_blank" rel="noreferrer" className="text-xs text-jarvis-muted hover:text-white flex items-center gap-1 transition-colors w-fit">
+                                            <ExternalLink className="w-3 h-3" />
+                                            Login
+                                        </a>
+                                    )}
+                                </div>
+
+                                {/* Cost */}
+                                <div className="col-span-2">
+                                    <div className="flex flex-col">
+                                        {service.cost && service.cost.amount > 0 ? (
+                                            <>
+                                                <span className="text-sm font-medium text-white">
+                                                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: service.cost.currency }).format(service.cost.amount)}
+                                                </span>
+                                                <span className="text-[10px] text-jarvis-muted capitalize">
+                                                    /{service.billingCycle}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <span className="text-sm text-jarvis-muted">-</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Status */}
+                                <div className="col-span-2">
+                                    <Badge variant={service.status === 'active' ? 'success' : 'outline'} className="text-[10px] capitalize">
+                                        {service.status}
+                                    </Badge>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="col-span-1 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button variant="ghost" size="icon" onClick={() => handleEdit(service)} className="h-8 w-8 text-jarvis-muted hover:text-white">
+                                        <Edit2 className="w-4 h-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(service)} className="h-8 w-8 text-jarvis-muted hover:text-red-400">
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="mt-auto space-y-2 text-sm">
-                            <div className="flex justify-between p-2 bg-slate-900/50 rounded">
-                                <span className="text-slate-500">Email</span>
-                                <span className="text-slate-300 truncate max-w-[150px]" title={getEmailAddress(service.emailId)}>
-                                    {getEmailAddress(service.emailId)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between p-2 bg-slate-900/50 rounded">
-                                <span className="text-slate-500">Plan</span>
-                                <span className={clsx(
-                                    "font-medium",
-                                    service.billingCycle === 'none' ? 'text-slate-400' : 'text-emerald-400'
-                                )}>
-                                    {service.billingCycle}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                        ))
+                    )}
+                </div>
             </div>
+
+            {isFormOpen && (
+                <ServiceForm
+                    onSubmit={handleFormSubmit}
+                    onClose={() => setIsFormOpen(false)}
+                    initialData={selectedService}
+                    emails={emails}
+                />
+            )}
         </div>
     );
 };

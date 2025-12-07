@@ -1,0 +1,24 @@
+
+> jarvis-client@0.0.0 build
+> tsc && vite build
+
+src/App.tsx(4,10): error TS2305: Module '"./pages/Login"' has no exported member 'LoginPage'.
+src/components/Layout.tsx(3,43): error TS6133: 'Search' is declared but its value is never read.
+src/pages/Home.tsx(2,15): error TS6133: 'Service' is declared but its value is never read.
+src/pages/Home.tsx(2,24): error TS6133: 'Project' is declared but its value is never read.
+src/pages/Home.tsx(6,38): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/pages/identity/EmailsList.tsx(35,9): error TS18048: 'e.label' is possibly 'undefined'.
+src/pages/identity/IdentityHome.tsx(2,33): error TS6133: 'EmailIdentity' is declared but its value is never read.
+src/pages/identity/IdentityHome.tsx(87,51): error TS2322: Type '{ children: Element[]; title: string; icon: LucideIcon; }' is not assignable to type 'IntrinsicAttributes & CardProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & CardProps'.
+src/pages/identity/IdentityHome.tsx(133,53): error TS2322: Type '{ children: Element; title: string; icon: LucideIcon; }' is not assignable to type 'IntrinsicAttributes & CardProps'.
+  Property 'icon' does not exist on type 'IntrinsicAttributes & CardProps'.
+src/pages/identity/ProjectList.tsx(194,17): error TS2322: Type '(data: Omit<Project, "id">) => Promise<void>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/pages/identity/ProjectsList.tsx(7,85): error TS6133: 'Archive' is declared but its value is never read.
+src/pages/identity/ServiceList.tsx(225,17): error TS2322: Type '(data: Omit<Service, "id">) => Promise<void>' is not assignable to type '() => void'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+src/pages/identity/ServicesList.tsx(9,1): error TS6133: 'format' is declared but its value is never read.
+src/pages/identity/ServicesList.tsx(69,11): error TS6133: 'getEmailAddress' is declared but its value is never read.
+src/pages/Login.tsx(26,36): error TS2345: Argument of type 'string' is not assignable to parameter of type 'User'.
+src/pages/Login.tsx(28,49): error TS2554: Expected 2 arguments, but got 3.

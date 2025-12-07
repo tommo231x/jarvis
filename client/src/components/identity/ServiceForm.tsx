@@ -1,228 +1,236 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { api, Service, EmailIdentity } from '../../api';
+import { Input } from '../Input';
+import { Button } from '../Button';
 import { X } from 'lucide-react';
-import { Service, Email } from '../../api';
 
 interface ServiceFormProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSubmit: (data: Omit<Service, 'id'>) => Promise<void>;
     initialData?: Service;
-    emails: Email[];
+    emails: EmailIdentity[];
+    onClose: () => void;
+    onSubmit: () => void;
 }
 
-const BILLING_CYCLES = ['monthly', 'yearly', 'one-time', 'none'] as const;
-const STATUSES = ['active', 'cancelled', 'trial', 'past_due'] as const;
+const defaultService: Omit<Service, 'id' | 'createdAt' | 'updatedAt'> = {
+    name: '',
+    category: '',
+    description: '',
+    loginUrl: '',
+    username: '',
+    password: '',
+    emailId: '',
+    cost: {
+        amount: 0,
+        currency: 'USD',
+        period: 'monthly'
+    },
+    billingCycle: 'monthly',
+    renewalDate: '',
+    status: 'active',
+    icon: ''
+};
 
-export const ServiceForm = ({ isOpen, onClose, onSubmit, initialData, emails }: ServiceFormProps) => {
-    const [formData, setFormData] = useState<Omit<Service, 'id'>>({
-        name: '',
-        category: '',
-        emailId: '',
-        billingCycle: 'monthly',
-        cost: { amount: 0, currency: 'USD' },
-        startDate: '',
-        renewalDate: '',
-        status: 'active',
-        loginUrl: '',
-        notes: ''
-    });
+export const ServiceForm = ({ initialData, emails, onClose, onSubmit }: ServiceFormProps) => {
+    const [formData, setFormData] = useState<Omit<Service, 'id' | 'createdAt' | 'updatedAt'>>(defaultService);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         if (initialData) {
             setFormData({
                 name: initialData.name,
                 category: initialData.category,
-                emailId: initialData.emailId,
-                billingCycle: initialData.billingCycle,
-                cost: initialData.cost || { amount: 0, currency: 'USD' },
-                startDate: initialData.startDate || '',
+                description: initialData.description || '',
+                loginUrl: initialData.loginUrl || '',
+                username: initialData.username || '',
+                password: initialData.password || '',
+                emailId: initialData.emailId || '',
+                cost: initialData.cost || { amount: 0, currency: 'USD', period: 'monthly' },
+                billingCycle: initialData.billingCycle || 'monthly',
                 renewalDate: initialData.renewalDate || '',
                 status: initialData.status,
-                loginUrl: initialData.loginUrl || '',
-                notes: initialData.notes || ''
-            });
-        } else {
-            setFormData({
-                name: '',
-                category: '',
-                emailId: emails.length > 0 ? emails[0].id : '',
-                billingCycle: 'monthly',
-                cost: { amount: 0, currency: 'USD' },
-                startDate: '',
-                renewalDate: '',
-                status: 'active',
-                loginUrl: '',
-                notes: ''
+                icon: initialData.icon || ''
             });
         }
-    }, [initialData, isOpen, emails]);
+    }, [initialData]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        await onSubmit(formData);
-        onClose();
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        if (name.includes('.')) {
+            const [parent, child] = name.split('.');
+            setFormData(prev => ({
+                ...prev,
+                [parent]: {
+                    ...(prev as any)[parent],
+                    [child]: name === 'cost.amount' ? parseFloat(value) : value
+                }
+            }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
     };
 
-    if (!isOpen) return null;
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            if (initialData) {
+                await api.services.update(initialData.id, formData);
+            } else {
+                await api.services.create(formData);
+            }
+            onSubmit();
+        } catch (err: any) {
+            console.error('Failed to save service:', err);
+            setError(err.message || 'Failed to save service');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-slate-900 rounded-xl border border-slate-800 p-6 w-full max-w-2xl relative shadow-2xl overflow-y-auto max-h-[90vh]">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
-                >
-                    <X size={20} />
-                </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-jarvis-card border border-jarvis-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between p-6 border-b border-jarvis-border bg-jarvis-bg/50 shrink-0">
+                    <h2 className="text-xl font-bold text-white">
+                        {initialData ? 'Edit Service' : 'Add New Service'}
+                    </h2>
+                    <button onClick={onClose} className="text-jarvis-muted hover:text-white transition-colors">
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>
 
-                <h2 className="text-xl font-bold text-white mb-6">
-                    {initialData ? 'Edit Service' : 'Add New Service'}
-                </h2>
+                <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto">
+                    {error && (
+                        <div className="p-3 bg-jarvis-danger/10 border border-jarvis-danger/20 text-jarvis-danger rounded-lg text-sm">
+                            {error}
+                        </div>
+                    )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Service Name</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.name}
-                                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                                placeholder="e.g. Netflix"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Category</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.category}
-                                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                                placeholder="e.g. Entertainment"
-                            />
-                        </div>
+                        <Input
+                            label="Service Name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                        <Input
+                            label="Category"
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <Input
+                        label="Login URL"
+                        name="loginUrl"
+                        value={formData.loginUrl}
+                        onChange={handleChange}
+                        type="url"
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input
+                            label="Username"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                        />
+                        <Input
+                            label="Password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            type="password"
+                        />
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-slate-300">Linked Email</label>
+                        <label className="text-sm font-medium text-jarvis-muted">Associated Email</label>
                         <select
+                            name="emailId"
                             value={formData.emailId}
-                            onChange={(e) => setFormData(prev => ({ ...prev, emailId: e.target.value }))}
-                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                            onChange={handleChange}
+                            className="w-full bg-black/20 border border-jarvis-border rounded-lg px-4 py-2 text-jarvis-text focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
                         >
                             <option value="">-- Select Email --</option>
                             {emails.map(email => (
                                 <option key={email.id} value={email.id}>
-                                    {email.label} ({email.address})
+                                    {email.address}
                                 </option>
                             ))}
                         </select>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
+                        <Input
+                            label="Cost"
+                            name="cost.amount"
+                            type="number"
+                            value={formData.cost?.amount}
+                            onChange={handleChange}
+                            step="0.01"
+                        />
+                        <Input
+                            label="Currency"
+                            name="cost.currency"
+                            value={formData.cost?.currency}
+                            onChange={handleChange}
+                        />
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Billing Cycle</label>
+                            <label className="text-sm font-medium text-jarvis-muted">Billing Cycle</label>
                             <select
+                                name="billingCycle"
                                 value={formData.billingCycle}
-                                onChange={(e) => setFormData(prev => ({ ...prev, billingCycle: e.target.value as any }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 bg-jarvis-bg/50 border border-jarvis-border rounded-lg text-sm text-white focus:outline-none focus:border-jarvis-accent/50 focus:ring-1 focus:ring-jarvis-accent/50 transition-all duration-200"
                             >
-                                {BILLING_CYCLES.map(c => (
-                                    <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Cost</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={formData.cost?.amount}
-                                onChange={(e) => setFormData(prev => ({ ...prev, cost: { ...prev.cost!, amount: parseFloat(e.target.value) || 0 } }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Currency</label>
-                            <input
-                                type="text"
-                                value={formData.cost?.currency}
-                                onChange={(e) => setFormData(prev => ({ ...prev, cost: { ...prev.cost!, currency: e.target.value } }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Start Date</label>
-                            <input
-                                type="date"
-                                value={formData.startDate}
-                                onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Renewal Date</label>
-                            <input
-                                type="date"
-                                value={formData.renewalDate}
-                                onChange={(e) => setFormData(prev => ({ ...prev, renewalDate: e.target.value }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                            />
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Status</label>
-                            <select
-                                value={formData.status}
-                                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as any }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                            >
-                                {STATUSES.map(s => (
-                                    <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1).replace('_', ' ')}</option>
-                                ))}
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
+                                <option value="one-time">One-time</option>
+                                <option value="none">Free/None</option>
                             </select>
                         </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-slate-300">Login URL</label>
-                        <input
-                            type="url"
-                            value={formData.loginUrl}
-                            onChange={(e) => setFormData(prev => ({ ...prev, loginUrl: e.target.value }))}
-                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                            placeholder="https://..."
-                        />
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-jarvis-muted">Status</label>
+                        <div className="flex gap-4">
+                            {['active', 'cancelled', 'paused'].map(status => (
+                                <label key={status} className="flex items-center gap-2 cursor-pointer group">
+                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${formData.status === status
+                                        ? 'border-jarvis-accent bg-jarvis-accent'
+                                        : 'border-jarvis-muted group-hover:border-jarvis-accent/50'
+                                        }`}>
+                                        {formData.status === status && <div className="w-2 h-2 rounded-full bg-black" />}
+                                    </div>
+                                    <span className={`capitalize text-sm ${formData.status === status ? 'text-white' : 'text-jarvis-muted group-hover:text-white'
+                                        }`}>
+                                        {status}
+                                    </span>
+                                    <input
+                                        type="radio"
+                                        name="status"
+                                        value={status}
+                                        checked={formData.status === status}
+                                        onChange={handleChange}
+                                        className="hidden"
+                                    />
+                                </label>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-slate-300">Notes (Markdown)</label>
-                        <textarea
-                            value={formData.notes}
-                            onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                            className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500 h-24 resize-none"
-                            placeholder="Additional private notes..."
-                        />
-                    </div>
-
-                    <div className="pt-4 flex justify-end space-x-3">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 text-slate-400 hover:text-white transition-colors"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
-                        >
-                            {initialData ? 'Update Service' : 'Add Service'}
-                        </button>
+                    <div className="pt-4 border-t border-jarvis-border flex justify-end gap-3 shrink-0">
+                        <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? 'Saving...' : (initialData ? 'Update Service' : 'Add Service')}
+                        </Button>
                     </div>
                 </form>
             </div>
