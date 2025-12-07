@@ -47,22 +47,22 @@ router.post('/auth/login', async (req, res) => {
     }
 });
 
-// Initialize OpenAI - supports both user's own API key or Replit AI Integrations
-// Priority: User's OPENAI_API_KEY > Replit AI Integrations
-const useOwnApiKey = !!process.env.OPENAI_API_KEY;
+// Initialize OpenAI - supports Jarvis API key or Replit AI Integrations
+// Priority: JARVIS_OPENAI_API_KEY > Replit AI Integrations
+const useJarvisKey = !!process.env.JARVIS_OPENAI_API_KEY;
 const openai = new OpenAI({
-    baseURL: useOwnApiKey ? undefined : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-    apiKey: useOwnApiKey ? process.env.OPENAI_API_KEY : process.env.AI_INTEGRATIONS_OPENAI_API_KEY
+    baseURL: useJarvisKey ? undefined : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+    apiKey: useJarvisKey ? process.env.JARVIS_OPENAI_API_KEY : process.env.AI_INTEGRATIONS_OPENAI_API_KEY
 });
 
 // --- Status Checks ---
 router.get('/status/openai', async (req, res) => {
-    const ownApiKey = process.env.OPENAI_API_KEY;
+    const jarvisApiKey = process.env.JARVIS_OPENAI_API_KEY;
     const integrationBaseUrl = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
     const integrationApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
     
-    const provider = ownApiKey ? 'OpenAI Direct' : 'Replit AI Integrations';
-    const isConfigured = ownApiKey || (integrationBaseUrl && integrationApiKey);
+    const provider = jarvisApiKey ? 'OpenAI Direct (Jarvis)' : 'Replit AI Integrations';
+    const isConfigured = jarvisApiKey || (integrationBaseUrl && integrationApiKey);
     
     if (!isConfigured) {
         return res.json({ status: 'not_configured', provider: 'None' });
