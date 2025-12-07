@@ -3,5 +3,10 @@
     "username": "admin@jarvis.local",
     "passwordHash": "$2b$10$MJn/0ulNa.u2QajVdJdtYuEy.EIOb2U8lQ/Vqf1Nov1F5IjEhLRnO",
     "id": "21c180bf-cd54-4d99-86b6-6cb6d1d2a177"
+  },
+  {
+    "username": "demo@jarvis.local",
+    "passwordHash": "$2b$10$1WymXCpbS/T4/uduP7mCqeBhwbjKlCW6DOzibSG.pm1ner0bnETS2",
+    "id": "demo-user-001"
   }
 ]
