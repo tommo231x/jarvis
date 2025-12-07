@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// GLOBAL DEV FLAG
-const DEV_MODE = true;
+// GLOBAL DEV FLAG - Set to false for proper authentication
+const DEV_MODE = false;
 
 interface User {
     id: string;

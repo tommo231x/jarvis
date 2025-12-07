@@ -24,13 +24,13 @@ export const Login = () => {
 
         try {
             if (isLogin) {
-                const response = await api.auth.login({ email, password });
+                const response = await api.auth.login({ username: email, password });
                 login(response.token, response.user);
             } else {
-                const response = await api.auth.register({ email, password, name });
+                const response = await api.auth.register({ username: email, password });
                 register(response.token, response.user);
             }
-            navigate('/apps');
+            navigate('/');
         } catch (err: any) {
             setError(err.message || 'Authentication failed');
         } finally {
