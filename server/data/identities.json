@@ -41,5 +41,12 @@
     "category": "personal",
     "description": "Separate identity - financial/pension holder",
     "notes": "Identity for pension and trust fund communications"
+  },
+  {
+    "name": "Fish and Dips",
+    "category": "business",
+    "notes": "Business persona created by user request",
+    "id": "cb8ef24e-89b6-43fd-a9cc-1983ef9c3768",
+    "website": "www.fishdips.com"
   }
 ]

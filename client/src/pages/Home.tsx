@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api, Identity, Email, Service } from '../api';
+import { useDataRefresh } from '../context/DataRefreshContext';
 import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
@@ -21,6 +22,7 @@ interface ApiConnection {
 
 export const HomePage = () => {
     const navigate = useNavigate();
+    const { refreshKey } = useDataRefresh();
     const [stats, setStats] = useState({
         monthlyCost: 0,
         activeProjects: 0,
@@ -100,7 +102,7 @@ export const HomePage = () => {
 
         fetchData();
         fetchApiConnections();
-    }, []);
+    }, [refreshKey]);
 
     const getIdentityIcon = (category: string) => {
         switch (category) {

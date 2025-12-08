@@ -8,7 +8,10 @@
     "isPrimary": true,
     "description": "Fina's primary email - owner of Midjourney account",
     "notes": "Login email for shared Midjourney subscription",
-    "sharedWithIdentityIds": ["id-leila", "id-lara"]
+    "sharedWithIdentityIds": [
+      "id-leila",
+      "id-lara"
+    ]
   },
   {
     "id": "email-leila-creative",
@@ -39,7 +42,11 @@
     "isPrimary": true,
     "description": "Business email for Fina Feels Studio",
     "notes": "Billing, YouTube Premium, Cloudflare, Twitch - shared by multiple personas",
-    "sharedWithIdentityIds": ["id-fina", "id-leila", "id-lara"],
+    "sharedWithIdentityIds": [
+      "id-fina",
+      "id-leila",
+      "id-lara"
+    ],
     "isAmbiguous": false
   },
   {
@@ -63,5 +70,13 @@
     "isPrimary": true,
     "description": "Tomo's main email for financial correspondence",
     "notes": "Pension and trust fund communications"
+  },
+  {
+    "identityId": "cb8ef24e-89b6-43fd-a9cc-1983ef9c3768",
+    "address": "fishdips@gmail.com",
+    "label": "Primary",
+    "provider": "gmail",
+    "isPrimary": true,
+    "id": "4a1ae98d-860f-40ef-bb84-bbd799e2635e"
   }
 ]

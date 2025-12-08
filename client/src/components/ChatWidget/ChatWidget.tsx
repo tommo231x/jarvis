@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { api } from "../../api";
 import { useAICommandExecutor } from "../../hooks/useAICommandExecutor";
+import { useDataRefresh } from "../../context/DataRefreshContext";
 import { 
   MessageSquare, 
   X, 
@@ -71,6 +72,7 @@ const ChatWidget: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { executeAll } = useAICommandExecutor();
+  const { triggerRefresh } = useDataRefresh();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -137,6 +139,11 @@ const ChatWidget: React.FC = () => {
             timestamp: new Date()
           };
           setMessages((prev) => [...prev, execMsg]);
+          
+          // Trigger dashboard refresh after successful commands
+          if (successCount > 0) {
+            triggerRefresh();
+          }
         }
       }
     } catch (err: any) {

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { IdentityProvider } from './context/IdentityContext';
 import { ModuleDataProvider } from './context/ModuleDataContext';
+import { DataRefreshProvider } from './context/DataRefreshContext';
 import { Login } from './pages/Login';
 import { Layout } from './components/Layout';
 import { HomePage } from './pages/Home';
@@ -26,6 +27,7 @@ function App() {
         <AuthProvider>
             <IdentityProvider>
                 <ModuleDataProvider>
+                    <DataRefreshProvider>
                     <Router>
                         <Routes>
                             <Route path="/login" element={<Login />} />
@@ -54,6 +56,7 @@ function App() {
                             } />
                         </Routes>
                     </Router>
+                    </DataRefreshProvider>
                 </ModuleDataProvider>
             </IdentityProvider>
         </AuthProvider>
