@@ -196,7 +196,7 @@ router.delete('/messages/:id', async (req, res) => {
 // --- AI Query ---
 router.post('/ai/query', async (req, res) => {
     try {
-        const { query } = req.body;
+        const { query, conversationHistory } = req.body;
         if (!query) {
             return res.status(400).json({ error: 'Query is required' });
         }
@@ -219,20 +219,31 @@ router.post('/ai/query', async (req, res) => {
             messages
         };
 
-        // 3. Call LLM
-        const systemPrompt = IDENTITY_AGENT_SYSTEM_PROMPT.replace('${JSON.stringify(context, null, 2)}', JSON.stringify(context, null, 2)) + `\n\nData Context:\n${JSON.stringify(context, null, 2)}`;
-        // Note: The prompt file doesn't have the context placeholder at the bottom by default in the user text, so we append it.
-        // Actually, looking at the user text, it ends with "Never hide uncertainty — always ask."
-        // And my technical override ends with "...return an empty 'commands' array."
-        // I need to make sure the Data Context is appended.
-
+        // 3. Build conversation messages
         const finalPrompt = IDENTITY_AGENT_SYSTEM_PROMPT + `\n\nData Context:\n${JSON.stringify(context, null, 2)}`;
 
+        // Build messages array with conversation history
+        const chatMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+            { role: 'system', content: finalPrompt }
+        ];
+
+        // Add conversation history (last 10 messages for context)
+        if (conversationHistory && Array.isArray(conversationHistory)) {
+            const recentHistory = conversationHistory.slice(-10);
+            for (const msg of recentHistory) {
+                if (msg.sender === 'user') {
+                    chatMessages.push({ role: 'user', content: msg.text });
+                } else if (msg.sender === 'jarvis') {
+                    chatMessages.push({ role: 'assistant', content: msg.text });
+                }
+            }
+        }
+
+        // Add the current query
+        chatMessages.push({ role: 'user', content: query });
+
         const completion = await openai.chat.completions.create({
-            messages: [
-                { role: 'system', content: finalPrompt },
-                { role: 'user', content: query }
-            ],
+            messages: chatMessages,
             model: 'gpt-5.1',
             response_format: { type: "json_object" },
             max_completion_tokens: 4096

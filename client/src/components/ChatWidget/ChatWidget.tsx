@@ -107,7 +107,9 @@ const ChatWidget: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const data = await api.ai.query(messageText);
+      // Pass conversation history to give AI context
+      const historyForApi = messages.map(m => ({ sender: m.sender, text: m.text }));
+      const data = await api.ai.query(messageText, historyForApi);
       const answer = data?.answer || "I didn't understand that.";
 
       const jarvisMsg: Message = { 

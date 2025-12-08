@@ -158,7 +158,11 @@ export const api = {
         delete: (id: string) => request<{ success: boolean }>(`/projects/${id}`, { method: 'DELETE' }),
     },
     ai: {
-        query: (query: string) => request<{ answer: string; commands: any[]; has_high_value_financial?: boolean }>('/ai/query', { method: 'POST', body: JSON.stringify({ query }) }),
+        query: (query: string, conversationHistory?: Array<{ sender: string; text: string }>) => 
+            request<{ answer: string; commands: any[]; has_high_value_financial?: boolean }>(
+                '/ai/query', 
+                { method: 'POST', body: JSON.stringify({ query, conversationHistory }) }
+            ),
     },
     status: {
         openai: () => request<{ status: string; latency?: number; provider?: string; model?: string; error?: string }>('/status/openai'),
