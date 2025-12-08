@@ -18,5 +18,15 @@
     "startDate": "2023-03-01",
     "description": "All AI art generation tools and services",
     "notes": "Various tools shared between Fina, Leila, and Lara"
+  },
+  {
+    "id": "proj-easy-split",
+    "name": "Easy Split",
+    "status": "active",
+    "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
+    "serviceIds": ["svc-easysplit-render", "svc-easysplit-firebase", "svc-easysplit-github"],
+    "startDate": "2024-01-01",
+    "description": "Web app to help split the bill at dinner",
+    "notes": "Plans to scale for restaurant use. Firebase frontend (finafeels@gmail.com), Render backend (tommo231@gmail.com), GitHub under tommo231@gmail.com. Monthly cost: £7.99 for Render."
   }
 ]

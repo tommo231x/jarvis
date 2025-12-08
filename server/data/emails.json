@@ -86,5 +86,25 @@
     "provider": "gmail",
     "isPrimary": true,
     "id": "45eca3bb-3936-42ae-a4f8-49d8aa4b8230"
+  },
+  {
+    "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
+    "address": "tommo231@gmail.com",
+    "label": "Primary - GitHub & Render",
+    "provider": "gmail",
+    "isPrimary": true,
+    "id": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
+    "description": "Primary email for Easy Split backend services",
+    "notes": "Used for GitHub repo and Render deployment"
+  },
+  {
+    "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
+    "address": "finafeels@gmail.com",
+    "label": "Firebase Frontend",
+    "provider": "gmail",
+    "isPrimary": false,
+    "id": "email-easysplit-firebase",
+    "description": "Firebase login for Easy Split frontend",
+    "notes": "Frontend hosting and authentication"
   }
 ]

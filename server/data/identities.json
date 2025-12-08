@@ -54,5 +54,11 @@
     "category": "business",
     "notes": "Business persona created by user request. Location: london park estae.",
     "id": "00e2f27b-dd4b-4a05-9846-4fd5d531c73f"
+  },
+  {
+    "name": "Easy Split",
+    "category": "business",
+    "notes": "Web business to help split the bill at dinner, with plans to scale for restaurant use. Uses Firebase for frontend (login via finafeels@gmail.com) and Render for backend (login via tommo231@gmail.com). GitHub repo under tommo231@gmail.com. Render plan costs 7.99/month. No physical location address yet.",
+    "id": "18728d2c-336a-49d3-a40c-950c27fcb193"
   }
 ]

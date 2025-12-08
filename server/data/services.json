@@ -159,5 +159,41 @@
     "billingCycle": "none",
     "status": "active",
     "notes": "Trust fund managed by Meridian Trust"
+  },
+  {
+    "id": "svc-easysplit-render",
+    "name": "Render",
+    "category": "Infrastructure",
+    "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
+    "emailId": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
+    "billingCycle": "monthly",
+    "cost": { "amount": 7.99, "currency": "GBP" },
+    "status": "active",
+    "loginUrl": "https://render.com",
+    "notes": "Backend hosting for Easy Split"
+  },
+  {
+    "id": "svc-easysplit-firebase",
+    "name": "Firebase",
+    "category": "Infrastructure",
+    "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
+    "emailId": "email-easysplit-firebase",
+    "billingCycle": "none",
+    "cost": { "amount": 0, "currency": "GBP" },
+    "status": "active",
+    "loginUrl": "https://firebase.google.com",
+    "notes": "Frontend hosting for Easy Split (free tier)"
+  },
+  {
+    "id": "svc-easysplit-github",
+    "name": "GitHub",
+    "category": "Development",
+    "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
+    "emailId": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
+    "billingCycle": "none",
+    "cost": { "amount": 0, "currency": "GBP" },
+    "status": "active",
+    "loginUrl": "https://github.com",
+    "notes": "Source code repository for Easy Split"
   }
 ]
