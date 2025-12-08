@@ -122,27 +122,34 @@ The system comes pre-loaded with realistic demo data:
 
 **Projects (1):** Jarvis Identity Hub
 
-## Recent Changes (December 7, 2025)
-- **Major Architecture Restructure:**
-  - Created Identity model as top-level entity
-  - Refactored Email model (accounts belong to identities)
-  - Updated Service and Project models to use identityId
-  - Added Message model with emailId and isRelevant flag
-- **UI Improvements:**
-  - Dashboard: Removed inbox widget, made all stat cards clickable
-  - Emails page: Groups accounts by identity with expandable sections
-  - ServiceForm: Identity-first workflow with optional email selection
-  - ProjectForm: Uses identityId instead of primaryEmailId
-  - Card component: Added onClick support for navigation
-- ChatWidget with enhanced UX:
-  - Violet/indigo gradient design matching Jarvis theme
-  - Chat history persistence in localStorage
-  - Clear conversation button (disabled when empty)
-  - Expand/minimize window toggle
-  - Copy message to clipboard
-  - Timestamps on all messages
-  - Quick action buttons for common queries
-  - GPT-5.1 model indicator
+## Recent Changes (December 8, 2025)
+- **Advanced AI Scenario Support:**
+  - **Shared Service Ownership**: Many-to-many identity relationships via sharedWithIdentityIds
+  - **Two-Layer Ownership Model**: Distinguishes primaryOwnerId (account holder) from financialOwnerId (bill payer)
+  - **Ambiguity Detection**: isAmbiguous and confidenceScore (0.0-1.0) for uncertain attributions
+  - **High-Value Financial Detection**: Automatic flagging for pensions, trust funds, ISAs
+  - **Usage Drift Tracking**: Historical ownership changes over time via usageHistory
+  - **Enhanced AI System Prompt**: 13 sections covering all advanced scenarios
+  
+- **Test Scenarios Validated:**
+  - Scenario 1A: Shared accounts (Midjourney shared by Fina, Leila, Lara)
+  - Scenario 2A: Ambiguous emails (creativehubproject@gmail.com correctly flagged)
+  - Scenario 4A: Financial detection (pension emails with action recommendations)
+  - Scenario 5A: Security analysis (distinguishes shared usage from breaches)
+
+- **Mock Data (Personas):**
+  - Fina Feels (id-fina): Primary owner, pays for shared services
+  - Leila (id-leila): Creative alias, manages Stable Diffusion login
+  - Lara Feels (id-lara): Family member, uses Spotify
+  - Fina Feels Studio (id-studio): Organization account
+  - Creative Hub (id-generic-creative): Shared/ambiguous account
+  - Tomo Connor (id-tomo): Pension and trust fund holder
+
+## Previous Changes (December 7, 2025)
+- Created Identity model as top-level entity
+- Refactored Email, Service, and Project models to use identityId
+- Added Message model with emailId and isRelevant flag
+- ChatWidget with enhanced UX and GPT-5.1 model support
 
 ## User Preferences
 - Dark "Jarvis" theme with violet/indigo gradients
