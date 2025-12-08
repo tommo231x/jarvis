@@ -78,5 +78,13 @@
     "provider": "gmail",
     "isPrimary": true,
     "id": "4a1ae98d-860f-40ef-bb84-bbd799e2635e"
+  },
+  {
+    "identityId": "00e2f27b-dd4b-4a05-9846-4fd5d531c73f",
+    "address": "doughnutty@gmail.com",
+    "label": "Primary",
+    "provider": "gmail",
+    "isPrimary": true,
+    "id": "45eca3bb-3936-42ae-a4f8-49d8aa4b8230"
   }
 ]

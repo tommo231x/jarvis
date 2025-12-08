@@ -179,61 +179,61 @@ const ChatWidget: React.FC = () => {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-[9999] group"
+        className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-[9999] group"
         aria-label="Open Jarvis Chat"
       >
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full blur-lg opacity-75 group-hover:opacity-100 transition-opacity" />
-          <div className="relative bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110">
-            <MessageSquare className="w-6 h-6" />
+          <div className="relative bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95">
+            <MessageSquare className="w-5 h-5 md:w-6 md:h-6" />
           </div>
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse" />
+          <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-emerald-500 rounded-full border-2 border-slate-900 animate-pulse" />
         </div>
       </button>
     );
   }
 
   const windowClasses = isExpanded 
-    ? "fixed inset-4 z-[9999]" 
-    : "fixed bottom-6 right-6 w-96 h-[600px] z-[9999]";
+    ? "fixed inset-0 z-[9999]" 
+    : "fixed top-0 left-0 right-0 bottom-16 md:inset-auto md:bottom-6 md:right-6 md:w-96 md:h-[600px] z-[9999] md:rounded-2xl";
 
   return (
-    <div className={`${windowClasses} bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl flex flex-col overflow-hidden`}>
-      <div className="px-4 py-3 bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700/50 flex justify-between items-center">
+    <div className={`${windowClasses} bg-slate-900 border-0 md:border border-slate-700/50 rounded-none md:rounded-2xl shadow-2xl flex flex-col overflow-hidden`}>
+      <div className="px-4 py-3 bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700/50 flex justify-between items-center safe-area-pt">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-              <Bot className="w-5 h-5 text-white" />
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+              <Bot className="w-4 h-4 md:w-5 md:h-5 text-white" />
             </div>
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900" />
+            <div className="absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3 md:h-3 bg-emerald-500 rounded-full border-2 border-slate-900" />
           </div>
           <div>
             <h3 className="font-semibold text-white text-sm">Jarvis</h3>
-            <p className="text-xs text-slate-400">GPT-5.1 Powered</p>
+            <p className="text-[10px] md:text-xs text-slate-400">GPT-5.1 Powered</p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 md:gap-1">
           <button
             onClick={handleClearChat}
             disabled={messages.length === 0}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400"
+            className="p-2.5 md:p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-slate-400"
             title="Clear conversation"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition"
+            className="hidden md:block p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition"
             title={isExpanded ? "Minimize" : "Expand"}
           >
             {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition"
+            className="p-2.5 md:p-2 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition"
             title="Close"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5 md:w-4 md:h-4" />
           </button>
         </div>
       </div>
@@ -343,21 +343,21 @@ const ChatWidget: React.FC = () => {
         </div>
       )}
 
-      <div className="p-3 border-t border-slate-700/50 bg-slate-900">
+      <div className="p-3 md:p-3 border-t border-slate-700/50 bg-slate-900 safe-area-pb">
         <div className="flex gap-2">
           <input
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSend()}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition"
+            className="flex-1 px-4 py-3 md:py-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition text-base md:text-sm"
             placeholder="Ask Jarvis anything..."
             disabled={isLoading}
           />
           <button
             onClick={() => handleSend()}
             disabled={isLoading || !input.trim()}
-            className="px-4 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white rounded-xl transition flex items-center gap-2"
+            className="px-4 py-3 md:py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white rounded-xl transition flex items-center gap-2 active:scale-95"
           >
             <Send className="w-4 h-4" />
           </button>

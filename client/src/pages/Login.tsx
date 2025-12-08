@@ -39,14 +39,14 @@ export const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-jarvis-bg flex items-center justify-center p-4">
+        <div className="min-h-screen bg-jarvis-bg flex items-center justify-center p-4 safe-area-pt safe-area-pb">
             <div className="w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2 tracking-tighter">JARVIS</h1>
-                    <p className="text-jarvis-muted">Identity & Services Command Center</p>
+                <div className="text-center mb-6 md:mb-8">
+                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tighter">JARVIS</h1>
+                    <p className="text-sm md:text-base text-jarvis-muted">Identity & Services Command Center</p>
                 </div>
 
-                <div className="bg-jarvis-card border border-jarvis-border rounded-xl p-8 shadow-2xl">
+                <div className="bg-jarvis-card border border-jarvis-border rounded-xl p-6 md:p-8 shadow-2xl">
                     <h2 className="text-xl font-semibold text-white mb-6">
                         {isLogin ? 'Welcome Back' : 'Initialize Identity'}
                     </h2>

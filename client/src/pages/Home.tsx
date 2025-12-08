@@ -131,114 +131,117 @@ export const HomePage = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-end justify-between">
+        <div className="space-y-6 md:space-y-8">
+            {/* Header - Mobile Optimized */}
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white mb-1">Command Center</h1>
-                    <p className="text-jarvis-muted">Overview of your digital ecosystem.</p>
+                    <h1 className="text-xl md:text-2xl font-bold text-white mb-0.5 md:mb-1">Command Center</h1>
+                    <p className="text-sm md:text-base text-jarvis-muted">Overview of your digital ecosystem.</p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4">
                     <button
                         onClick={triggerRefresh}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg transition-all"
+                        className="flex items-center justify-center gap-2 px-3 py-2 md:py-1.5 text-sm text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg transition-all active:scale-95"
                         title="Refresh data"
                     >
                         <RefreshCw className={`w-4 h-4 ${stats.isLoading ? 'animate-spin' : ''}`} />
-                        Refresh
+                        <span className="hidden sm:inline">Refresh</span>
                     </button>
-                    <div className="text-sm text-jarvis-muted">
-                        {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    <div className="text-xs md:text-sm text-jarvis-muted">
+                        <span className="hidden sm:inline">{new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                        <span className="sm:hidden">{new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                     </div>
                 </div>
             </div>
 
-            {/* Summary Stats - Clickable Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Summary Stats - Mobile Optimized Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                 <Card 
                     hover 
-                    className="p-5 flex items-center justify-between cursor-pointer"
+                    className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/services')}
                 >
-                    <div>
-                        <p className="text-sm text-jarvis-muted mb-1">Monthly Spend</p>
-                        <p className="text-2xl font-bold text-white">
-                            {stats.isLoading ? '...' : `£${stats.monthlyCost.toFixed(2)}`}
+                    <div className="min-w-0">
+                        <p className="text-xs md:text-sm text-jarvis-muted mb-0.5 md:mb-1 truncate">Monthly Spend</p>
+                        <p className="text-lg md:text-2xl font-bold text-white">
+                            {stats.isLoading ? '...' : `£${stats.monthlyCost.toFixed(0)}`}
                         </p>
                     </div>
-                    <div className="p-3 bg-jarvis-accent/10 rounded-lg text-jarvis-accent">
-                        <CreditCard className="w-5 h-5" />
+                    <div className="p-2 md:p-3 bg-jarvis-accent/10 rounded-lg text-jarvis-accent flex-shrink-0">
+                        <CreditCard className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                 </Card>
 
                 <Card 
                     hover 
-                    className="p-5 flex items-center justify-between cursor-pointer"
+                    className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/emails')}
                 >
-                    <div>
-                        <p className="text-sm text-jarvis-muted mb-1">Identities</p>
-                        <p className="text-2xl font-bold text-white">
+                    <div className="min-w-0">
+                        <p className="text-xs md:text-sm text-jarvis-muted mb-0.5 md:mb-1 truncate">Identities</p>
+                        <p className="text-lg md:text-2xl font-bold text-white">
                             {stats.isLoading ? '...' : stats.identityCount}
                         </p>
                     </div>
-                    <div className="p-3 bg-violet-500/10 rounded-lg text-violet-400">
-                        <User className="w-5 h-5" />
+                    <div className="p-2 md:p-3 bg-violet-500/10 rounded-lg text-violet-400 flex-shrink-0">
+                        <User className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                 </Card>
 
                 <Card 
                     hover 
-                    className="p-5 flex items-center justify-between cursor-pointer"
+                    className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/services')}
                 >
-                    <div>
-                        <p className="text-sm text-jarvis-muted mb-1">Services Tracked</p>
-                        <p className="text-2xl font-bold text-white">
+                    <div className="min-w-0">
+                        <p className="text-xs md:text-sm text-jarvis-muted mb-0.5 md:mb-1 truncate">Services</p>
+                        <p className="text-lg md:text-2xl font-bold text-white">
                             {stats.isLoading ? '...' : stats.serviceCount}
                         </p>
                     </div>
-                    <div className="p-3 bg-emerald-500/10 rounded-lg text-emerald-400">
-                        <Shield className="w-5 h-5" />
+                    <div className="p-2 md:p-3 bg-emerald-500/10 rounded-lg text-emerald-400 flex-shrink-0">
+                        <Shield className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                 </Card>
 
                 <Card 
                     hover 
-                    className="p-5 flex items-center justify-between cursor-pointer"
+                    className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/projects')}
                 >
-                    <div>
-                        <p className="text-sm text-jarvis-muted mb-1">Active Projects</p>
-                        <p className="text-2xl font-bold text-white">
+                    <div className="min-w-0">
+                        <p className="text-xs md:text-sm text-jarvis-muted mb-0.5 md:mb-1 truncate">Projects</p>
+                        <p className="text-lg md:text-2xl font-bold text-white">
                             {stats.isLoading ? '...' : stats.activeProjects}
                         </p>
                     </div>
-                    <div className="p-3 bg-purple-500/10 rounded-lg text-purple-400">
-                        <Folder className="w-5 h-5" />
+                    <div className="p-2 md:p-3 bg-purple-500/10 rounded-lg text-purple-400 flex-shrink-0">
+                        <Folder className="w-4 h-4 md:w-5 md:h-5" />
                     </div>
                 </Card>
             </div>
 
             {/* Identities & Services Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 {/* Identities Section */}
                 <div>
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                            <User className="w-5 h-5 text-violet-400" />
-                            <h2 className="text-lg font-semibold text-white">Identities</h2>
+                    <div className="flex items-center justify-between mb-3 md:mb-4">
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <User className="w-4 h-4 md:w-5 md:h-5 text-violet-400" />
+                            <h2 className="text-base md:text-lg font-semibold text-white">Identities</h2>
                         </div>
                         <Link to="/apps/identity/emails">
-                            <Button variant="ghost" size="sm" className="gap-2">
-                                Manage <ArrowRight className="w-4 h-4" />
+                            <Button variant="ghost" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+                                <span className="hidden sm:inline">Manage</span>
+                                <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
                     </div>
                     <Card className="divide-y divide-jarvis-border">
                         {identities.length === 0 ? (
-                            <div className="p-8 text-center text-jarvis-muted">
-                                <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                                <p>No identities configured yet</p>
+                            <div className="p-6 md:p-8 text-center text-jarvis-muted">
+                                <User className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 opacity-50" />
+                                <p className="text-sm">No identities configured yet</p>
                             </div>
                         ) : (
                             identities.map((identity) => {
@@ -247,25 +250,25 @@ export const HomePage = () => {
                                 return (
                                     <div 
                                         key={identity.id} 
-                                        className="p-4 flex items-center justify-between hover:bg-jarvis-border/20 transition cursor-pointer"
+                                        className="p-3 md:p-4 flex items-center justify-between hover:bg-jarvis-border/20 active:bg-jarvis-border/30 transition cursor-pointer"
                                         onClick={() => navigate('/apps/identity/emails')}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIdentityColor(identity.category)}`}>
+                                        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                                            <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getIdentityColor(identity.category)}`}>
                                                 {getIdentityIcon(identity.category)}
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-white">{identity.name}</p>
-                                                <p className="text-xs text-jarvis-muted">{identity.description}</p>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-medium text-white truncate">{identity.name}</p>
+                                                <p className="text-xs text-jarvis-muted truncate">{identity.description}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <Badge variant="outline" className="text-xs">
-                                                <Mail className="w-3 h-3 mr-1" />
+                                        <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 ml-2">
+                                            <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 md:px-2">
+                                                <Mail className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
                                                 {identityEmails.length}
                                             </Badge>
-                                            <Badge variant="outline" className="text-xs">
-                                                <Globe className="w-3 h-3 mr-1" />
+                                            <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 md:px-2 hidden sm:flex">
+                                                <Globe className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
                                                 {identityServices.length}
                                             </Badge>
                                         </div>
@@ -278,44 +281,45 @@ export const HomePage = () => {
 
                 {/* Services Section */}
                 <div>
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                            <Globe className="w-5 h-5 text-emerald-400" />
-                            <h2 className="text-lg font-semibold text-white">Services</h2>
+                    <div className="flex items-center justify-between mb-3 md:mb-4">
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <Globe className="w-4 h-4 md:w-5 md:h-5 text-emerald-400" />
+                            <h2 className="text-base md:text-lg font-semibold text-white">Services</h2>
                         </div>
                         <Link to="/apps/identity/services">
-                            <Button variant="ghost" size="sm" className="gap-2">
-                                View All <ArrowRight className="w-4 h-4" />
+                            <Button variant="ghost" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+                                <span className="hidden sm:inline">View All</span>
+                                <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
                     </div>
                     <Card className="divide-y divide-jarvis-border">
                         {services.length === 0 ? (
-                            <div className="p-8 text-center text-jarvis-muted">
-                                <Globe className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                                <p>No services tracked yet</p>
+                            <div className="p-6 md:p-8 text-center text-jarvis-muted">
+                                <Globe className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 opacity-50" />
+                                <p className="text-sm">No services tracked yet</p>
                             </div>
                         ) : (
                             services.slice(0, 5).map((service) => (
                                 <div 
                                     key={service.id} 
-                                    className="p-4 flex items-center justify-between hover:bg-jarvis-border/20 transition cursor-pointer"
+                                    className="p-3 md:p-4 flex items-center justify-between hover:bg-jarvis-border/20 active:bg-jarvis-border/30 transition cursor-pointer"
                                     onClick={() => navigate('/apps/identity/services')}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-jarvis-accent/20 to-purple-500/20 flex items-center justify-center text-jarvis-accent font-bold text-sm">
+                                    <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                                        <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-jarvis-accent/20 to-purple-500/20 flex items-center justify-center text-jarvis-accent font-bold text-xs md:text-sm flex-shrink-0">
                                             {service.name.charAt(0)}
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-white">{service.name}</p>
-                                            <p className="text-xs text-jarvis-muted">{service.category}</p>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium text-white truncate">{service.name}</p>
+                                            <p className="text-xs text-jarvis-muted truncate">{service.category}</p>
                                         </div>
                                     </div>
-                                    <div className="text-right">
+                                    <div className="text-right flex-shrink-0 ml-2">
                                         {service.cost ? (
-                                            <p className="text-sm font-medium text-white">
-                                                £{service.cost.amount.toFixed(2)}
-                                                <span className="text-xs text-jarvis-muted ml-1">
+                                            <p className="text-xs md:text-sm font-medium text-white">
+                                                £{service.cost.amount.toFixed(0)}
+                                                <span className="text-[10px] md:text-xs text-jarvis-muted ml-0.5">
                                                     /{service.billingCycle === 'yearly' ? 'yr' : 'mo'}
                                                 </span>
                                             </p>
@@ -324,7 +328,7 @@ export const HomePage = () => {
                                         )}
                                         <Badge 
                                             variant={service.status === 'active' ? 'success' : service.status === 'past_due' ? 'danger' : 'outline'}
-                                            className="text-xs mt-1"
+                                            className="text-[10px] md:text-xs mt-1"
                                         >
                                             {service.status}
                                         </Badge>
@@ -337,21 +341,21 @@ export const HomePage = () => {
             </div>
 
             {/* API Connections Card */}
-            <div className="border-t border-jarvis-border pt-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-white">API Connections</h2>
+            <div className="border-t border-jarvis-border pt-4 md:pt-6">
+                <div className="flex items-center justify-between mb-3 md:mb-4">
+                    <h2 className="text-base md:text-lg font-semibold text-white">API Connections</h2>
                     <Button 
                         variant="ghost" 
                         size="sm" 
                         onClick={fetchApiConnections}
                         disabled={isRefreshing}
-                        className="gap-2"
+                        className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3"
                     >
                         <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                        Refresh
+                        <span className="hidden sm:inline">Refresh</span>
                     </Button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     {apiConnections.map((connection) => (
                         <Card key={connection.name} className="p-5">
                             <div className="flex items-start justify-between">

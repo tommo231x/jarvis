@@ -10,6 +10,7 @@ import {
     Settings,
     Bell
 } from 'lucide-react';
+import { MobileNav } from './MobileNav';
 
 interface LayoutProps {
     children: ReactNode;
@@ -21,9 +22,9 @@ export const Layout = ({ children }: LayoutProps) => {
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Overview', path: '/' },
-        { icon: Box, label: 'Services', path: '/services' },
-        { icon: Layers, label: 'Projects', path: '/projects' },
-        { icon: Mail, label: 'Emails', path: '/emails' },
+        { icon: Box, label: 'Services', path: '/apps/identity/services' },
+        { icon: Layers, label: 'Projects', path: '/apps/identity/projects' },
+        { icon: Mail, label: 'Emails', path: '/apps/identity/emails' },
     ];
 
     const isActive = (path: string) => {
@@ -77,13 +78,15 @@ export const Layout = ({ children }: LayoutProps) => {
                 {/* Main Content Area */}
                 <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                     {/* Top Bar for Mobile/Search */}
-                    <header className="h-16 border-b border-jarvis-border/50 bg-jarvis-bg/30 backdrop-blur-sm flex items-center justify-between px-6 shrink-0">
+                    <header className="h-14 md:h-16 border-b border-jarvis-border/50 bg-jarvis-bg/30 backdrop-blur-sm flex items-center justify-between px-4 md:px-6 shrink-0 safe-area-pt">
                         <div className="md:hidden flex items-center gap-2 text-white font-bold">
-                            <Command className="w-5 h-5 text-jarvis-accent" />
-                            <span>Jarvis</span>
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-jarvis-accent to-jarvis-secondary flex items-center justify-center shadow-lg shadow-jarvis-accent/20">
+                                <Command className="w-4 h-4" />
+                            </div>
+                            <span className="text-lg tracking-tight">Jarvis</span>
                         </div>
 
-                        {/* Global Search */}
+                        {/* Global Search - Desktop only */}
                         <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-jarvis-card/50 border border-jarvis-border rounded-lg w-96 group focus-within:border-jarvis-accent/50 transition-colors">
                             <Search className="w-4 h-4 text-jarvis-muted group-focus-within:text-jarvis-accent transition-colors" />
                             <input
@@ -99,22 +102,25 @@ export const Layout = ({ children }: LayoutProps) => {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <button className="relative text-jarvis-muted hover:text-white transition-colors">
+                        <div className="flex items-center gap-3">
+                            <button className="relative p-2 text-jarvis-muted hover:text-white transition-colors rounded-lg hover:bg-white/5 active:scale-95">
                                 <Bell className="w-5 h-5" />
-                                <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-jarvis-danger border border-jarvis-bg" />
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-jarvis-danger border border-jarvis-bg" />
                             </button>
                         </div>
                     </header>
 
                     {/* Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-jarvis-border scrollbar-track-transparent">
-                        <div className="max-w-7xl mx-auto w-full pb-20">
+                    <div className="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin scrollbar-thumb-jarvis-border scrollbar-track-transparent">
+                        <div className="max-w-7xl mx-auto w-full pb-24 md:pb-20">
                             {children}
                         </div>
                     </div>
                 </main>
             </div>
+            
+            {/* Mobile Bottom Navigation */}
+            <MobileNav />
         </div>
     );
 };

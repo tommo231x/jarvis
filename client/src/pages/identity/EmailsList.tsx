@@ -147,15 +147,18 @@ export const EmailsList = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
             <BackButton to="/" label="Back to Dashboard" />
             
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-white">Email Accounts</h2>
-                    <p className="text-jarvis-muted mt-1">Manage email addresses grouped by identity</p>
+                    <h2 className="text-xl md:text-2xl font-bold text-white">Email Accounts</h2>
+                    <p className="text-sm md:text-base text-jarvis-muted mt-0.5 md:mt-1">Manage email addresses grouped by identity</p>
                 </div>
-                <Button onClick={() => { setIsEditing(!isEditing); setEditingId(null); setFormData({ identityId: identities[0]?.id || '', provider: 'gmail', isPrimary: false }); }}>
+                <Button 
+                    onClick={() => { setIsEditing(!isEditing); setEditingId(null); setFormData({ identityId: identities[0]?.id || '', provider: 'gmail', isPrimary: false }); }}
+                    className="w-full md:w-auto justify-center"
+                >
                     {isEditing ? 'Cancel' : <><Plus size={18} className="mr-2" /> Add Email</>}
                 </Button>
             </div>
@@ -257,22 +260,23 @@ export const EmailsList = () => {
                         return (
                             <Card key={identity.id} className={`overflow-hidden border ${getIdentityColor(identity.category).split(' ')[2]}`}>
                                 <div 
-                                    className="flex items-center justify-between cursor-pointer p-4 -m-5 mb-0 hover:bg-jarvis-border/10 transition"
+                                    className="flex items-center justify-between cursor-pointer p-3 md:p-4 -m-5 mb-0 hover:bg-jarvis-border/10 active:bg-jarvis-border/20 transition"
                                     onClick={() => toggleIdentity(identity.id)}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getIdentityColor(identity.category).split(' ').slice(0, 2).join(' ')}`}>
+                                    <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                                        <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getIdentityColor(identity.category).split(' ').slice(0, 2).join(' ')}`}>
                                             {getIdentityIcon(identity.category)}
                                         </div>
-                                        <div>
-                                            <h3 className="text-white font-semibold">{identity.name}</h3>
-                                            <p className="text-xs text-jarvis-muted">{identity.description}</p>
+                                        <div className="min-w-0">
+                                            <h3 className="text-white font-semibold text-sm md:text-base truncate">{identity.name}</h3>
+                                            <p className="text-xs text-jarvis-muted truncate">{identity.description}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <Badge variant="outline" className="text-xs">
-                                            <Mail className="w-3 h-3 mr-1" />
-                                            {identityEmails.length} emails
+                                    <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 ml-2">
+                                        <Badge variant="outline" className="text-[10px] md:text-xs">
+                                            <Mail className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
+                                            <span className="hidden sm:inline">{identityEmails.length} emails</span>
+                                            <span className="sm:hidden">{identityEmails.length}</span>
                                         </Badge>
                                         {isExpanded ? (
                                             <ChevronDown className="w-5 h-5 text-jarvis-muted" />
@@ -290,30 +294,30 @@ export const EmailsList = () => {
                                             identityEmails.map(email => {
                                                 const emailMessages = getMessagesForEmail(email.id);
                                                 return (
-                                                    <div key={email.id} className="bg-jarvis-bg/50 rounded-lg p-4 group">
-                                                        <div className="flex items-start justify-between">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className={`p-2 rounded-lg ${getProviderColor(email.provider)}`}>
-                                                                    <Mail className="w-4 h-4" />
+                                                    <div key={email.id} className="bg-jarvis-bg/50 rounded-lg p-3 md:p-4 group">
+                                                        <div className="flex items-start justify-between gap-2">
+                                                            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                                                                <div className={`p-1.5 md:p-2 rounded-lg flex-shrink-0 ${getProviderColor(email.provider)}`}>
+                                                                    <Mail className="w-3.5 h-3.5 md:w-4 md:h-4" />
                                                                 </div>
-                                                                <div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="font-medium text-white">{email.label}</span>
+                                                                <div className="min-w-0">
+                                                                    <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
+                                                                        <span className="font-medium text-white text-sm truncate">{email.label}</span>
                                                                         {email.isPrimary && (
-                                                                            <Badge variant="success" className="text-xs">Primary</Badge>
+                                                                            <Badge variant="success" className="text-[10px] md:text-xs">Primary</Badge>
                                                                         )}
                                                                     </div>
-                                                                    <p className="text-sm text-jarvis-muted font-mono">{email.address}</p>
+                                                                    <p className="text-xs md:text-sm text-jarvis-muted font-mono truncate">{email.address}</p>
                                                                 </div>
                                                             </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <Badge variant="outline" className="text-xs capitalize">{email.provider}</Badge>
-                                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    <button onClick={() => startEdit(email)} className="p-1.5 text-jarvis-muted hover:text-white rounded hover:bg-jarvis-border/50">
-                                                                        <Edit2 size={14} />
+                                                            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                                                                <Badge variant="outline" className="text-[10px] md:text-xs capitalize hidden sm:flex">{email.provider}</Badge>
+                                                                <div className="flex gap-0.5 md:gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                                                                    <button onClick={() => startEdit(email)} className="p-2 md:p-1.5 text-jarvis-muted hover:text-white rounded hover:bg-jarvis-border/50 active:bg-jarvis-border/70">
+                                                                        <Edit2 className="w-4 h-4 md:w-3.5 md:h-3.5" />
                                                                     </button>
-                                                                    <button onClick={() => handleDelete(email.id)} className="p-1.5 text-jarvis-muted hover:text-red-400 rounded hover:bg-jarvis-border/50">
-                                                                        <Trash2 size={14} />
+                                                                    <button onClick={() => handleDelete(email.id)} className="p-2 md:p-1.5 text-jarvis-muted hover:text-red-400 rounded hover:bg-jarvis-border/50 active:bg-jarvis-border/70">
+                                                                        <Trash2 className="w-4 h-4 md:w-3.5 md:h-3.5" />
                                                                     </button>
                                                                 </div>
                                                             </div>
