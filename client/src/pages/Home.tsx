@@ -22,7 +22,7 @@ interface ApiConnection {
 
 export const HomePage = () => {
     const navigate = useNavigate();
-    const { refreshKey } = useDataRefresh();
+    const { refreshKey, triggerRefresh } = useDataRefresh();
     const [stats, setStats] = useState({
         monthlyCost: 0,
         activeProjects: 0,
@@ -137,8 +137,18 @@ export const HomePage = () => {
                     <h1 className="text-2xl font-bold text-white mb-1">Command Center</h1>
                     <p className="text-jarvis-muted">Overview of your digital ecosystem.</p>
                 </div>
-                <div className="text-sm text-jarvis-muted">
-                    {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={triggerRefresh}
+                        className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg transition-all"
+                        title="Refresh data"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${stats.isLoading ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </button>
+                    <div className="text-sm text-jarvis-muted">
+                        {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </div>
                 </div>
             </div>
 
