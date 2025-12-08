@@ -28,7 +28,7 @@ export const AIQuery = () => {
             setAnswer(res.answer || 'No answer returned.');
 
             if (res.commands && res.commands.length > 0) {
-                const results = executeAll(res.commands);
+                const results = await executeAll(res.commands);
                 setExecutions(results.map(r => ({
                     summary: r.message,
                     success: r.success

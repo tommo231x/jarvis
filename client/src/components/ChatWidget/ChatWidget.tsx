@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { api } from "../../api";
+import { useAICommandExecutor } from "../../hooks/useAICommandExecutor";
 import { 
   MessageSquare, 
   X, 
@@ -69,6 +70,7 @@ const ChatWidget: React.FC = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { executeAll } = useAICommandExecutor();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -115,6 +117,26 @@ const ChatWidget: React.FC = () => {
         timestamp: new Date()
       };
       setMessages((prev) => [...prev, jarvisMsg]);
+
+      if (data?.commands && data.commands.length > 0) {
+        const results = await executeAll(data.commands);
+        const successCount = results.filter(r => r.success).length;
+        const failCount = results.length - successCount;
+        
+        if (successCount > 0 || failCount > 0) {
+          const executionSummary = results
+            .map(r => `${r.success ? '✓' : '✗'} ${r.message}`)
+            .join('\n');
+          
+          const execMsg: Message = {
+            id: generateId(),
+            sender: "jarvis",
+            text: `**Actions completed:**\n${executionSummary}`,
+            timestamp: new Date()
+          };
+          setMessages((prev) => [...prev, execMsg]);
+        }
+      }
     } catch (err: any) {
       const errorMsg: Message = {
         id: generateId(),

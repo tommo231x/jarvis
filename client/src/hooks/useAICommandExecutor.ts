@@ -1,182 +1,196 @@
-import { useIdentity } from '../context/IdentityContext';
-import { useModuleData } from '../context/ModuleDataContext';
-import { AICommand } from '../types/aiCommands';
-import { v4 as uuidv4 } from 'uuid';
+import { api } from '../api';
+
+export interface AICommandPayload {
+    name?: string;
+    category?: string;
+    type?: string;
+    description?: string;
+    notes?: string;
+    email?: string;
+    address?: string;
+    identityId?: string;
+    isPrimary?: boolean;
+    label?: string;
+    provider?: string;
+    serviceId?: string;
+    emailId?: string;
+    [key: string]: any;
+}
+
+export interface AICommand {
+    action: string;
+    payload: AICommandPayload;
+}
 
 export const useAICommandExecutor = () => {
-    const { identities, addIdentity } = useIdentity();
-    const { addItem, updateItem, data } = useModuleData();
 
-    // Helper to find identity ID by name or ID
-    const resolveIdentityId = (cmd: AICommand): string | undefined => {
-        if (cmd.identityId) {
-            // Validate it exists
-            const exists = identities.find(i => i.id === cmd.identityId);
-            return exists ? exists.id : undefined;
-        }
-
-        if (cmd.identityName) {
-            const nameLower = cmd.identityName.toLowerCase();
-            const match = identities.find(i => i.name.toLowerCase() === nameLower);
-            return match ? match.id : undefined;
-        }
-
-        return undefined;
-    };
-
-    const executeCommand = (cmd: AICommand) => {
-        const id = resolveIdentityId(cmd);
-
-        switch (cmd.type) {
-            case 'create_identity': {
-                // Check if already exists to avoid duplicates if possible, though ID is unique.
-                // Assuming payload has name.
-                const exists = identities.find(i => i.name.toLowerCase() === cmd.payload.name.toLowerCase());
-                if (exists) throw new Error(`Identity "${cmd.payload.name}" already exists.`);
-
-                addIdentity({
-                    name: cmd.payload.name,
-                    type: cmd.payload.type || 'personal',
-                    description: cmd.payload.description || 'Created via Jarvis AI',
-                });
-                break;
-            }
-
-            case 'add_task': {
-                if (!id) throw new Error(`Could not find identity "${cmd.identityName || 'unknown'}"`);
-                addItem(id, 'tasks', {
-                    id: uuidv4(),
-                    title: cmd.payload.title,
-                    dueDate: cmd.payload.dueDate,
-                    notes: cmd.payload.notes,
-                    isDone: false
-                });
-                break;
-            }
-
-            case 'complete_task': {
-                if (!id) throw new Error(`Could not find identity "${cmd.identityName || 'unknown'}"`);
-
-                // Find task
-                const tasks = data[id]?.tasks || [];
-                let taskToComplete;
-
-                if (cmd.payload.taskId) {
-                    taskToComplete = tasks.find(t => t.id === cmd.payload.taskId);
-                } else if (cmd.payload.taskTitle) {
-                    const titleLower = cmd.payload.taskTitle.toLowerCase();
-                    taskToComplete = tasks.find(t => t.title.toLowerCase().includes(titleLower) && !t.isDone);
+    const executeCommand = async (cmd: AICommand): Promise<{ success: boolean; message: string; data?: any }> => {
+        try {
+            switch (cmd.action) {
+                case 'create_identity': {
+                    const identity = await api.identities.create({
+                        name: cmd.payload.name || 'New Identity',
+                        category: (cmd.payload.category || cmd.payload.type || 'personal') as any,
+                        description: cmd.payload.description,
+                        notes: cmd.payload.notes,
+                    });
+                    return { 
+                        success: true, 
+                        message: `Created identity "${identity.name}"`,
+                        data: identity
+                    };
                 }
 
-                if (!taskToComplete) throw new Error(`Could not find open task "${cmd.payload.taskTitle || cmd.payload.taskId}"`);
+                case 'add_email_to_identity': {
+                    const emailAddress = cmd.payload.email || cmd.payload.address;
+                    if (!emailAddress) {
+                        return { success: false, message: 'No email address provided' };
+                    }
+                    if (!cmd.payload.identityId) {
+                        return { success: false, message: 'No identity ID provided for email' };
+                    }
+                    
+                    const provider = emailAddress.includes('gmail') ? 'gmail' :
+                                    emailAddress.includes('outlook') ? 'outlook' :
+                                    emailAddress.includes('yahoo') ? 'yahoo' :
+                                    emailAddress.includes('proton') ? 'proton' :
+                                    emailAddress.includes('icloud') ? 'icloud' : 'other';
+                    
+                    const email = await api.emails.create({
+                        identityId: cmd.payload.identityId,
+                        address: emailAddress,
+                        label: cmd.payload.label || 'Primary',
+                        provider: provider as any,
+                        isPrimary: cmd.payload.isPrimary !== false,
+                    });
+                    return { 
+                        success: true, 
+                        message: `Added email "${emailAddress}"`,
+                        data: email
+                    };
+                }
 
-                updateItem(id, 'tasks', taskToComplete.id, { isDone: true });
-                break;
+                case 'update_identity': {
+                    if (!cmd.payload.identityId) {
+                        return { success: false, message: 'No identity ID provided' };
+                    }
+                    const updates = cmd.payload.updates || cmd.payload;
+                    const identity = await api.identities.update(cmd.payload.identityId, updates);
+                    return { 
+                        success: true, 
+                        message: `Updated identity`,
+                        data: identity
+                    };
+                }
+
+                case 'delete_identity': {
+                    if (!cmd.payload.identityId) {
+                        return { success: false, message: 'No identity ID provided' };
+                    }
+                    await api.identities.delete(cmd.payload.identityId);
+                    return { success: true, message: 'Deleted identity' };
+                }
+
+                case 'delete_email': {
+                    if (!cmd.payload.emailId) {
+                        return { success: false, message: 'No email ID provided' };
+                    }
+                    await api.emails.delete(cmd.payload.emailId);
+                    return { success: true, message: 'Deleted email' };
+                }
+
+                case 'update_email': {
+                    if (!cmd.payload.emailId) {
+                        return { success: false, message: 'No email ID provided' };
+                    }
+                    const updates = cmd.payload.updates || cmd.payload;
+                    const email = await api.emails.update(cmd.payload.emailId, updates);
+                    return { 
+                        success: true, 
+                        message: `Updated email`,
+                        data: email
+                    };
+                }
+
+                case 'add_service':
+                case 'create_service': {
+                    if (!cmd.payload.identityId) {
+                        return { success: false, message: 'No identity ID provided for service' };
+                    }
+                    const service = await api.services.create({
+                        name: cmd.payload.name || 'New Service',
+                        category: cmd.payload.category || 'other',
+                        identityId: cmd.payload.identityId,
+                        emailId: cmd.payload.emailId,
+                        billingCycle: cmd.payload.billingCycle || 'monthly',
+                        status: 'active',
+                        notes: cmd.payload.notes,
+                    });
+                    return { 
+                        success: true, 
+                        message: `Added service "${service.name}"`,
+                        data: service
+                    };
+                }
+
+                case 'delete_service': {
+                    if (!cmd.payload.serviceId) {
+                        return { success: false, message: 'No service ID provided' };
+                    }
+                    await api.services.delete(cmd.payload.serviceId);
+                    return { success: true, message: 'Deleted service' };
+                }
+
+                case 'flag_financial_item':
+                case 'security_alert':
+                case 'flag_ambiguous_identity':
+                case 'suggest_new_identity':
+                case 'update_usage_attribution':
+                case 'update_service_ownership':
+                case 'note_shared_usage':
+                case 'link_service_identity':
+                    return { 
+                        success: true, 
+                        message: `Noted: ${cmd.action}`,
+                        data: cmd.payload
+                    };
+
+                default:
+                    console.warn(`Unknown command action: ${cmd.action}`);
+                    return { 
+                        success: false, 
+                        message: `Unknown command: ${cmd.action}` 
+                    };
             }
-
-            case 'add_subscription': {
-                if (!id) throw new Error(`Could not find identity "${cmd.identityName || 'unknown'}"`);
-                addItem(id, 'subscriptions', {
-                    id: uuidv4(),
-                    name: cmd.payload.name,
-                    amount: cmd.payload.amount || 0,
-                    currency: cmd.payload.currency || 'USD',
-                    frequency: cmd.payload.frequency || 'monthly',
-                    nextBillingDate: cmd.payload.nextBillingDate
-                });
-                break;
-            }
-
-            case 'add_service': {
-                if (!id) throw new Error(`Could not find identity "${cmd.identityName || 'unknown'}"`);
-
-                // We need emailId for Service record usually, but context might handle it or we mock it?
-                // ServiceRecord: { id, name, category, url, notes, cost? }
-                // Warning: The types might mismatch if ServiceRecord requires rigid fields not in AI payload.
-                // Let's check ServiceRecord in moduleData.ts?
-                // It has: id, name, category?, url?, notes?, cost?
-                // payload has: name, category?, url?, notes?
-                // Seems compatible.
-
-                addItem(id, 'services', {
-                    id: uuidv4(),
-                    name: cmd.payload.name,
-                    category: cmd.payload.category,
-                    url: cmd.payload.url,
-                    notes: cmd.payload.notes
-                });
-                break;
-            }
-
-            case 'add_admin_link': {
-                if (!id) throw new Error(`Could not find identity "${cmd.identityName || 'unknown'}"`);
-                addItem(id, 'adminLinks', {
-                    id: uuidv4(),
-                    label: cmd.payload.label,
-                    url: cmd.payload.url,
-                    category: cmd.payload.category
-                });
-                break;
-            }
-
-            default:
-                throw new Error(`Unknown command type: ${(cmd as any).type}`);
+        } catch (error: any) {
+            console.error(`Command execution failed:`, error);
+            return { 
+                success: false, 
+                message: error?.message || 'Command execution failed' 
+            };
         }
     };
 
-    const executeAll = (commands: AICommand[]) => {
-        const results: { command: AICommand; success: boolean; message: string }[] = [];
-
-        // If we create identity, we should maybe await or refetch?
-        // But addIdentity is sync state update usually.
-        // However, if we Create Identity -> then Add Task to it in same batch,
-        // the state might not be updated yet in 'identities' array during the loop.
-        // LIMITATION: Batch commands that depend on immediately created identity might fail if state not flushed.
-        // For now, we'll try running them. We might need a small hack to "predict" the new identity if creating.
-        // Actually, 'addIdentity' in context sets state. 'identities' won't update until next render.
-        // FIX: If we see create_identity, we can cache it locally for this function execution.
-
-        let localIdentities = [...identities];
+    const executeAll = async (commands: AICommand[]): Promise<{ command: AICommand; success: boolean; message: string; data?: any }[]> => {
+        const results: { command: AICommand; success: boolean; message: string; data?: any }[] = [];
+        
+        let createdIdentityId: string | null = null;
 
         for (const cmd of commands) {
-            try {
-                // Special handling for Create to update local snapshot
-                if (cmd.type === 'create_identity') {
-                    // We run the actual hook
-                    executeCommand(cmd);
-
-                    // And mock update our local view so subsequent commands in this batch can find it
-                    localIdentities.push({
-                        id: 'temp-id-optimistic', // We don't know real ID easily unless we change hook...
-                        // Actually, we can rely on Name matching if we just pass the name down.
-                        // But 'resolveIdentityId' uses 'identities' from closure.
-                        // We can't easily hot-patch 'resolveIdentityId'.
-                        // For V1, let's assume users won't overly complex "Create AND Add" in one go, or LLM will fail.
-                        // Or, we can just catch it.
-                        name: cmd.payload.name,
-                        type: (cmd.payload.type || 'personal') as any,
-                        description: cmd.payload.description,
-                        createdAt: '', updatedAt: '', modules: []
-                    });
-
-                    results.push({ command: cmd, success: true, message: `Created identity "${cmd.payload.name}"` });
-                } else {
-                    executeCommand(cmd);
-
-                    let msg = "Executed successfully";
-                    if (cmd.type === 'add_task') msg = `Added task "${cmd.payload.title}"`;
-                    if (cmd.type === 'complete_task') msg = `Completed task`;
-                    if (cmd.type === 'add_subscription') msg = `Added sub "${cmd.payload.name}"`;
-
-                    results.push({ command: cmd, success: true, message: msg });
-                }
-
-            } catch (e: any) {
-                results.push({ command: cmd, success: false, message: e?.message || "Unknown error" });
+            if (cmd.action === 'add_email_to_identity' && !cmd.payload.identityId && createdIdentityId) {
+                cmd.payload.identityId = createdIdentityId;
+            }
+            
+            const result = await executeCommand(cmd);
+            results.push({ command: cmd, ...result });
+            
+            if (cmd.action === 'create_identity' && result.success && result.data?.id) {
+                createdIdentityId = result.data.id;
             }
         }
+        
         return results;
     };
 
-    return { executeAll };
+    return { executeAll, executeCommand };
 };
