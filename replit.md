@@ -123,6 +123,14 @@ The system comes pre-loaded with realistic demo data:
 **Projects (1):** Jarvis Identity Hub
 
 ## Recent Changes (December 8, 2025)
+- **Mobile-Responsive UI:**
+  - New MobileNav component with bottom navigation bar (Overview, Services, Projects, Emails, AI)
+  - Full-screen ChatWidget on mobile with safe area support
+  - Responsive grid layouts (2x2 stats cards, mobile card views)
+  - Touch-friendly tap targets (44px minimum)
+  - iOS notch and safe area inset support
+  - Desktop sidebar navigation fixed to use correct /apps/identity/... routes
+
 - **Advanced AI Scenario Support:**
   - **Shared Service Ownership**: Many-to-many identity relationships via sharedWithIdentityIds
   - **Two-Layer Ownership Model**: Distinguishes primaryOwnerId (account holder) from financialOwnerId (bill payer)
