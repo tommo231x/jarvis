@@ -3,6 +3,7 @@ import { api, Project, Service, Identity } from '../../api';
 import { Button } from '../../components/Button';
 import { Badge } from '../../components/Badge';
 import { Input } from '../../components/Input';
+import { BackButton } from '../../components/BackButton';
 import { Search, Plus, MoreHorizontal, Folder, Trash2 } from 'lucide-react';
 import { ProjectForm } from '../../components/identity/ProjectForm';
 
@@ -66,6 +67,8 @@ export const ProjectsList = () => {
 
     return (
         <div className="space-y-6 animate-fade-in">
+            <BackButton to="/" label="Back to Dashboard" />
+            
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-white tracking-tight">Projects</h1>

@@ -3,6 +3,7 @@ import { api, Service, Identity, Email } from '../../api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Badge } from '../../components/Badge';
+import { BackButton } from '../../components/BackButton';
 import { Search, Plus, ExternalLink, Globe, Edit2, Trash2 } from 'lucide-react';
 import { ServiceForm } from '../../components/identity/ServiceForm';
 
@@ -66,6 +67,8 @@ export const ServicesList = () => {
 
     return (
         <div className="space-y-6 animate-fade-in">
+            <BackButton to="/" label="Back to Dashboard" />
+            
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>

@@ -5,6 +5,7 @@ import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { Card } from '../../components/Card';
 import { Badge } from '../../components/Badge';
+import { BackButton } from '../../components/BackButton';
 
 export const EmailsList = () => {
     const [identities, setIdentities] = useState<Identity[]>([]);
@@ -147,6 +148,8 @@ export const EmailsList = () => {
 
     return (
         <div className="space-y-6">
+            <BackButton to="/" label="Back to Dashboard" />
+            
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-white">Email Accounts</h2>

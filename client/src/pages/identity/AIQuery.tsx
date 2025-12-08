@@ -3,6 +3,7 @@ import { Send, Sparkles, CheckCircle, XCircle } from 'lucide-react';
 import { api } from '../../api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { BackButton } from '../../components/BackButton';
 import { useAICommandExecutor } from '../../hooks/useAICommandExecutor';
 
 export const AIQuery = () => {
@@ -44,6 +45,8 @@ export const AIQuery = () => {
 
     return (
         <div className="max-w-2xl mx-auto space-y-8">
+            <BackButton to="/" label="Back to Dashboard" />
+            
             <div className="text-center space-y-2">
                 <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4 animate-pulse-slow">
                     <Sparkles className="text-white" size={24} />
