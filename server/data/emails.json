@@ -1,42 +1,67 @@
 [
   {
-    "id": "email-001",
-    "identityId": "identity-personal",
-    "label": "Primary Gmail",
-    "address": "james.mitchell@gmail.com",
+    "id": "email-fina-main",
+    "identityId": "id-fina",
+    "label": "Fina Main",
+    "address": "finafeels@gmail.com",
     "provider": "gmail",
     "isPrimary": true,
-    "description": "Main personal email for banking, subscriptions, and important accounts",
-    "notes": "Recovery email for most services"
+    "description": "Fina's primary email - owner of Midjourney account",
+    "notes": "Login email for shared Midjourney subscription",
+    "sharedWithIdentityIds": ["id-leila", "id-lara"]
   },
   {
-    "id": "email-002",
-    "identityId": "identity-work",
-    "label": "Work Email",
-    "address": "j.mitchell@techcorp.io",
+    "id": "email-leila-creative",
+    "identityId": "id-leila",
+    "label": "Leila Creative",
+    "address": "leila.creative@gmail.com",
+    "provider": "gmail",
+    "isPrimary": true,
+    "description": "Leila's creative work email",
+    "notes": "Used for Stable Diffusion login"
+  },
+  {
+    "id": "email-lara-main",
+    "identityId": "id-lara",
+    "label": "Lara Main",
+    "address": "lara@feels.family",
+    "provider": "other",
+    "isPrimary": true,
+    "description": "Lara's primary email",
+    "notes": "Personal and shared service communications"
+  },
+  {
+    "id": "email-studio",
+    "identityId": "id-studio",
+    "label": "Studio Business",
+    "address": "studio@finafeels.com",
+    "provider": "other",
+    "isPrimary": true,
+    "description": "Business email for Fina Feels Studio",
+    "notes": "Billing, YouTube Premium, Cloudflare, Twitch - shared by multiple personas",
+    "sharedWithIdentityIds": ["id-fina", "id-leila", "id-lara"],
+    "isAmbiguous": false
+  },
+  {
+    "id": "email-generic-creative",
+    "identityId": "id-generic-creative",
+    "label": "Creative Hub Generic",
+    "address": "creativehubproject@gmail.com",
+    "provider": "gmail",
+    "isPrimary": true,
+    "description": "Generic shared creative account",
+    "notes": "Used for multiple services - ownership unclear",
+    "isAmbiguous": true,
+    "confidenceScore": 0.3
+  },
+  {
+    "id": "email-tomo",
+    "identityId": "id-tomo",
+    "label": "Tomo Main",
+    "address": "tomo.connor@outlook.com",
     "provider": "outlook",
     "isPrimary": true,
-    "description": "Corporate Microsoft 365 account",
-    "notes": "Used for Slack, Jira, and work subscriptions"
-  },
-  {
-    "id": "email-003",
-    "identityId": "identity-personal",
-    "label": "iCloud",
-    "address": "jamesmitchell@icloud.com",
-    "provider": "icloud",
-    "isPrimary": false,
-    "description": "Apple ecosystem email for iCloud services",
-    "notes": "Linked to Apple ID"
-  },
-  {
-    "id": "email-004",
-    "identityId": "identity-side-projects",
-    "label": "Dev Projects",
-    "address": "james@jarvis.io",
-    "provider": "proton",
-    "isPrimary": true,
-    "description": "Email for development projects and APIs",
-    "notes": "Used for GitHub, Stripe dev, and side project services"
+    "description": "Tomo's main email for financial correspondence",
+    "notes": "Pension and trust fund communications"
   }
 ]

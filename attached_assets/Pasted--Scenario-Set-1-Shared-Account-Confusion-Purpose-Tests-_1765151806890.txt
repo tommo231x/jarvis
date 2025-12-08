@@ -1,0 +1,259 @@
+🔵 Scenario Set 1 — Shared Account Confusion
+
+Purpose: Tests many-to-many identity ↔ service mapping.
+
+Scenario 1A — One email, three identities using the service
+
+Login email: finafeels@...
+
+Service: Midjourney
+
+Users: Fina (owner), Leila, Lara
+
+Expected AI behaviour:
+
+Primary identity: Fina
+
+Shared identities: Leila, Lara
+
+Should NOT duplicate the service
+
+Should NOT force each user to have their own service
+
+Scenario 1B — A single identity uses multiple services with different personas
+
+Example:
+
+Fina uses: Midjourney, Tensor, Muse AI
+
+Leila uses: Midjourney, Stable Diffusion
+
+Lara uses: Midjourney, Stable Diffusion, Runway
+
+What this exposes:
+
+Whether the agent can build an “identity footprint”
+
+Whether it can correlate multi-service behaviour
+
+Whether it sees inconsistent persona usage patterns
+
+🔵 Scenario Set 2 — Email identity ambiguity
+
+Purpose: Test how the agent handles email addresses that don’t clearly map to a specific persona.
+
+Scenario 2A — The “Generic Gmail Account”
+
+Email: creativehubproject@gmail.com
+Used for:
+
+Midjourney
+
+Adobe
+
+Runway
+
+Netflix
+
+A VISA card that doesn’t say who owns it
+
+Expected:
+
+AI should NOT assign to Fina/Leila/Lara unless confident
+
+Should suggest a “Personal” or “Generic Creative” identity
+
+Should flag ambiguity
+
+Scenario 2B — A business email used by multiple personas
+
+Email: studio@finafeels.com
+Used for:
+
+Billing receipts
+
+Password resets
+
+YouTube Premium
+
+Cloudflare
+
+Twitch
+
+Expected:
+
+Should NOT force it into Fina’s personal identity
+
+Should treat it as a business or shared identity
+
+Should classify this identity as “Organisation / Studio”
+
+🔵 Scenario Set 3 — Conflicting ownership
+
+Purpose: When signals contradict each other.
+
+Scenario 3A — Billing says Fina, email says Leila
+
+Email: leila.creative@...
+Invoice: Charged to “Fina Feels Ltd”
+Service: Stable Diffusion
+
+Expected:
+
+AI should pick Fina as financial owner
+
+But note that Leila manages the login
+
+Should create a two-layer attribution:
+
+primary_owner: Fina
+
+login_manager: Leila
+
+Scenario 3B — Emails from two different names for the same service
+
+Service: Spotify
+
+Email 1 to: lara@... → promo
+
+Email 2 to: finafeels@... → billing
+
+Email 3 to: Lara Feels in the greeting
+
+Expected:
+
+AI should deduce that Lara is the actual user
+
+Fina is the payer
+
+Service = shared but primarily used by Lara
+
+🔵 Scenario Set 4 — High-value financial triggers
+
+Purpose: Test pension / trust / investment logic.
+
+Scenario 4A — Pension statement
+
+Email subject: “Annual pension valuation update”
+Sent to: tomo.connor@...
+
+Expected:
+
+AI MUST flag: has_high_value_financial: true
+
+Must generate command:
+
+flag_financial_item
+
+Should NOT misclassify as a subscription
+
+Scenario 4B — Trust fund notification
+
+Email: “Trust Fund Reallocation Notice – Action Required”
+
+Expected:
+
+Highest importance
+
+Financial category: trust_fund
+
+Prompt user to review
+
+Scenario 4C — Mixed content email
+
+Email: Contains:
+
+Promo for ISA account
+
+A paragraph about tax on gains
+
+A marketing message
+
+Expected:
+
+Identify financial content
+
+Still classify high-value
+
+Do not drown it in marketing noise
+
+🔵 Scenario Set 5 — Security vs identity confusion
+Scenario 5A — Login attempts from two places
+
+Email 1: “New login from London”
+
+Email 2: “New login from Spain”
+
+Same account, two identities have access
+
+Expected:
+AI must NOT assume a hack.
+It should consider shared usage.
+
+Scenario 5B — Password reset requested by unknown identity
+
+User doesn't know who requested it.
+
+Expected:
+
+AI should classify under security
+
+NOT under billing
+
+Suggest checking shared identities who use the service
+
+🔵 Scenario Set 6 — Service ownership drift
+
+Over time usage changes.
+
+Scenario 6A — Service used by one person originally, then shared later
+
+Early emails show only Fina using it.
+Later ones reference Lara’s creative work.
+
+Expected:
+
+Service ownership becomes shared
+
+AI should update the identity mapping dynamically
+
+Scenario 6B — A persona stops using a service
+
+AI should:
+
+Drop them from shared_with_identities
+
+NOT drop the primary owner
+
+🔵 Scenario Set 7 — Identity creation suggestions
+Scenario 7A — New email appears for the first time
+
+AI should ask:
+
+“Should I create an identity for this email address?”
+
+Scenario 7B — Multiple services but no identity
+
+AI should propose:
+
+“These belong to a new identity — do you want to name it?”
+
+⭐ What you now tell Repl.it:
+
+“Generate mock email, service, and identity data to test all scenarios listed here.
+
+For each scenario, run the AI agent using /api/ai/query, analyse the output, tell me what logic needs fixing or expanding, and make suggestions for improvements to the agent prompt if required.
+
+If data is missing, fabricate realistic mock data automatically.”
+
+Repl.it will:
+
+Build the data
+
+Simulate each scenario
+
+Identify failures
+
+Suggest improvements
+
+Patch the prompt if necessary

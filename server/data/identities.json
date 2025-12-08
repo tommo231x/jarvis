@@ -1,23 +1,45 @@
 [
   {
-    "id": "identity-personal",
-    "name": "Personal",
+    "id": "id-fina",
+    "name": "Fina Feels",
     "category": "personal",
-    "description": "My personal digital identity for everyday use",
-    "notes": "Primary identity for personal subscriptions and communications"
+    "description": "Primary personal identity - Fina",
+    "notes": "Main persona for personal accounts and creative work"
   },
   {
-    "id": "identity-work",
-    "name": "Work",
-    "category": "work",
-    "description": "Professional work identity",
-    "notes": "Corporate communications and business services"
+    "id": "id-leila",
+    "name": "Leila",
+    "category": "personal",
+    "description": "Secondary persona - Leila (creative alias)",
+    "notes": "Used for some creative and shared accounts"
   },
   {
-    "id": "identity-side-projects",
-    "name": "Side Projects",
-    "category": "project",
-    "description": "Identity for personal development projects",
-    "notes": "Used for dev tools, APIs, and project-related services"
+    "id": "id-lara",
+    "name": "Lara Feels",
+    "category": "personal",
+    "description": "Third persona - Lara (family member)",
+    "notes": "Family member who shares some services"
+  },
+  {
+    "id": "id-studio",
+    "name": "Fina Feels Studio",
+    "category": "organization",
+    "description": "Business/studio identity for creative work",
+    "notes": "Organisation account for billing and business services",
+    "isOrganization": true
+  },
+  {
+    "id": "id-generic-creative",
+    "name": "Creative Hub (Shared)",
+    "category": "shared",
+    "description": "Shared creative account - ambiguous ownership",
+    "notes": "Generic account used for multiple services - unclear primary owner"
+  },
+  {
+    "id": "id-tomo",
+    "name": "Tomo Connor",
+    "category": "personal",
+    "description": "Separate identity - financial/pension holder",
+    "notes": "Identity for pension and trust fund communications"
   }
 ]

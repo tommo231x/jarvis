@@ -1,12 +1,22 @@
 [
   {
-    "id": "proj-001",
-    "name": "Jarvis Identity Hub",
+    "id": "proj-studio-creative",
+    "name": "Fina Feels Studio",
     "status": "active",
-    "identityId": "identity-side-projects",
-    "serviceIds": ["svc-007"],
-    "startDate": "2024-11-01",
-    "description": "Personal command center for managing digital identity and subscriptions",
-    "notes": "Uses Stripe for payment processing on premium features"
+    "identityId": "id-studio",
+    "serviceIds": ["svc-youtube-premium", "svc-cloudflare", "svc-twitch"],
+    "startDate": "2023-01-15",
+    "description": "Main creative studio project for all personas",
+    "notes": "Shared infrastructure for Fina, Leila, and Lara's creative work"
+  },
+  {
+    "id": "proj-ai-art",
+    "name": "AI Art Collection",
+    "status": "active",
+    "identityId": "id-fina",
+    "serviceIds": ["svc-midjourney", "svc-tensor", "svc-muse-ai", "svc-stable-diffusion", "svc-runway"],
+    "startDate": "2023-03-01",
+    "description": "All AI art generation tools and services",
+    "notes": "Various tools shared between Fina, Leila, and Lara"
   }
 ]
