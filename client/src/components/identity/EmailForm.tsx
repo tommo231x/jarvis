@@ -10,14 +10,14 @@ interface EmailFormProps {
 }
 
 const PROVIDERS = ['gmail', 'outlook', 'yahoo', 'proton', 'icloud', 'aws', 'other'] as const;
-const TYPES = ['personal', 'work', 'burner', 'project'] as const;
 
 export const EmailForm = ({ isOpen, onClose, onSubmit, initialData }: EmailFormProps) => {
     const [formData, setFormData] = useState<Omit<Email, 'id'>>({
         label: '',
         address: '',
         provider: 'gmail',
-        type: 'personal',
+        identityId: '',
+        isPrimary: false,
         description: '',
         notes: ''
     });
@@ -28,7 +28,8 @@ export const EmailForm = ({ isOpen, onClose, onSubmit, initialData }: EmailFormP
                 label: initialData.label,
                 address: initialData.address,
                 provider: initialData.provider,
-                type: initialData.type,
+                identityId: initialData.identityId,
+                isPrimary: initialData.isPrimary,
                 description: initialData.description || '',
                 notes: initialData.notes || ''
             });
@@ -37,7 +38,8 @@ export const EmailForm = ({ isOpen, onClose, onSubmit, initialData }: EmailFormP
                 label: '',
                 address: '',
                 provider: 'gmail',
-                type: 'personal',
+                identityId: '',
+                isPrimary: false,
                 description: '',
                 notes: ''
             });
@@ -106,16 +108,16 @@ export const EmailForm = ({ isOpen, onClose, onSubmit, initialData }: EmailFormP
                             </select>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-slate-300">Type</label>
-                            <select
-                                value={formData.type}
-                                onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
-                                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                            >
-                                {TYPES.map(t => (
-                                    <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
-                                ))}
-                            </select>
+                            <label className="text-sm font-medium text-slate-300">Primary</label>
+                            <div className="flex items-center gap-2 h-[42px]">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.isPrimary}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, isPrimary: e.target.checked }))}
+                                    className="w-5 h-5 rounded bg-slate-800 border-slate-700 text-blue-500 focus:ring-blue-500"
+                                />
+                                <span className="text-sm text-slate-400">Primary email</span>
+                            </div>
                         </div>
                     </div>
 

@@ -12,7 +12,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 interface ApiConnection {
     name: string;
-    status: 'connected' | 'not_configured' | 'error' | 'loading';
+    status: string;
     latency?: number;
     provider?: string;
     model?: string;
