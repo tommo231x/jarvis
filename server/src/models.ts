@@ -4,6 +4,34 @@ export interface User {
     passwordHash: string;
 }
 
+export interface Address {
+    id: string;
+    label: string; // e.g., "Headquarters", "Warehouse", "Home"
+    type: 'business' | 'residential' | 'mailing' | 'warehouse' | 'other';
+    line1: string;
+    line2?: string;
+    city: string;
+    county?: string;
+    postcode: string;
+    country: string;
+    isPrimary?: boolean;
+}
+
+export interface PhoneNumber {
+    id: string;
+    label: string; // e.g., "Mobile", "Office", "WhatsApp"
+    type: 'mobile' | 'landline' | 'fax' | 'business' | 'personal';
+    number: string;
+    countryCode?: string;
+    isPrimary?: boolean;
+}
+
+export interface SocialLink {
+    platform: 'linkedin' | 'twitter' | 'instagram' | 'facebook' | 'tiktok' | 'youtube' | 'website' | 'other';
+    url: string;
+    username?: string;
+}
+
 export interface Identity {
     id: string;
     name: string;
@@ -13,6 +41,12 @@ export interface Identity {
     notes?: string;
     isOrganization?: boolean;
     parentIdentityId?: string;
+    addresses?: Address[];
+    phoneNumbers?: PhoneNumber[];
+    socialLinks?: SocialLink[];
+    website?: string;
+    companyNumber?: string; // For registered businesses
+    vatNumber?: string;
 }
 
 export interface Email {
