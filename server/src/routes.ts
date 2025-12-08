@@ -227,9 +227,9 @@ router.post('/ai/query', async (req, res) => {
             { role: 'system', content: finalPrompt }
         ];
 
-        // Add conversation history (last 10 messages for context)
+        // Add conversation history (last 50 messages for context)
         if (conversationHistory && Array.isArray(conversationHistory)) {
-            const recentHistory = conversationHistory.slice(-10);
+            const recentHistory = conversationHistory.slice(-50);
             for (const msg of recentHistory) {
                 if (msg.sender === 'user') {
                     chatMessages.push({ role: 'user', content: msg.text });
