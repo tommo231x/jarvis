@@ -231,7 +231,7 @@ router.post('/ai/query', async (req, res) => {
         }
 
         // 1. Fetch all data to provide context
-        const [identities, emails, services, projects, messages] = await Promise.all([
+        const [identities, emails, allServices, projects, messages] = await Promise.all([
             db.collection<Identity>('identities').find(),
             db.collection<Email>('emails').find(),
             db.collection<Service>('services').find(),
@@ -239,13 +239,47 @@ router.post('/ai/query', async (req, res) => {
             db.collection<Message>('messages').find()
         ]);
 
-        // 2. Prepare Context
+        // 2. Filter and normalize services (same logic as dashboard)
+        const activeServices = allServices.filter(s => 
+            s.status !== 'cancelled' && !s.isArchived
+        );
+
+        // Add computed monthly cost to each service
+        const servicesWithMonthlyCost = activeServices.map(s => {
+            let monthlyAmount = 0;
+            if (s.cost) {
+                if (s.billingCycle === 'monthly') {
+                    monthlyAmount = s.cost.amount;
+                } else if (s.billingCycle === 'yearly') {
+                    monthlyAmount = s.cost.amount / 12;
+                }
+            }
+            return {
+                ...s,
+                computedMonthlyAmount: monthlyAmount,
+                computedMonthlyCurrency: s.cost?.currency || 'GBP'
+            };
+        });
+
+        // Calculate totals by currency
+        const totalsByCurrency: Record<string, number> = {};
+        servicesWithMonthlyCost.forEach(s => {
+            const currency = s.computedMonthlyCurrency;
+            totalsByCurrency[currency] = (totalsByCurrency[currency] || 0) + s.computedMonthlyAmount;
+        });
+
+        // 3. Prepare Context with filtered/normalized data
         const context = {
             identities,
             emails,
-            services,
+            services: servicesWithMonthlyCost,
             projects,
-            messages
+            messages,
+            summary: {
+                activeServiceCount: activeServices.length,
+                monthlyTotalsByCurrency: totalsByCurrency,
+                note: "All service costs shown as monthly amounts (yearly costs divided by 12). Only active services are included."
+            }
         };
 
         // 3. Build conversation messages
