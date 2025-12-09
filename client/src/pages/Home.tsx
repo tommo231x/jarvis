@@ -4,12 +4,21 @@ import { useDataRefresh } from '../context/DataRefreshContext';
 import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
+import { ExchangeRateIndicator } from '../components/ExchangeRateIndicator';
 import {
     Shield, CreditCard, Folder, ArrowRight, Zap, LayoutGrid,
     CheckCircle, XCircle, AlertCircle, RefreshCw, Mail,
     User, Building2, Code
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+    detectBaseCurrency,
+    detectForeignCurrencies,
+    fetchExchangeRates,
+    convertToBaseCurrency,
+    formatCurrency,
+    ExchangeRates
+} from '../utils/currency';
 
 interface ApiConnection {
     name: string;
@@ -41,6 +50,11 @@ export const HomePage = () => {
     ]);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
+    const [baseCurrency, setBaseCurrency] = useState<string>('GBP');
+    const [foreignCurrencies, setForeignCurrencies] = useState<string[]>([]);
+    const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
+    const [isRefreshingRates, setIsRefreshingRates] = useState(false);
+
     const fetchApiConnections = async () => {
         setIsRefreshing(true);
         try {
@@ -63,6 +77,19 @@ export const HomePage = () => {
         setIsRefreshing(false);
     };
 
+    const refreshExchangeRates = async () => {
+        if (foreignCurrencies.length === 0) return;
+        setIsRefreshingRates(true);
+        try {
+            const rates = await fetchExchangeRates(baseCurrency, foreignCurrencies, true);
+            setExchangeRates(rates);
+            triggerRefresh();
+        } catch (error) {
+            console.error('Failed to refresh exchange rates:', error);
+        }
+        setIsRefreshingRates(false);
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -77,11 +104,31 @@ export const HomePage = () => {
                 setEmails(emailsData);
                 setServices(servicesData);
 
+                const detectedBase = detectBaseCurrency(servicesData);
+                const detectedForeign = detectForeignCurrencies(servicesData, detectedBase);
+                setBaseCurrency(detectedBase);
+                setForeignCurrencies(detectedForeign);
+
+                let rates: ExchangeRates | null = null;
+                if (detectedForeign.length > 0) {
+                    rates = await fetchExchangeRates(detectedBase, detectedForeign);
+                    setExchangeRates(rates);
+                }
+
                 const monthlyCost = servicesData.reduce((total, service) => {
-                    if (!service.cost || service.status === 'cancelled') return total;
-                    if (service.billingCycle === 'monthly') return total + service.cost.amount;
-                    if (service.billingCycle === 'yearly') return total + (service.cost.amount / 12);
-                    return total;
+                    if (!service.cost || service.status === 'cancelled' || service.isArchived) return total;
+                    let amount = 0;
+                    if (service.billingCycle === 'monthly') amount = service.cost.amount;
+                    else if (service.billingCycle === 'yearly') amount = service.cost.amount / 12;
+                    else return total;
+
+                    const convertedAmount = convertToBaseCurrency(
+                        amount,
+                        service.cost.currency,
+                        detectedBase,
+                        rates
+                    );
+                    return total + convertedAmount;
                 }, 0);
 
                 const activeProjects = projects.filter(p => p.status === 'active').length;
@@ -89,7 +136,7 @@ export const HomePage = () => {
                 setStats({
                     monthlyCost,
                     activeProjects,
-                    serviceCount: servicesData.length,
+                    serviceCount: servicesData.filter(s => !s.isArchived).length,
                     identityCount: identitiesData.length,
                     emailCount: emailsData.length,
                     isLoading: false
@@ -163,18 +210,31 @@ export const HomePage = () => {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                 <Card
                     hover
-                    className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
+                    className="p-3 md:p-5 cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/services')}
                 >
-                    <div className="min-w-0">
-                        <p className="text-xs md:text-sm text-jarvis-muted mb-0.5 md:mb-1 truncate">Monthly Spend</p>
-                        <p className="text-lg md:text-2xl font-bold text-white">
-                            {stats.isLoading ? '...' : `£${stats.monthlyCost.toFixed(0)}`}
-                        </p>
+                    <div className="flex items-center justify-between">
+                        <div className="min-w-0">
+                            <p className="text-xs md:text-sm text-jarvis-muted mb-0.5 md:mb-1 truncate">Monthly Spend</p>
+                            <p className="text-lg md:text-2xl font-bold text-white">
+                                {stats.isLoading ? '...' : formatCurrency(stats.monthlyCost, baseCurrency)}
+                            </p>
+                        </div>
+                        <div className="p-2 md:p-3 bg-jarvis-accent/10 rounded-lg text-jarvis-accent flex-shrink-0">
+                            <CreditCard className="w-4 h-4 md:w-5 md:h-5" />
+                        </div>
                     </div>
-                    <div className="p-2 md:p-3 bg-jarvis-accent/10 rounded-lg text-jarvis-accent flex-shrink-0">
-                        <CreditCard className="w-4 h-4 md:w-5 md:h-5" />
-                    </div>
+                    {foreignCurrencies.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-jarvis-border/30" onClick={e => e.stopPropagation()}>
+                            <ExchangeRateIndicator
+                                rates={exchangeRates}
+                                baseCurrency={baseCurrency}
+                                foreignCurrencies={foreignCurrencies}
+                                onRefresh={refreshExchangeRates}
+                                isRefreshing={isRefreshingRates}
+                            />
+                        </div>
+                    )}
                 </Card>
 
                 <Card
