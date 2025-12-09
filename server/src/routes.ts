@@ -244,7 +244,52 @@ router.post('/ai/query', async (req, res) => {
             s.status !== 'cancelled' && !s.isArchived
         );
 
-        // Add computed monthly cost to each service
+        // Detect base currency (most common currency in services)
+        const currencyCounts: Record<string, number> = {};
+        activeServices.forEach(s => {
+            if (s.cost?.currency) {
+                const currency = s.cost.currency.toUpperCase();
+                currencyCounts[currency] = (currencyCounts[currency] || 0) + 1;
+            }
+        });
+        let baseCurrency = 'GBP';
+        let maxCount = 0;
+        Object.entries(currencyCounts).forEach(([currency, count]) => {
+            if (count > maxCount) {
+                maxCount = count;
+                baseCurrency = currency;
+            }
+        });
+
+        // Detect foreign currencies
+        const foreignCurrencies = new Set<string>();
+        activeServices.forEach(s => {
+            if (s.cost?.currency) {
+                const currency = s.cost.currency.toUpperCase();
+                if (currency !== baseCurrency) {
+                    foreignCurrencies.add(currency);
+                }
+            }
+        });
+
+        // Fetch exchange rates if needed
+        let exchangeRates: Record<string, number> = {};
+        if (foreignCurrencies.size > 0) {
+            try {
+                const symbols = Array.from(foreignCurrencies).join(',');
+                const response = await fetch(
+                    `https://api.frankfurter.app/latest?from=${baseCurrency}&to=${symbols}`
+                );
+                if (response.ok) {
+                    const data = await response.json();
+                    exchangeRates = data.rates || {};
+                }
+            } catch (e) {
+                console.error('Failed to fetch exchange rates for AI context:', e);
+            }
+        }
+
+        // Add computed monthly cost to each service (with base currency conversion)
         const servicesWithMonthlyCost = activeServices.map(s => {
             let monthlyAmount = 0;
             if (s.cost) {
@@ -254,18 +299,29 @@ router.post('/ai/query', async (req, res) => {
                     monthlyAmount = s.cost.amount / 12;
                 }
             }
+
+            // Convert to base currency if foreign
+            const serviceCurrency = (s.cost?.currency || 'GBP').toUpperCase();
+            let monthlyInBaseCurrency = monthlyAmount;
+            if (serviceCurrency !== baseCurrency && exchangeRates[serviceCurrency]) {
+                monthlyInBaseCurrency = monthlyAmount / exchangeRates[serviceCurrency];
+            }
+
             return {
                 ...s,
                 computedMonthlyAmount: monthlyAmount,
-                computedMonthlyCurrency: s.cost?.currency || 'GBP'
+                computedMonthlyCurrency: serviceCurrency,
+                computedMonthlyInBaseCurrency: Math.round(monthlyInBaseCurrency * 100) / 100
             };
         });
 
-        // Calculate totals by currency
+        // Calculate totals by currency AND total in base currency
         const totalsByCurrency: Record<string, number> = {};
+        let totalInBaseCurrency = 0;
         servicesWithMonthlyCost.forEach(s => {
             const currency = s.computedMonthlyCurrency;
             totalsByCurrency[currency] = (totalsByCurrency[currency] || 0) + s.computedMonthlyAmount;
+            totalInBaseCurrency += s.computedMonthlyInBaseCurrency;
         });
 
         // 3. Prepare Context with filtered/normalized data
@@ -277,8 +333,11 @@ router.post('/ai/query', async (req, res) => {
             messages,
             summary: {
                 activeServiceCount: activeServices.length,
+                baseCurrency,
+                monthlyTotalInBaseCurrency: Math.round(totalInBaseCurrency * 100) / 100,
                 monthlyTotalsByCurrency: totalsByCurrency,
-                note: "All service costs shown as monthly amounts (yearly costs divided by 12). Only active services are included."
+                exchangeRatesUsed: Object.keys(exchangeRates).length > 0 ? exchangeRates : null,
+                note: "All service costs shown as monthly amounts (yearly costs divided by 12). Only active services are included. Totals converted to base currency using current exchange rates."
             }
         };
 
