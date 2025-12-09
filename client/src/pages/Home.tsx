@@ -83,7 +83,6 @@ export const HomePage = () => {
         try {
             const rates = await fetchExchangeRates(baseCurrency, foreignCurrencies, true);
             setExchangeRates(rates);
-            triggerRefresh();
         } catch (error) {
             console.error('Failed to refresh exchange rates:', error);
         }
@@ -192,7 +191,7 @@ export const HomePage = () => {
                 </div>
                 <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4">
                     <button
-                        onClick={triggerRefresh}
+                        onClick={() => triggerRefresh({ refreshExchangeRates: true })}
                         className="flex items-center justify-center gap-2 px-3 py-2 md:py-1.5 text-sm text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg transition-all active:scale-95"
                         title="Refresh data"
                     >
