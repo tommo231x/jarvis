@@ -4,10 +4,10 @@ import { useDataRefresh } from '../context/DataRefreshContext';
 import { Card } from '../components/Card';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
-import { 
-    Shield, CreditCard, Folder, ArrowRight, LayoutGrid, Bot, Zap, 
+import {
+    Shield, CreditCard, Folder, ArrowRight, Zap, LayoutGrid,
     CheckCircle, XCircle, AlertCircle, RefreshCw, Mail,
-    User, Building2, Globe, Briefcase, Code
+    User, Building2, Code
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -106,18 +106,20 @@ export const HomePage = () => {
 
     const getIdentityIcon = (category: string) => {
         switch (category) {
-            case 'work': return <Briefcase className="w-5 h-5" />;
             case 'business': return <Building2 className="w-5 h-5" />;
             case 'project': return <Code className="w-5 h-5" />;
+            case 'event': return <Zap className="w-5 h-5" />;
+            case 'personal':
             default: return <User className="w-5 h-5" />;
         }
     };
 
     const getIdentityColor = (category: string) => {
         switch (category) {
-            case 'work': return 'bg-blue-500/10 text-blue-400';
             case 'business': return 'bg-emerald-500/10 text-emerald-400';
             case 'project': return 'bg-amber-500/10 text-amber-400';
+            case 'event': return 'bg-pink-500/10 text-pink-400';
+            case 'personal':
             default: return 'bg-violet-500/10 text-violet-400';
         }
     };
@@ -127,7 +129,10 @@ export const HomePage = () => {
     };
 
     const getServicesForIdentity = (identityId: string) => {
-        return services.filter(s => s.identityId === identityId);
+        return services.filter(s =>
+            (s.ownerIdentityIds && s.ownerIdentityIds.includes(identityId)) ||
+            s.identityId === identityId
+        );
     };
 
     return (
@@ -156,8 +161,8 @@ export const HomePage = () => {
 
             {/* Summary Stats - Mobile Optimized Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                <Card 
-                    hover 
+                <Card
+                    hover
                     className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/services')}
                 >
@@ -172,8 +177,8 @@ export const HomePage = () => {
                     </div>
                 </Card>
 
-                <Card 
-                    hover 
+                <Card
+                    hover
                     className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/emails')}
                 >
@@ -188,8 +193,8 @@ export const HomePage = () => {
                     </div>
                 </Card>
 
-                <Card 
-                    hover 
+                <Card
+                    hover
                     className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/services')}
                 >
@@ -204,8 +209,8 @@ export const HomePage = () => {
                     </div>
                 </Card>
 
-                <Card 
-                    hover 
+                <Card
+                    hover
                     className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
                     onClick={() => navigate('/apps/identity/projects')}
                 >
@@ -221,7 +226,7 @@ export const HomePage = () => {
                 </Card>
             </div>
 
-            {/* Identities & Services Grid */}
+            {/* Identities & Priority Alerts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 {/* Identities Section */}
                 <div>
@@ -230,7 +235,7 @@ export const HomePage = () => {
                             <User className="w-4 h-4 md:w-5 md:h-5 text-violet-400" />
                             <h2 className="text-base md:text-lg font-semibold text-white">Identities</h2>
                         </div>
-                        <Link to="/apps/identity/emails">
+                        <Link to="/identities">
                             <Button variant="ghost" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
                                 <span className="hidden sm:inline">Manage</span>
                                 <ArrowRight className="w-4 h-4" />
@@ -248,29 +253,50 @@ export const HomePage = () => {
                                 const identityEmails = getEmailsForIdentity(identity.id);
                                 const identityServices = getServicesForIdentity(identity.id);
                                 return (
-                                    <div 
-                                        key={identity.id} 
-                                        className="p-3 md:p-4 flex items-center justify-between hover:bg-jarvis-border/20 active:bg-jarvis-border/30 transition cursor-pointer"
-                                        onClick={() => navigate('/apps/identity/emails')}
+                                    <div
+                                        key={identity.id}
+                                        className="p-3 md:p-4 hover:bg-jarvis-border/20 active:bg-jarvis-border/30 transition group"
                                     >
-                                        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-                                            <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getIdentityColor(identity.category)}`}>
-                                                {getIdentityIcon(identity.category)}
+                                        <div
+                                            className="flex items-center justify-between cursor-pointer"
+                                            onClick={() => navigate('/identities')}
+                                        >
+                                            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                                                <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getIdentityColor(identity.category)}`}>
+                                                    {getIdentityIcon(identity.category)}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="text-sm font-medium text-white truncate">{identity.name}</p>
+                                                        <span className="text-[10px] uppercase tracking-wider text-jarvis-muted border border-jarvis-border px-1.5 py-0.5 rounded-full">{identity.category}</span>
+                                                    </div>
+                                                    <p className="text-xs text-jarvis-muted truncate">{identity.description}</p>
+                                                </div>
                                             </div>
-                                            <div className="min-w-0">
-                                                <p className="text-sm font-medium text-white truncate">{identity.name}</p>
-                                                <p className="text-xs text-jarvis-muted truncate">{identity.description}</p>
+                                            <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 ml-2">
+                                                <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 md:px-2" title={`${identityEmails.length} Emails`}>
+                                                    <Mail className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
+                                                    {identityEmails.length}
+                                                </Badge>
+                                                <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 md:px-2" title={`${identityServices.length} Services`}>
+                                                    <Shield className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
+                                                    {identityServices.length}
+                                                </Badge>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0 ml-2">
-                                            <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 md:px-2">
-                                                <Mail className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
-                                                {identityEmails.length}
-                                            </Badge>
-                                            <Badge variant="outline" className="text-[10px] md:text-xs px-1.5 md:px-2 hidden sm:flex">
-                                                <Globe className="w-2.5 h-2.5 md:w-3 md:h-3 mr-0.5 md:mr-1" />
-                                                {identityServices.length}
-                                            </Badge>
+                                        <div className="mt-3 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-[10px] h-6 text-jarvis-muted hover:text-white"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    // Placeholder action
+                                                    console.log('Add workspace clicked for', identity.id);
+                                                }}
+                                            >
+                                                + Add Workspace
+                                            </Button>
                                         </div>
                                     </div>
                                 );
@@ -279,74 +305,107 @@ export const HomePage = () => {
                     </Card>
                 </div>
 
-                {/* Services Section */}
+                {/* Priority Alerts Section (Replaces Services) */}
                 <div>
                     <div className="flex items-center justify-between mb-3 md:mb-4">
                         <div className="flex items-center gap-2 md:gap-3">
-                            <Globe className="w-4 h-4 md:w-5 md:h-5 text-emerald-400" />
-                            <h2 className="text-base md:text-lg font-semibold text-white">Services</h2>
+                            <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-amber-400" />
+                            <h2 className="text-base md:text-lg font-semibold text-white">Priority Alerts</h2>
                         </div>
                         <Link to="/apps/identity/services">
                             <Button variant="ghost" size="sm" className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
-                                <span className="hidden sm:inline">View All</span>
+                                <span className="hidden sm:inline">View All Services</span>
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
                     </div>
                     <Card className="divide-y divide-jarvis-border">
-                        {services.length === 0 ? (
-                            <div className="p-6 md:p-8 text-center text-jarvis-muted">
-                                <Globe className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 opacity-50" />
-                                <p className="text-sm">No services tracked yet</p>
-                            </div>
-                        ) : (
-                            services.slice(0, 5).map((service) => (
-                                <div 
-                                    key={service.id} 
+                        {(() => {
+                            const now = new Date();
+                            const urgentServices = services.filter(s => {
+                                if (s.status === 'trial') return true;
+                                if (s.renewalDate) {
+                                    const renewal = new Date(s.renewalDate);
+                                    const diffTime = renewal.getTime() - now.getTime();
+                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                    return diffDays >= 0 && diffDays <= 5;
+                                }
+                                return false;
+                            }).sort((a, b) => {
+                                // Sort by urgency (trial first, then date)
+                                if (a.status === 'trial' && b.status !== 'trial') return -1;
+                                if (b.status === 'trial' && a.status !== 'trial') return 1;
+                                return (new Date(a.renewalDate || '').getTime()) - (new Date(b.renewalDate || '').getTime());
+                            });
+
+                            if (urgentServices.length === 0) {
+                                return (
+                                    <div className="p-6 md:p-8 text-center text-jarvis-muted">
+                                        <CheckCircle className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 opacity-50 text-emerald-500" />
+                                        <p className="text-sm font-medium text-white mb-1">All Clear</p>
+                                        <p className="text-xs">No upcoming payments or expiring trials in the next 5 days.</p>
+                                    </div>
+                                );
+                            }
+
+                            return urgentServices.slice(0, 5).map((service) => (
+                                <div
+                                    key={service.id}
                                     className="p-3 md:p-4 flex items-center justify-between hover:bg-jarvis-border/20 active:bg-jarvis-border/30 transition cursor-pointer"
                                     onClick={() => navigate('/apps/identity/services')}
                                 >
                                     <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-                                        <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-jarvis-accent/20 to-purple-500/20 flex items-center justify-center text-jarvis-accent font-bold text-xs md:text-sm flex-shrink-0">
-                                            {service.name.charAt(0)}
+                                        <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${service.status === 'trial' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
+                                            {service.status === 'trial' ? <Zap className="w-4 h-4" /> : <CreditCard className="w-4 h-4" />}
                                         </div>
                                         <div className="min-w-0">
                                             <p className="text-sm font-medium text-white truncate">{service.name}</p>
-                                            <p className="text-xs text-jarvis-muted truncate">{service.category}</p>
+                                            <p className="text-xs text-jarvis-muted truncate">
+                                                {service.status === 'trial' ? 'Trial Ending Soon' : `Payment Due: ${new Date(service.renewalDate!).toLocaleDateString()}`}
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="text-right flex-shrink-0 ml-2">
-                                        {service.cost ? (
-                                            <p className="text-xs md:text-sm font-medium text-white">
-                                                £{service.cost.amount.toFixed(0)}
-                                                <span className="text-[10px] md:text-xs text-jarvis-muted ml-0.5">
-                                                    /{service.billingCycle === 'yearly' ? 'yr' : 'mo'}
-                                                </span>
-                                            </p>
-                                        ) : (
-                                            <p className="text-xs text-jarvis-muted">Free</p>
-                                        )}
-                                        <Badge 
-                                            variant={service.status === 'active' ? 'success' : service.status === 'past_due' ? 'danger' : 'outline'}
-                                            className="text-[10px] md:text-xs mt-1"
+                                        <Badge
+                                            variant={service.status === 'trial' ? 'warning' : 'danger'}
+                                            className="text-[10px] md:text-xs"
                                         >
-                                            {service.status}
+                                            {service.status === 'trial' ? 'Trial' : 'Due Soon'}
                                         </Badge>
                                     </div>
                                 </div>
-                            ))
-                        )}
+                            ));
+                        })()}
                     </Card>
                 </div>
+            </div>
+
+            {/* Apps Placeholder Section */}
+            <div>
+                <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                    <LayoutGrid className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
+                    <h2 className="text-base md:text-lg font-semibold text-white">Apps</h2>
+                </div>
+                <Card className="p-8 text-center border-dashed border-jarvis-border bg-transparent hover:bg-jarvis-card/50 transition-colors">
+                    <div className="max-w-md mx-auto">
+                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mx-auto mb-4 text-blue-400">
+                            <LayoutGrid className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-lg font-medium text-white mb-2">Apps coming soon</h3>
+                        <p className="text-sm text-jarvis-muted">
+                            Quick access links to your internal tools and applications will appear here.
+                        </p>
+                    </div>
+                </Card>
             </div>
 
             {/* API Connections Card */}
             <div className="border-t border-jarvis-border pt-4 md:pt-6">
                 <div className="flex items-center justify-between mb-3 md:mb-4">
                     <h2 className="text-base md:text-lg font-semibold text-white">API Connections</h2>
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
+                    <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={fetchApiConnections}
                         disabled={isRefreshing}
                         className="gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3"
@@ -360,15 +419,14 @@ export const HomePage = () => {
                         <Card key={connection.name} className="p-5">
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg ${
-                                        connection.status === 'connected' 
-                                            ? 'bg-emerald-500/10 text-emerald-400' 
-                                            : connection.status === 'error' 
+                                    <div className={`p-2 rounded-lg ${connection.status === 'connected'
+                                        ? 'bg-emerald-500/10 text-emerald-400'
+                                        : connection.status === 'error'
                                             ? 'bg-red-500/10 text-red-400'
                                             : connection.status === 'loading'
-                                            ? 'bg-blue-500/10 text-blue-400'
-                                            : 'bg-amber-500/10 text-amber-400'
-                                    }`}>
+                                                ? 'bg-blue-500/10 text-blue-400'
+                                                : 'bg-amber-500/10 text-amber-400'
+                                        }`}>
                                         <Zap className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -395,18 +453,18 @@ export const HomePage = () => {
                             </div>
                             <div className="mt-4 pt-3 border-t border-jarvis-border">
                                 <div className="flex items-center justify-between">
-                                    <Badge 
+                                    <Badge
                                         variant={
-                                            connection.status === 'connected' ? 'success' 
-                                            : connection.status === 'error' ? 'danger'
-                                            : connection.status === 'loading' ? 'default'
-                                            : 'outline'
+                                            connection.status === 'connected' ? 'success'
+                                                : connection.status === 'error' ? 'danger'
+                                                    : connection.status === 'loading' ? 'default'
+                                                        : 'outline'
                                         }
                                     >
-                                        {connection.status === 'connected' ? 'Connected' 
-                                         : connection.status === 'error' ? 'Error'
-                                         : connection.status === 'loading' ? 'Checking...'
-                                         : 'Not Configured'}
+                                        {connection.status === 'connected' ? 'Connected'
+                                            : connection.status === 'error' ? 'Error'
+                                                : connection.status === 'loading' ? 'Checking...'
+                                                    : 'Not Configured'}
                                     </Badge>
                                     {connection.latency && (
                                         <span className="text-xs text-jarvis-muted">{connection.latency}ms</span>
@@ -426,60 +484,6 @@ export const HomePage = () => {
                 </div>
             </div>
 
-            <div className="border-t border-jarvis-border pt-6">
-                <h2 className="text-lg font-semibold text-white mb-4">Applications</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Identity App Card - Fully Clickable */}
-                    <Card 
-                        hover 
-                        className="group relative overflow-hidden text-left bg-gradient-to-br from-jarvis-card to-jarvis-bg border-jarvis-accent/20 cursor-pointer"
-                        onClick={() => navigate('/apps/identity/services')}
-                    >
-                        <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
-                            <LayoutGrid className="w-16 h-16 text-jarvis-accent/20" />
-                        </div>
-                        <div className="p-6 relative z-10">
-                            <div className="p-3 bg-jarvis-accent/10 rounded-lg w-fit mb-4">
-                                <Shield className="w-6 h-6 text-jarvis-accent" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-jarvis-accent transition-colors">Identity & Services</h3>
-                                <p className="text-sm text-jarvis-muted mb-4">
-                                    Manage your digital identities, email accounts, subscriptions, and projects.
-                                </p>
-                                <div className="flex items-center text-jarvis-accent text-sm font-medium gap-1">
-                                    Open App <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-
-                    {/* AI Assistant Card - Fully Clickable */}
-                    <Card 
-                        hover 
-                        className="group relative overflow-hidden text-left bg-gradient-to-br from-jarvis-card to-jarvis-bg border-purple-500/20 cursor-pointer"
-                        onClick={() => navigate('/apps/identity/ai-query')}
-                    >
-                        <div className="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
-                            <Bot className="w-16 h-16 text-purple-500/20" />
-                        </div>
-                        <div className="p-6 relative z-10">
-                            <div className="p-3 bg-purple-500/10 rounded-lg w-fit mb-4">
-                                <Bot className="w-6 h-6 text-purple-400" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-purple-400 transition-colors">AI Assistant</h3>
-                                <p className="text-sm text-jarvis-muted mb-4">
-                                    Query your data using natural language. Ask about costs, renewals, and more.
-                                </p>
-                                <div className="flex items-center text-purple-400 text-sm font-medium gap-1">
-                                    Open App <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            </div>
         </div>
     );
 };

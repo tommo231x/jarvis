@@ -35,7 +35,7 @@ export interface SocialLink {
 export interface Identity {
     id: string;
     name: string;
-    category: 'personal' | 'work' | 'business' | 'project' | 'alias' | 'organization' | 'shared';
+    category: 'personal' | 'business' | 'project' | 'event';
     description?: string;
     avatar?: string;
     notes?: string;
@@ -74,8 +74,16 @@ export interface Service {
     id: string;
     name: string;
     category: string;
-    identityId: string;
-    emailId?: string;
+
+    // New Fields
+    ownerIdentityIds: string[]; // Supports multiple owners
+    billingEmailId?: string;    // Explicit billing email relation
+    isArchived?: boolean;       // Soft delete support
+
+    // Deprecated / Legacy Support
+    identityId?: string;        // @deprecated use ownerIdentityIds[0]
+    emailId?: string;          // @deprecated use billingEmailId
+
     ownership?: ServiceOwnership;
     billingCycle: 'monthly' | 'yearly' | 'none' | 'one-time';
     cost?: {

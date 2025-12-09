@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIdentity } from '../../context/IdentityContext';
 import { IdentityType } from '../../types/identity';
@@ -16,7 +16,7 @@ const CreateIdentity = () => {
         avatarUrl: ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         addIdentity(formData);
         navigate('/identities');

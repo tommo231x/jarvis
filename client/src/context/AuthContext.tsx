@@ -17,6 +17,7 @@ interface AuthContextType {
     register: (token: string, user: User) => void; // Added for consistency
     logout: () => void;
     isAuthenticated: boolean;
+    isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(DEV_MODE ? { id: 'dev-admin', username: 'Developer', name: 'Developer', email: 'dev@jarvis.local' } : null);
     const [token, setToken] = useState<string | null>(DEV_MODE ? 'dev-token-bypass' : null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (!DEV_MODE) {
@@ -35,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setUser(JSON.parse(storedUser));
             }
         }
+        setIsLoading(false);
     }, []);
 
     const login = (newToken: string, newUser: User) => {
@@ -56,7 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated: !!token }}>
+        <AuthContext.Provider value={{ user, token, login, register, logout, isAuthenticated: !!token, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

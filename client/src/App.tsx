@@ -18,7 +18,12 @@ import ChatWidget from './components/ChatWidget/ChatWidget';
 import './App.css'
 
 const PrivateRoute = ({ children }: { children: ReactNode }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isLoading } = useAuth();
+
+    if (isLoading) {
+        return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white">Loading...</div>;
+    }
+
     return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
@@ -28,34 +33,34 @@ function App() {
             <IdentityProvider>
                 <ModuleDataProvider>
                     <DataRefreshProvider>
-                    <Router>
-                        <Routes>
-                            <Route path="/login" element={<Login />} />
+                        <Router>
+                            <Routes>
+                                <Route path="/login" element={<Login />} />
 
-                            <Route path="/*" element={
-                                <PrivateRoute>
-                                    <Layout>
-                                        <Routes>
-                                            <Route path="/" element={<HomePage />} />
+                                <Route path="/*" element={
+                                    <PrivateRoute>
+                                        <Layout>
+                                            <Routes>
+                                                <Route path="/" element={<HomePage />} />
 
-                                            {/* Identity System Routes */}
-                                            <Route path="/identities" element={<IdentityHome />} />
-                                            <Route path="/identities/create" element={<CreateIdentity />} />
-                                            <Route path="/identities/:id" element={<IdentityDashboard />} />
+                                                {/* Identity System Routes */}
+                                                <Route path="/identities" element={<IdentityHome />} />
+                                                <Route path="/identities/create" element={<CreateIdentity />} />
+                                                <Route path="/identities/:id" element={<IdentityDashboard />} />
 
-                                            {/* Legacy/Existing Routes - Keeping /apps/identity as alias to IdentityHome if needed, or removing if replaced */}
-                                            <Route path="/apps/identity" element={<IdentityHome />} />
-                                            <Route path="/apps/identity/emails" element={<EmailsList />} />
-                                            <Route path="/apps/identity/services" element={<ServicesList />} />
-                                            <Route path="/apps/identity/projects" element={<ProjectsList />} />
-                                            <Route path="/apps/identity/ai" element={<AIQuery />} />
-                                        </Routes>
-                                    </Layout>
-                                    <ChatWidget />
-                                </PrivateRoute>
-                            } />
-                        </Routes>
-                    </Router>
+                                                {/* Legacy/Existing Routes - Keeping /apps/identity as alias to IdentityHome if needed, or removing if replaced */}
+                                                <Route path="/apps/identity" element={<IdentityHome />} />
+                                                <Route path="/apps/identity/emails" element={<EmailsList />} />
+                                                <Route path="/apps/identity/services" element={<ServicesList />} />
+                                                <Route path="/apps/identity/projects" element={<ProjectsList />} />
+                                                <Route path="/apps/identity/ai" element={<AIQuery />} />
+                                            </Routes>
+                                        </Layout>
+                                        <ChatWidget />
+                                    </PrivateRoute>
+                                } />
+                            </Routes>
+                        </Router>
                     </DataRefreshProvider>
                 </ModuleDataProvider>
             </IdentityProvider>

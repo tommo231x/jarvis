@@ -19,17 +19,12 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.use('/api', (req, res, next) => {
-    if (req.path.startsWith('/auth') || req.path.startsWith('/status')) {
-        return next();
-    }
-    authenticateToken(req, res, next);
-}, apiRouter);
+app.use('/api', apiRouter);
 
 if (process.env.NODE_ENV === 'production') {
     const clientDistPath = path.join(__dirname, '../../client/dist');
     app.use(express.static(clientDistPath));
-    
+
     app.get('*', (req, res) => {
         res.sendFile(path.join(clientDistPath, 'index.html'));
     });

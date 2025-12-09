@@ -2,7 +2,7 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { api, Service, Identity, Email } from '../../api';
 import { Input } from '../Input';
 import { Button } from '../Button';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 
 interface ServiceFormProps {
     initialData?: Service;
@@ -16,6 +16,9 @@ const defaultService: Omit<Service, 'id'> = {
     name: '',
     category: '',
     loginUrl: '',
+    ownerIdentityIds: [],
+    billingEmailId: '',
+    // Legacy fields for type safety, though we primarily set the new ones
     identityId: '',
     emailId: '',
     cost: {
@@ -39,8 +42,16 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                 name: initialData.name,
                 category: initialData.category,
                 loginUrl: initialData.loginUrl || '',
+                // Prefer new fields, fallback to legacy
+                ownerIdentityIds: initialData.ownerIdentityIds && initialData.ownerIdentityIds.length > 0
+                    ? initialData.ownerIdentityIds
+                    : (initialData.identityId ? [initialData.identityId] : []),
+                billingEmailId: initialData.billingEmailId || initialData.emailId || '',
+
+                // Keep legacy fields populated for internal consistency if needed
                 identityId: initialData.identityId || '',
                 emailId: initialData.emailId || '',
+
                 cost: initialData.cost || { amount: 0, currency: 'GBP' },
                 billingCycle: initialData.billingCycle || 'monthly',
                 renewalDate: initialData.renewalDate || '',
@@ -66,6 +77,32 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
         }
     };
 
+    const toggleOwner = (identityId: string) => {
+        setFormData(prev => {
+            const current = prev.ownerIdentityIds || [];
+            const exists = current.includes(identityId);
+            const newOwners = exists
+                ? current.filter(id => id !== identityId)
+                : [...current, identityId];
+
+            return {
+                ...prev,
+                ownerIdentityIds: newOwners,
+                // Update legacy singular field to the first selected owner (or empty)
+                identityId: newOwners.length > 0 ? newOwners[0] : ''
+            };
+        });
+    };
+
+    const handleBillingEmailChange = (e: ChangeEvent<HTMLSelectElement>) => {
+        const emailId = e.target.value;
+        setFormData(prev => ({
+            ...prev,
+            billingEmailId: emailId,
+            emailId: emailId // Sync legacy
+        }));
+    };
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -86,12 +123,8 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
         }
     };
 
-    const filteredEmails = formData.identityId 
-        ? emails.filter(e => e.identityId === formData.identityId)
-        : emails;
-
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
             <div className="bg-jarvis-card border border-jarvis-border rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between p-6 border-b border-jarvis-border bg-jarvis-bg/50 shrink-0">
                     <h2 className="text-xl font-bold text-white">
@@ -137,39 +170,54 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                         placeholder="https://..."
                     />
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-jarvis-muted">Identity</label>
-                            <select
-                                name="identityId"
-                                value={formData.identityId}
-                                onChange={handleChange}
-                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
-                                required
-                            >
-                                <option value="">-- Select Identity --</option>
-                                {identities.map(identity => (
-                                    <option key={identity.id} value={identity.id}>
-                                        {identity.name}
-                                    </option>
-                                ))}
-                            </select>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Owners Multi-Select */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-jarvis-muted">Owned By (Identities)</label>
+                            <div className="bg-jarvis-bg border border-jarvis-border rounded-lg p-2 max-h-40 overflow-y-auto space-y-1">
+                                {identities.map(identity => {
+                                    const isSelected = formData.ownerIdentityIds?.includes(identity.id);
+                                    return (
+                                        <div
+                                            key={identity.id}
+                                            onClick={() => toggleOwner(identity.id)}
+                                            className={`flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors ${isSelected ? 'bg-jarvis-accent/20 text-white' : 'hover:bg-white/5 text-jarvis-muted'
+                                                }`}
+                                        >
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'border-jarvis-accent bg-jarvis-accent' : 'border-jarvis-muted'
+                                                }`}>
+                                                {isSelected && <Check className="w-3 h-3 text-black" />}
+                                            </div>
+                                            <span className="text-sm">{identity.name}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            {(!formData.ownerIdentityIds || formData.ownerIdentityIds.length === 0) && (
+                                <p className="text-xs text-amber-400">Please select at least one owner.</p>
+                            )}
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-jarvis-muted">Associated Email (Optional)</label>
+
+                        {/* Billing Email Selection */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-jarvis-muted">Billing Email</label>
                             <select
-                                name="emailId"
-                                value={formData.emailId || ''}
-                                onChange={handleChange}
+                                name="billingEmailId"
+                                value={formData.billingEmailId || ''}
+                                onChange={handleBillingEmailChange}
                                 className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
                             >
-                                <option value="">-- No specific email --</option>
-                                {filteredEmails.map(email => (
+                                <option value="">-- Select Billing Email --</option>
+                                {emails.map(email => (
                                     <option key={email.id} value={email.id}>
                                         {email.address}
+                                        {email.label ? ` (${email.label})` : ''}
                                     </option>
                                 ))}
                             </select>
+                            <p className="text-xs text-jarvis-muted">
+                                Which email account receives the invoices?
+                            </p>
                         </div>
                     </div>
 

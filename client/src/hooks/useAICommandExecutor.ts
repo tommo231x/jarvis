@@ -34,8 +34,8 @@ export const useAICommandExecutor = () => {
                         description: cmd.payload.description,
                         notes: cmd.payload.notes,
                     });
-                    return { 
-                        success: true, 
+                    return {
+                        success: true,
                         message: `Created identity "${identity.name}"`,
                         data: identity
                     };
@@ -49,13 +49,13 @@ export const useAICommandExecutor = () => {
                     if (!cmd.payload.identityId) {
                         return { success: false, message: 'No identity ID provided for email' };
                     }
-                    
+
                     const provider = emailAddress.includes('gmail') ? 'gmail' :
-                                    emailAddress.includes('outlook') ? 'outlook' :
-                                    emailAddress.includes('yahoo') ? 'yahoo' :
-                                    emailAddress.includes('proton') ? 'proton' :
+                        emailAddress.includes('outlook') ? 'outlook' :
+                            emailAddress.includes('yahoo') ? 'yahoo' :
+                                emailAddress.includes('proton') ? 'proton' :
                                     emailAddress.includes('icloud') ? 'icloud' : 'other';
-                    
+
                     const email = await api.emails.create({
                         identityId: cmd.payload.identityId,
                         address: emailAddress,
@@ -63,8 +63,8 @@ export const useAICommandExecutor = () => {
                         provider: provider as any,
                         isPrimary: cmd.payload.isPrimary !== false,
                     });
-                    return { 
-                        success: true, 
+                    return {
+                        success: true,
                         message: `Added email "${emailAddress}"`,
                         data: email
                     };
@@ -76,8 +76,8 @@ export const useAICommandExecutor = () => {
                     }
                     const updates = cmd.payload.updates || cmd.payload;
                     const identity = await api.identities.update(cmd.payload.identityId, updates);
-                    return { 
-                        success: true, 
+                    return {
+                        success: true,
                         message: `Updated identity`,
                         data: identity
                     };
@@ -105,8 +105,8 @@ export const useAICommandExecutor = () => {
                     }
                     const updates = cmd.payload.updates || cmd.payload;
                     const email = await api.emails.update(cmd.payload.emailId, updates);
-                    return { 
-                        success: true, 
+                    return {
+                        success: true,
                         message: `Updated email`,
                         data: email
                     };
@@ -120,14 +120,16 @@ export const useAICommandExecutor = () => {
                     const service = await api.services.create({
                         name: cmd.payload.name || 'New Service',
                         category: cmd.payload.category || 'other',
+                        ownerIdentityIds: cmd.payload.identityId ? [cmd.payload.identityId] : [],
                         identityId: cmd.payload.identityId,
+                        billingEmailId: cmd.payload.emailId,
                         emailId: cmd.payload.emailId,
                         billingCycle: cmd.payload.billingCycle || 'monthly',
                         status: 'active',
                         notes: cmd.payload.notes,
                     });
-                    return { 
-                        success: true, 
+                    return {
+                        success: true,
                         message: `Added service "${service.name}"`,
                         data: service
                     };
@@ -149,46 +151,46 @@ export const useAICommandExecutor = () => {
                 case 'update_service_ownership':
                 case 'note_shared_usage':
                 case 'link_service_identity':
-                    return { 
-                        success: true, 
+                    return {
+                        success: true,
                         message: `Noted: ${cmd.action}`,
                         data: cmd.payload
                     };
 
                 default:
                     console.warn(`Unknown command action: ${cmd.action}`);
-                    return { 
-                        success: false, 
-                        message: `Unknown command: ${cmd.action}` 
+                    return {
+                        success: false,
+                        message: `Unknown command: ${cmd.action}`
                     };
             }
         } catch (error: any) {
             console.error(`Command execution failed:`, error);
-            return { 
-                success: false, 
-                message: error?.message || 'Command execution failed' 
+            return {
+                success: false,
+                message: error?.message || 'Command execution failed'
             };
         }
     };
 
     const executeAll = async (commands: AICommand[]): Promise<{ command: AICommand; success: boolean; message: string; data?: any }[]> => {
         const results: { command: AICommand; success: boolean; message: string; data?: any }[] = [];
-        
+
         let createdIdentityId: string | null = null;
 
         for (const cmd of commands) {
             if (cmd.action === 'add_email_to_identity' && !cmd.payload.identityId && createdIdentityId) {
                 cmd.payload.identityId = createdIdentityId;
             }
-            
+
             const result = await executeCommand(cmd);
             results.push({ command: cmd, ...result });
-            
+
             if (cmd.action === 'create_identity' && result.success && result.data?.id) {
                 createdIdentityId = result.data.id;
             }
         }
-        
+
         return results;
     };
 

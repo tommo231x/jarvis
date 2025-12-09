@@ -3,7 +3,7 @@ import { db } from './db';
 import { Email, Project, Service, User, Message, Identity } from './models';
 import { IDENTITY_AGENT_SYSTEM_PROMPT } from './prompts/identityAgentSystemPrompt';
 import OpenAI from 'openai';
-import { hashPassword, comparePassword, generateToken } from './auth';
+import { hashPassword, comparePassword, generateToken, authenticateToken } from './auth';
 
 const router = express.Router();
 
@@ -50,9 +50,14 @@ router.post('/auth/login', async (req, res) => {
 // Initialize OpenAI - supports Jarvis API key or Replit AI Integrations
 // Priority: JARVIS_OPENAI_API_KEY > Replit AI Integrations
 const useJarvisKey = !!process.env.JARVIS_OPENAI_API_KEY;
+const apiKey = useJarvisKey ? process.env.JARVIS_OPENAI_API_KEY : process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+
+// Fallback to avoid crash if no key is present - allows server to start for non-AI features
+const effectiveApiKey = apiKey || process.env.OPENAI_API_KEY || 'not-configured';
+
 const openai = new OpenAI({
     baseURL: useJarvisKey ? undefined : process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-    apiKey: useJarvisKey ? process.env.JARVIS_OPENAI_API_KEY : process.env.AI_INTEGRATIONS_OPENAI_API_KEY
+    apiKey: effectiveApiKey
 });
 
 // --- Status Checks ---
@@ -60,10 +65,10 @@ router.get('/status/openai', async (req, res) => {
     const jarvisApiKey = process.env.JARVIS_OPENAI_API_KEY;
     const integrationBaseUrl = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
     const integrationApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
-    
+
     const provider = jarvisApiKey ? 'OpenAI Direct (Jarvis)' : 'Replit AI Integrations';
     const isConfigured = jarvisApiKey || (integrationBaseUrl && integrationApiKey);
-    
+
     if (!isConfigured) {
         return res.json({ status: 'not_configured', provider: 'None' });
     }
@@ -76,9 +81,9 @@ router.get('/status/openai', async (req, res) => {
             max_completion_tokens: 50
         });
         const latency = Date.now() - start;
-        res.json({ 
-            status: 'connected', 
-            latency, 
+        res.json({
+            status: 'connected',
+            latency,
             provider,
             model: testCompletion.model || 'gpt-5.1'
         });
@@ -87,6 +92,10 @@ router.get('/status/openai', async (req, res) => {
         res.json({ status: 'error', error: error.message, provider });
     }
 });
+
+// --- Protected Routes Middleware ---
+// All routes defined after this will require authentication
+router.use(authenticateToken);
 
 // --- Identities ---
 router.get('/identities', async (req, res) => {
@@ -136,13 +145,33 @@ router.get('/services', async (req, res) => {
     res.json(services);
 });
 
+const syncServiceFields = (data: any) => {
+    // 1. Sync Owners -> Legacy Identity
+    if (data.ownerIdentityIds && data.ownerIdentityIds.length > 0 && !data.identityId) {
+        data.identityId = data.ownerIdentityIds[0];
+    } else if (data.identityId && (!data.ownerIdentityIds || data.ownerIdentityIds.length === 0)) {
+        data.ownerIdentityIds = [data.identityId];
+    }
+
+    // 2. Sync Billing Email -> Legacy Email
+    if (data.billingEmailId && !data.emailId) {
+        data.emailId = data.billingEmailId;
+    } else if (data.emailId && !data.billingEmailId) {
+        data.billingEmailId = data.emailId;
+    }
+
+    return data;
+};
+
 router.post('/services', async (req, res) => {
-    const newService = await db.collection<Service>('services').add(req.body);
+    const serviceData = syncServiceFields(req.body);
+    const newService = await db.collection<Service>('services').add(serviceData);
     res.status(201).json(newService);
 });
 
 router.put('/services/:id', async (req, res) => {
-    const updated = await db.collection<Service>('services').update(req.params.id, req.body);
+    const serviceData = syncServiceFields(req.body);
+    const updated = await db.collection<Service>('services').update(req.params.id, serviceData);
     res.json(updated);
 });
 

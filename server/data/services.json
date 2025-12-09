@@ -3,33 +3,65 @@
     "id": "svc-midjourney",
     "name": "Midjourney",
     "category": "AI Creative",
-    "identityId": "id-fina",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "billingEmailId": "email-fina-main",
+    "identityId": "id-tommo",
     "emailId": "email-fina-main",
     "billingCycle": "monthly",
-    "cost": { "amount": 30.00, "currency": "USD" },
+    "cost": {
+      "amount": 30,
+      "currency": "USD"
+    },
     "startDate": "2023-01-15",
     "renewalDate": "2025-01-15",
     "status": "active",
     "loginUrl": "https://midjourney.com",
     "notes": "Shared with Leila and Lara - Fina is primary owner",
     "ownership": {
-      "primaryOwnerId": "id-fina",
-      "sharedWithIdentityIds": ["id-leila", "id-lara"]
+      "primaryOwnerId": "id-tommo",
+      "sharedWithIdentityIds": [
+        "id-leila",
+        "id-lara"
+      ]
     },
     "usageHistory": [
-      { "identityId": "id-fina", "firstSeen": "2023-01-15", "lastSeen": "2024-12-07", "isActive": true },
-      { "identityId": "id-leila", "firstSeen": "2023-03-01", "lastSeen": "2024-12-05", "isActive": true },
-      { "identityId": "id-lara", "firstSeen": "2023-06-01", "lastSeen": "2024-12-06", "isActive": true }
+      {
+        "identityId": "id-tommo",
+        "firstSeen": "2023-01-15",
+        "lastSeen": "2024-12-07",
+        "isActive": true
+      },
+      {
+        "identityId": "id-leila",
+        "firstSeen": "2023-03-01",
+        "lastSeen": "2024-12-05",
+        "isActive": true
+      },
+      {
+        "identityId": "id-lara",
+        "firstSeen": "2023-06-01",
+        "lastSeen": "2024-12-06",
+        "isActive": true
+      }
     ]
   },
   {
     "id": "svc-tensor",
     "name": "Tensor Art",
     "category": "AI Creative",
-    "identityId": "id-fina",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "billingEmailId": "email-fina-main",
+    "identityId": "id-tommo",
     "emailId": "email-fina-main",
     "billingCycle": "monthly",
-    "cost": { "amount": 15.00, "currency": "USD" },
+    "cost": {
+      "amount": 15,
+      "currency": "USD"
+    },
     "status": "active",
     "notes": "Only used by Fina"
   },
@@ -37,10 +69,17 @@
     "id": "svc-muse-ai",
     "name": "Muse AI",
     "category": "AI Creative",
-    "identityId": "id-fina",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "billingEmailId": "email-fina-main",
+    "identityId": "id-tommo",
     "emailId": "email-fina-main",
     "billingCycle": "monthly",
-    "cost": { "amount": 20.00, "currency": "USD" },
+    "cost": {
+      "amount": 20,
+      "currency": "USD"
+    },
     "status": "active",
     "notes": "Only used by Fina"
   },
@@ -48,6 +87,10 @@
     "id": "svc-stable-diffusion",
     "name": "Stable Diffusion (DreamStudio)",
     "category": "AI Creative",
+    "ownerIdentityIds": [
+      "id-leila"
+    ],
+    "billingEmailId": "email-leila-creative",
     "identityId": "id-leila",
     "emailId": "email-leila-creative",
     "billingCycle": "none",
@@ -56,7 +99,9 @@
     "ownership": {
       "primaryOwnerId": "id-leila",
       "loginManagerId": "id-leila",
-      "sharedWithIdentityIds": ["id-lara"],
+      "sharedWithIdentityIds": [
+        "id-lara"
+      ],
       "financialOwnerId": "id-fina"
     }
   },
@@ -64,10 +109,17 @@
     "id": "svc-runway",
     "name": "Runway ML",
     "category": "AI Creative",
+    "ownerIdentityIds": [
+      "id-lara"
+    ],
+    "billingEmailId": "email-lara-main",
     "identityId": "id-lara",
     "emailId": "email-lara-main",
     "billingCycle": "monthly",
-    "cost": { "amount": 35.00, "currency": "USD" },
+    "cost": {
+      "amount": 35,
+      "currency": "USD"
+    },
     "status": "active",
     "notes": "Only used by Lara"
   },
@@ -75,10 +127,17 @@
     "id": "svc-adobe",
     "name": "Adobe Creative Cloud",
     "category": "Creative Tools",
+    "ownerIdentityIds": [
+      "id-generic-creative"
+    ],
+    "billingEmailId": "email-generic-creative",
     "identityId": "id-generic-creative",
     "emailId": "email-generic-creative",
     "billingCycle": "monthly",
-    "cost": { "amount": 54.99, "currency": "GBP" },
+    "cost": {
+      "amount": 54.99,
+      "currency": "GBP"
+    },
     "status": "active",
     "notes": "Generic creative account - unclear owner"
   },
@@ -86,10 +145,17 @@
     "id": "svc-netflix-generic",
     "name": "Netflix",
     "category": "Entertainment",
+    "ownerIdentityIds": [
+      "id-generic-creative"
+    ],
+    "billingEmailId": "email-generic-creative",
     "identityId": "id-generic-creative",
     "emailId": "email-generic-creative",
     "billingCycle": "monthly",
-    "cost": { "amount": 15.99, "currency": "GBP" },
+    "cost": {
+      "amount": 15.99,
+      "currency": "GBP"
+    },
     "status": "active",
     "notes": "Registered to generic email - ownership ambiguous"
   },
@@ -97,10 +163,17 @@
     "id": "svc-youtube-premium",
     "name": "YouTube Premium",
     "category": "Entertainment",
-    "identityId": "id-studio",
+    "ownerIdentityIds": [
+      "id-tommo-studio"
+    ],
+    "billingEmailId": "email-studio",
+    "identityId": "id-tommo-studio",
     "emailId": "email-studio",
     "billingCycle": "monthly",
-    "cost": { "amount": 12.99, "currency": "GBP" },
+    "cost": {
+      "amount": 12.99,
+      "currency": "GBP"
+    },
     "status": "active",
     "notes": "Studio account - used by all personas"
   },
@@ -108,10 +181,17 @@
     "id": "svc-cloudflare",
     "name": "Cloudflare",
     "category": "Infrastructure",
-    "identityId": "id-studio",
+    "ownerIdentityIds": [
+      "id-tommo-studio"
+    ],
+    "billingEmailId": "email-studio",
+    "identityId": "id-tommo-studio",
     "emailId": "email-studio",
     "billingCycle": "monthly",
-    "cost": { "amount": 20.00, "currency": "USD" },
+    "cost": {
+      "amount": 20,
+      "currency": "USD"
+    },
     "status": "active",
     "notes": "Business infrastructure - studio managed"
   },
@@ -119,7 +199,11 @@
     "id": "svc-twitch",
     "name": "Twitch",
     "category": "Streaming",
-    "identityId": "id-studio",
+    "ownerIdentityIds": [
+      "id-tommo-studio"
+    ],
+    "billingEmailId": "email-studio",
+    "identityId": "id-tommo-studio",
     "emailId": "email-studio",
     "billingCycle": "none",
     "status": "active",
@@ -129,10 +213,17 @@
     "id": "svc-spotify-lara",
     "name": "Spotify Premium",
     "category": "Entertainment",
+    "ownerIdentityIds": [
+      "id-lara"
+    ],
+    "billingEmailId": "email-lara-main",
     "identityId": "id-lara",
     "emailId": "email-lara-main",
     "billingCycle": "monthly",
-    "cost": { "amount": 10.99, "currency": "GBP" },
+    "cost": {
+      "amount": 10.99,
+      "currency": "GBP"
+    },
     "status": "active",
     "notes": "Lara is primary user, Fina pays the bill",
     "ownership": {
@@ -144,6 +235,10 @@
     "id": "svc-pension-tomo",
     "name": "Aviva Pension",
     "category": "Finance",
+    "ownerIdentityIds": [
+      "id-tomo"
+    ],
+    "billingEmailId": "email-tomo",
     "identityId": "id-tomo",
     "emailId": "email-tomo",
     "billingCycle": "none",
@@ -154,6 +249,10 @@
     "id": "svc-trust-tomo",
     "name": "Connor Family Trust",
     "category": "Finance",
+    "ownerIdentityIds": [
+      "id-tomo"
+    ],
+    "billingEmailId": "email-tomo",
     "identityId": "id-tomo",
     "emailId": "email-tomo",
     "billingCycle": "none",
@@ -164,10 +263,17 @@
     "id": "svc-easysplit-render",
     "name": "Render",
     "category": "Infrastructure",
+    "ownerIdentityIds": [
+      "18728d2c-336a-49d3-a40c-950c27fcb193"
+    ],
+    "billingEmailId": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
     "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
     "emailId": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
     "billingCycle": "monthly",
-    "cost": { "amount": 7.99, "currency": "GBP" },
+    "cost": {
+      "amount": 7.99,
+      "currency": "GBP"
+    },
     "status": "active",
     "loginUrl": "https://render.com",
     "notes": "Backend hosting for Easy Split"
@@ -176,10 +282,17 @@
     "id": "svc-easysplit-firebase",
     "name": "Firebase",
     "category": "Infrastructure",
+    "ownerIdentityIds": [
+      "18728d2c-336a-49d3-a40c-950c27fcb193"
+    ],
+    "billingEmailId": "email-easysplit-firebase",
     "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
     "emailId": "email-easysplit-firebase",
     "billingCycle": "none",
-    "cost": { "amount": 0, "currency": "GBP" },
+    "cost": {
+      "amount": 0,
+      "currency": "GBP"
+    },
     "status": "active",
     "loginUrl": "https://firebase.google.com",
     "notes": "Frontend hosting for Easy Split (free tier)"
@@ -188,12 +301,122 @@
     "id": "svc-easysplit-github",
     "name": "GitHub",
     "category": "Development",
+    "ownerIdentityIds": [
+      "18728d2c-336a-49d3-a40c-950c27fcb193"
+    ],
+    "billingEmailId": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
     "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
     "emailId": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
     "billingCycle": "none",
-    "cost": { "amount": 0, "currency": "GBP" },
+    "cost": {
+      "amount": 0,
+      "currency": "GBP"
+    },
     "status": "active",
     "loginUrl": "https://github.com",
-    "notes": "Source code repository for Easy Split"
+    "notes": "Source code repository for Easy Split",
+    "isArchived": false
+  },
+  {
+    "name": "bean counter",
+    "category": "finance",
+    "loginUrl": "",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "billingEmailId": "email-fina-main",
+    "identityId": "id-tommo",
+    "emailId": "email-fina-main",
+    "cost": {
+      "amount": 20,
+      "currency": "GBP"
+    },
+    "billingCycle": "monthly",
+    "renewalDate": "",
+    "status": "active",
+    "notes": "i might cancel ",
+    "id": "1ab25655-46a6-498a-8696-e9db8f6593c2"
+  },
+  {
+    "name": "Test Archive Service",
+    "category": "Testing",
+    "loginUrl": "",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "billingEmailId": "",
+    "identityId": "id-tommo",
+    "emailId": "",
+    "cost": {
+      "amount": 0,
+      "currency": "GBP"
+    },
+    "billingCycle": "monthly",
+    "renewalDate": "",
+    "status": "active",
+    "notes": "",
+    "id": "0ad4c41b-cd40-45ec-beae-79202beb98b8",
+    "isArchived": false
+  },
+  {
+    "name": "Test Archive Service",
+    "category": "Testing",
+    "loginUrl": "",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "billingEmailId": "email-fina-main",
+    "identityId": "id-tommo",
+    "emailId": "email-fina-main",
+    "cost": {
+      "amount": 0,
+      "currency": "GBP"
+    },
+    "billingCycle": "monthly",
+    "renewalDate": "",
+    "status": "active",
+    "notes": "",
+    "id": "9b6f6975-9a05-4e52-ae0f-06f671cdc3b3"
+  },
+  {
+    "name": "Test Archive Service",
+    "category": "Testing",
+    "loginUrl": "",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "billingEmailId": "email-fina-main",
+    "identityId": "id-tommo",
+    "emailId": "email-fina-main",
+    "cost": {
+      "amount": 0,
+      "currency": "GBP"
+    },
+    "billingCycle": "monthly",
+    "renewalDate": "",
+    "status": "active",
+    "notes": "",
+    "id": "51e911aa-cb88-40d1-9cff-a9fe5ab35e0d"
+  },
+  {
+    "name": "Test Archive Service",
+    "category": "Testing",
+    "loginUrl": "",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "billingEmailId": "email-fina-main",
+    "identityId": "id-tommo",
+    "emailId": "email-fina-main",
+    "cost": {
+      "amount": 0,
+      "currency": "USD"
+    },
+    "billingCycle": "monthly",
+    "renewalDate": "",
+    "status": "active",
+    "notes": "",
+    "id": "0f0e0dd0-1fe1-439a-aa7b-1fbb146dcc93",
+    "isArchived": false
   }
 ]

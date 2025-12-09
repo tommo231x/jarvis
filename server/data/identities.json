@@ -1,29 +1,15 @@
 [
   {
-    "id": "id-fina",
-    "name": "Fina Feels",
+    "id": "id-tommo",
+    "name": "Tommo",
     "category": "personal",
-    "description": "Primary personal identity - Fina",
+    "description": "Primary identity",
     "notes": "Main persona for personal accounts and creative work"
   },
   {
-    "id": "id-leila",
-    "name": "Leila",
-    "category": "personal",
-    "description": "Secondary persona - Leila (creative alias)",
-    "notes": "Used for some creative and shared accounts"
-  },
-  {
-    "id": "id-lara",
-    "name": "Lara Feels",
-    "category": "personal",
-    "description": "Third persona - Lara (family member)",
-    "notes": "Family member who shares some services"
-  },
-  {
-    "id": "id-studio",
-    "name": "Fina Feels Studio",
-    "category": "organization",
+    "id": "id-tommo-studio",
+    "name": "Tommo Dev",
+    "category": "business",
     "description": "Business/studio identity for creative work",
     "notes": "Organisation account for billing and business services",
     "isOrganization": true
@@ -31,16 +17,9 @@
   {
     "id": "id-generic-creative",
     "name": "Creative Hub (Shared)",
-    "category": "shared",
+    "category": "project",
     "description": "Shared creative account - ambiguous ownership",
     "notes": "Generic account used for multiple services - unclear primary owner"
-  },
-  {
-    "id": "id-tomo",
-    "name": "Tomo Connor",
-    "category": "personal",
-    "description": "Separate identity - financial/pension holder",
-    "notes": "Identity for pension and trust fund communications"
   },
   {
     "name": "Fish and Dips",

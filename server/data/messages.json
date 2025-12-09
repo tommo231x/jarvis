@@ -10,10 +10,19 @@
     "priority": "low",
     "read": true,
     "isRelevant": true,
-    "flags": ["receipt", "subscription"],
+    "flags": [
+      "receipt",
+      "subscription"
+    ],
     "detectedService": "Midjourney",
-    "detectedIdentities": ["id-fina"],
-    "billingInfo": { "chargedTo": "Fina Feels", "amount": 30.00, "currency": "USD" }
+    "detectedIdentities": [
+      "id-tommo"
+    ],
+    "billingInfo": {
+      "chargedTo": "Fina Feels",
+      "amount": 30.00,
+      "currency": "USD"
+    }
   },
   {
     "id": "msg-sd-invoice",
@@ -26,10 +35,20 @@
     "priority": "medium",
     "read": false,
     "isRelevant": true,
-    "flags": ["invoice", "business-billing"],
+    "flags": [
+      "invoice",
+      "business-billing"
+    ],
     "detectedService": "Stable Diffusion",
-    "detectedIdentities": ["id-leila", "id-fina"],
-    "billingInfo": { "chargedTo": "Fina Feels Ltd", "amount": 50.00, "currency": "USD" }
+    "detectedIdentities": [
+      "id-leila",
+      "id-tommo"
+    ],
+    "billingInfo": {
+      "chargedTo": "Fina Feels Ltd",
+      "amount": 50.00,
+      "currency": "USD"
+    }
   },
   {
     "id": "msg-spotify-promo",
@@ -43,7 +62,9 @@
     "read": true,
     "isRelevant": false,
     "detectedService": "Spotify",
-    "detectedIdentities": ["id-lara"],
+    "detectedIdentities": [
+      "id-lara"
+    ],
     "greetingName": "Lara Feels"
   },
   {
@@ -57,10 +78,18 @@
     "priority": "low",
     "read": true,
     "isRelevant": true,
-    "flags": ["receipt"],
+    "flags": [
+      "receipt"
+    ],
     "detectedService": "Spotify",
-    "detectedIdentities": ["id-fina"],
-    "billingInfo": { "chargedTo": "Fina Feels", "amount": 10.99, "currency": "GBP" }
+    "detectedIdentities": [
+      "id-tommo"
+    ],
+    "billingInfo": {
+      "chargedTo": "Fina Feels",
+      "amount": 10.99,
+      "currency": "GBP"
+    }
   },
   {
     "id": "msg-spotify-promo-lara",
@@ -74,7 +103,9 @@
     "read": true,
     "isRelevant": true,
     "detectedService": "Spotify",
-    "detectedIdentities": ["id-lara"],
+    "detectedIdentities": [
+      "id-lara"
+    ],
     "greetingName": "Lara Feels"
   },
   {
@@ -88,9 +119,15 @@
     "priority": "medium",
     "read": true,
     "isRelevant": true,
-    "flags": ["login-alert"],
+    "flags": [
+      "login-alert"
+    ],
     "detectedService": "Midjourney",
-    "securityEvent": { "type": "login", "location": "London, United Kingdom", "device": "Chrome on Windows" }
+    "securityEvent": {
+      "type": "login",
+      "location": "London, United Kingdom",
+      "device": "Chrome on Windows"
+    }
   },
   {
     "id": "msg-login-spain",
@@ -103,9 +140,15 @@
     "priority": "medium",
     "read": false,
     "isRelevant": true,
-    "flags": ["login-alert"],
+    "flags": [
+      "login-alert"
+    ],
     "detectedService": "Midjourney",
-    "securityEvent": { "type": "login", "location": "Barcelona, Spain", "device": "Safari on macOS" }
+    "securityEvent": {
+      "type": "login",
+      "location": "Barcelona, Spain",
+      "device": "Safari on macOS"
+    }
   },
   {
     "id": "msg-password-reset-unknown",
@@ -118,9 +161,14 @@
     "priority": "high",
     "read": false,
     "isRelevant": true,
-    "flags": ["password-reset", "security-alert"],
+    "flags": [
+      "password-reset",
+      "security-alert"
+    ],
     "detectedService": "Cloudflare",
-    "securityEvent": { "type": "password_reset" }
+    "securityEvent": {
+      "type": "password_reset"
+    }
   },
   {
     "id": "msg-pension-annual",
@@ -133,9 +181,15 @@
     "priority": "high",
     "read": false,
     "isRelevant": true,
-    "flags": ["pension", "statement", "high-value"],
+    "flags": [
+      "pension",
+      "statement",
+      "high-value"
+    ],
     "financialType": "pension",
-    "attachments": ["Pension_Statement_2024.pdf"]
+    "attachments": [
+      "Pension_Statement_2024.pdf"
+    ]
   },
   {
     "id": "msg-trust-reallocation",
@@ -148,7 +202,11 @@
     "priority": "high",
     "read": false,
     "isRelevant": true,
-    "flags": ["trust-fund", "action-required", "high-value"],
+    "flags": [
+      "trust-fund",
+      "action-required",
+      "high-value"
+    ],
     "financialType": "trust_fund"
   },
   {
@@ -162,7 +220,11 @@
     "priority": "medium",
     "read": false,
     "isRelevant": true,
-    "flags": ["isa", "tax-info", "investment"],
+    "flags": [
+      "isa",
+      "tax-info",
+      "investment"
+    ],
     "financialType": "investment"
   },
   {
@@ -176,9 +238,14 @@
     "priority": "medium",
     "read": false,
     "isRelevant": true,
-    "flags": ["transaction"],
+    "flags": [
+      "transaction"
+    ],
     "detectedService": "Adobe",
-    "billingInfo": { "amount": 54.99, "currency": "GBP" }
+    "billingInfo": {
+      "amount": 54.99,
+      "currency": "GBP"
+    }
   },
   {
     "id": "msg-usage-change-early",
@@ -192,7 +259,9 @@
     "read": true,
     "isRelevant": true,
     "detectedService": "Runway",
-    "detectedIdentities": ["id-fina"]
+    "detectedIdentities": [
+      "id-tommo"
+    ]
   },
   {
     "id": "msg-usage-change-later",
@@ -206,7 +275,9 @@
     "read": true,
     "isRelevant": true,
     "detectedService": "Runway",
-    "detectedIdentities": ["id-lara"],
+    "detectedIdentities": [
+      "id-lara"
+    ],
     "greetingName": "Lara"
   },
   {
@@ -220,6 +291,8 @@
     "priority": "low",
     "read": false,
     "isRelevant": true,
-    "flags": ["new-service"]
+    "flags": [
+      "new-service"
+    ]
   }
 ]

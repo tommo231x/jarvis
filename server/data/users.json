@@ -8,5 +8,20 @@
     "username": "demo@jarvis.local",
     "passwordHash": "$2b$10$844rEiFroY5CvK4hSOc7F.wuqh7aHnoas7dSo5DFWGZi5JwHL27Cq",
     "id": "demo-user-001"
+  },
+  {
+    "username": "admin@example.com",
+    "passwordHash": "$2b$10$kOqIgacgYqSd2zcZS5i2ZuG9bi3yZHLMVZo.HXUaYXnr4GWgamh.q",
+    "id": "e60006da-8e8d-4f69-af68-2e12e97cfadf"
+  },
+  {
+    "username": "owner_v2@jarvis.local",
+    "passwordHash": "$2b$10$oRv5H6cXIklG7qUtHzruWuauClTTqJSUeRhLS3uXWYAkP1c0Qs8Du",
+    "id": "52a07d9d-6dc7-4dfa-807e-0e4c8dc8b299"
+  },
+  {
+    "username": "tommo231@gmail.com",
+    "passwordHash": "$2b$10$c2qQVff1IIdlb48CObcLDuZdLAd8VOPvAKiRilWjZ6gVjvPEGIgfW",
+    "id": "5b2f9093-3486-4576-a886-9dc4b3a177d5"
   }
 ]

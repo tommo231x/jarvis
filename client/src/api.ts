@@ -36,8 +36,16 @@ export interface Service {
     id: string;
     name: string;
     category: string;
-    identityId: string;
+
+    // New Fields
+    ownerIdentityIds: string[];
+    billingEmailId?: string;
+    isArchived?: boolean; // New field for soft delete
+
+    // Deprecated / Legacy
+    identityId?: string;
     emailId?: string;
+
     ownership?: ServiceOwnership;
     billingCycle: 'monthly' | 'yearly' | 'none' | 'one-time';
     cost?: {
@@ -158,9 +166,9 @@ export const api = {
         delete: (id: string) => request<{ success: boolean }>(`/projects/${id}`, { method: 'DELETE' }),
     },
     ai: {
-        query: (query: string, conversationHistory?: Array<{ sender: string; text: string }>) => 
+        query: (query: string, conversationHistory?: Array<{ sender: string; text: string }>) =>
             request<{ answer: string; commands: any[]; has_high_value_financial?: boolean }>(
-                '/ai/query', 
+                '/ai/query',
                 { method: 'POST', body: JSON.stringify({ query, conversationHistory }) }
             ),
     },

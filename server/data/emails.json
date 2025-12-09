@@ -1,9 +1,9 @@
 [
   {
     "id": "email-fina-main",
-    "identityId": "id-fina",
+    "identityId": "id-tommo",
     "label": "Fina Main",
-    "address": "finafeels@gmail.com",
+    "address": "tommo231@gmail.com",
     "provider": "gmail",
     "isPrimary": true,
     "description": "Fina's primary email - owner of Midjourney account",
@@ -35,15 +35,15 @@
   },
   {
     "id": "email-studio",
-    "identityId": "id-studio",
+    "identityId": "id-tommo-studio",
     "label": "Studio Business",
-    "address": "studio@finafeels.com",
+    "address": "tommo.dev@gmail.com",
     "provider": "other",
     "isPrimary": true,
     "description": "Business email for Fina Feels Studio",
     "notes": "Billing, YouTube Premium, Cloudflare, Twitch - shared by multiple personas",
     "sharedWithIdentityIds": [
-      "id-fina",
+      "id-tommo",
       "id-leila",
       "id-lara"
     ],

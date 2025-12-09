@@ -1,32 +1,39 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useIdentity } from '../../context/IdentityContext';
 import { useModuleData } from '../../context/ModuleDataContext';
 import { TaskRecord, AdminLinkRecord } from '../../types/moduleData';
+import { api, Service } from '../../api';
 import { CreditCard, CheckSquare, Clock, Link as LinkIcon, Mail, ExternalLink } from 'lucide-react';
 
 const IdentityGlobalWidgets = () => {
     const { identities } = useIdentity();
     const { data } = useModuleData();
+    const [services, setServices] = useState<Service[]>([]);
+
+    useEffect(() => {
+        api.services.list().then(setServices).catch(console.error);
+    }, []);
 
     // -- 1. Subscription Overview --
     const subscriptionData = useMemo(() => {
         let totalCount = 0;
         let monthlyCost = 0;
 
-        identities.forEach(identity => {
-            const subs = data[identity.id]?.subscriptions || [];
-            totalCount += subs.length;
-            subs.forEach(sub => {
-                if (sub.frequency === 'monthly') {
-                    monthlyCost += sub.amount;
-                } else if (sub.frequency === 'yearly') {
-                    monthlyCost += sub.amount / 12;
-                }
-            });
+        // Use real services
+        const activeServices = services.filter(s => s.status === 'active' && s.cost);
+        totalCount = activeServices.length;
+
+        activeServices.forEach(sub => {
+            if (!sub.cost) return;
+            if (sub.billingCycle === 'monthly') {
+                monthlyCost += sub.cost.amount;
+            } else if (sub.billingCycle === 'yearly') {
+                monthlyCost += sub.cost.amount / 12;
+            }
         });
 
         return { totalCount, monthlyCost };
-    }, [identities, data]);
+    }, [services]);
 
     // -- 2. Reminders / Upcoming Tasks --
     const upcomingTasks = useMemo(() => {
@@ -62,64 +69,72 @@ const IdentityGlobalWidgets = () => {
     const recentActivity = useMemo(() => {
         let events: RecentEvent[] = [];
 
+        // Mix Module Data (Emails/Tasks) + Real Services (Subscriptions)
+
         identities.forEach(identity => {
             const modData = data[identity.id];
-            if (!modData) return;
 
             // Emails
-            (modData.email || []).forEach(email => {
-                events.push({
-                    id: email.id,
-                    type: 'email',
-                    title: email.subject,
-                    date: email.date,
-                    identityName: identity.name,
-                    identityId: identity.id
+            if (modData) {
+                (modData.email || []).forEach(email => {
+                    events.push({
+                        id: email.id,
+                        type: 'email',
+                        title: email.subject,
+                        date: email.date,
+                        identityName: identity.name,
+                        identityId: identity.id
+                    });
                 });
-            });
 
-            // Tasks (upcoming)
-            (modData.tasks || []).forEach(task => {
-                if (!task.isDone && task.dueDate) {
-                    events.push({
-                        id: task.id,
-                        type: 'task',
-                        title: task.title,
-                        date: task.dueDate,
-                        identityName: identity.name,
-                        identityId: identity.id
-                    });
-                }
-            });
+                // Tasks (upcoming)
+                (modData.tasks || []).forEach(task => {
+                    if (!task.isDone && task.dueDate) {
+                        events.push({
+                            id: task.id,
+                            type: 'task',
+                            title: task.title,
+                            date: task.dueDate,
+                            identityName: identity.name,
+                            identityId: identity.id
+                        });
+                    }
+                });
+            }
+        });
 
-            // Subscriptions (upcoming billing)
-            (modData.subscriptions || []).forEach(sub => {
-                if (sub.nextBillingDate) {
-                    events.push({
-                        id: sub.id,
-                        type: 'subscription',
-                        title: `Billing: ${sub.name}`,
-                        date: sub.nextBillingDate,
-                        identityName: identity.name,
-                        identityId: identity.id
-                    });
+        // Subscriptions (Real Data)
+        services.forEach(sub => {
+            if (sub.renewalDate) {
+                // Find primary owner name
+                // Logic: ownerIdentityIds[0] -> name
+                let identityName = 'Unknown';
+                if (sub.ownerIdentityIds && sub.ownerIdentityIds.length > 0) {
+                    const owner = identities.find(i => i.id === sub.ownerIdentityIds[0]);
+                    if (owner) identityName = owner.name;
+                } else if (sub.identityId) {
+                    const owner = identities.find(i => i.id === sub.identityId); // Legacy
+                    if (owner) identityName = owner.name;
                 }
-            });
+
+                events.push({
+                    id: sub.id,
+                    type: 'subscription',
+                    title: `Renew: ${sub.name}`,
+                    date: sub.renewalDate,
+                    identityName: identityName,
+                    identityId: sub.ownerIdentityIds?.[0] || sub.identityId || ''
+                });
+            }
         });
 
         // Sort by date descending (Activity Feed style)
-        // Note: For upcoming stuff, "newest first" (furthest future) puts them at top?
-        // Actually usually "Recent Updates" implies "What just happened" OR "What is most relevant".
-        // The user said: "Most recent emails (by date)", "Tasks upcoming soon".
-        // If we sort simply by date descending:
-        // Future dates (tasks/subs) > Current > Past (emails).
-        // This effectively shows upcoming tasks first, then recent emails. This works well.
         return events.sort((a, b) => {
             if (!a.date) return 1;
             if (!b.date) return -1;
             return new Date(b.date).getTime() - new Date(a.date).getTime();
         }).slice(0, 5);
-    }, [identities, data]);
+    }, [identities, data, services]);
 
     // -- 4. Quick Admin Links --
     const quickLinks = useMemo(() => {
