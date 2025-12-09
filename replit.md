@@ -122,7 +122,18 @@ The system comes pre-loaded with realistic demo data:
 
 **Projects (1):** Jarvis Identity Hub
 
-## Recent Changes (December 8, 2025)
+## Recent Changes (December 9, 2025)
+- **Multi-Currency Conversion System:**
+  - Auto-detects base currency from most common currency in user's services
+  - Only fetches exchange rates when foreign currencies are present
+  - Uses Frankfurter API for real-time exchange rates
+  - 24-hour caching in localStorage to minimize API calls
+  - Subtle exchange rate indicator on "Monthly Spend" card (clickable)
+  - Popover shows active rates with inverse conversion display
+  - Refresh button clears cache and fetches fresh rates
+  - New files: `client/src/utils/currency.ts`, `client/src/components/ExchangeRateIndicator.tsx`
+
+## Previous Changes (December 8, 2025)
 - **Mobile-Responsive UI:**
   - New MobileNav component with bottom navigation bar (Overview, Services, Projects, Emails, AI)
   - Full-screen ChatWidget on mobile with safe area support
