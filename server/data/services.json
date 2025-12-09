@@ -376,7 +376,8 @@
     "renewalDate": "",
     "status": "active",
     "notes": "",
-    "id": "9b6f6975-9a05-4e52-ae0f-06f671cdc3b3"
+    "id": "9b6f6975-9a05-4e52-ae0f-06f671cdc3b3",
+    "isArchived": false
   },
   {
     "name": "Test Archive Service",
@@ -396,7 +397,8 @@
     "renewalDate": "",
     "status": "active",
     "notes": "",
-    "id": "51e911aa-cb88-40d1-9cff-a9fe5ab35e0d"
+    "id": "51e911aa-cb88-40d1-9cff-a9fe5ab35e0d",
+    "isArchived": false
   },
   {
     "name": "Test Archive Service",
