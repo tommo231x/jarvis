@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { api, Service, Identity, Email } from '../../api';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
@@ -6,8 +6,16 @@ import { Badge } from '../../components/Badge';
 import { BackButton } from '../../components/BackButton';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { RestoreServiceModal } from '../../components/RestoreServiceModal';
-import { Search, Plus, Globe, Edit2, Trash2, Archive, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
+import { Search, Plus, Globe, Edit2, Trash2, Archive, RefreshCw, ChevronDown, ChevronRight, Calculator } from 'lucide-react';
 import { ServiceForm } from '../../components/identity/ServiceForm';
+import {
+    detectBaseCurrency,
+    detectForeignCurrencies,
+    fetchExchangeRates,
+    convertToBaseCurrency,
+    formatCurrency,
+    ExchangeRates
+} from '../../utils/currency';
 
 export const ServicesList = () => {
     const [services, setServices] = useState<Service[]>([]);
@@ -20,6 +28,8 @@ export const ServicesList = () => {
     const [filterIdentity, setFilterIdentity] = useState('');
     const [filterEmail, setFilterEmail] = useState('');
     const [showArchived, setShowArchived] = useState(false);
+    const [baseCurrency, setBaseCurrency] = useState<string>('GBP');
+    const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
 
     // Confirmation Modal State
     const [confirmationModal, setConfirmationModal] = useState<{
@@ -56,6 +66,15 @@ export const ServicesList = () => {
             setServices(servicesData);
             setIdentities(identitiesData);
             setEmails(emailsData);
+
+            const detectedBase = detectBaseCurrency(servicesData);
+            const detectedForeign = detectForeignCurrencies(servicesData, detectedBase);
+            setBaseCurrency(detectedBase);
+
+            if (detectedForeign.length > 0) {
+                const rates = await fetchExchangeRates(detectedBase, detectedForeign);
+                setExchangeRates(rates);
+            }
         } catch (error) {
             console.error('Failed to fetch data:', error);
         } finally {
@@ -161,6 +180,42 @@ export const ServicesList = () => {
 
     const archivedServices = services.filter(s => s.isArchived);
 
+    const costSummary = useMemo(() => {
+        const currencyTotals: Record<string, number> = {};
+        let convertedTotal = 0;
+        const includedServices: { name: string; amount: number; currency: string; monthly: number }[] = [];
+
+        filteredServices.forEach(service => {
+            if (!service.cost || service.status === 'cancelled') return;
+            
+            let monthlyAmount = 0;
+            if (service.billingCycle === 'monthly') {
+                monthlyAmount = service.cost.amount;
+            } else if (service.billingCycle === 'yearly') {
+                monthlyAmount = service.cost.amount / 12;
+            } else {
+                return;
+            }
+
+            if (monthlyAmount > 0) {
+                const currency = service.cost.currency;
+                currencyTotals[currency] = (currencyTotals[currency] || 0) + monthlyAmount;
+                
+                includedServices.push({
+                    name: service.name,
+                    amount: service.cost.amount,
+                    currency,
+                    monthly: monthlyAmount
+                });
+
+                const converted = convertToBaseCurrency(monthlyAmount, currency, baseCurrency, exchangeRates);
+                convertedTotal += converted;
+            }
+        });
+
+        return { currencyTotals, convertedTotal, includedServices };
+    }, [filteredServices, baseCurrency, exchangeRates]);
+
     return (
         <div className="space-y-4 md:space-y-6 animate-fade-in">
             <BackButton to="/" label="Back to Dashboard" />
@@ -214,6 +269,66 @@ export const ServicesList = () => {
                     </select>
                 </div>
             </div>
+
+            {/* Cost Summary */}
+            {costSummary.includedServices.length > 0 && (
+                <div className="bg-gradient-to-r from-jarvis-accent/10 to-violet-500/10 border border-jarvis-accent/30 rounded-xl p-4">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-jarvis-accent/20 flex items-center justify-center">
+                                <Calculator className="w-5 h-5 text-jarvis-accent" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-medium text-white">Monthly Total</h3>
+                                <p className="text-xs text-jarvis-muted">
+                                    {costSummary.includedServices.length} services with costs
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div className="flex flex-col md:flex-row md:items-center gap-4">
+                            <div className="flex flex-wrap gap-3">
+                                {Object.entries(costSummary.currencyTotals).map(([currency, amount]) => (
+                                    <div key={currency} className="bg-jarvis-bg/50 rounded-lg px-3 py-2">
+                                        <span className="text-xs text-jarvis-muted block">{currency}</span>
+                                        <span className="text-sm font-semibold text-white">
+                                            {formatCurrency(amount, currency)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {Object.keys(costSummary.currencyTotals).length > 1 && exchangeRates && (
+                                <div className="bg-jarvis-accent/20 rounded-lg px-4 py-2 border border-jarvis-accent/30">
+                                    <span className="text-xs text-jarvis-muted block">Converted Total ({baseCurrency})</span>
+                                    <span className="text-lg font-bold text-jarvis-accent">
+                                        {formatCurrency(costSummary.convertedTotal, baseCurrency)}
+                                    </span>
+                                </div>
+                            )}
+                            
+                            {Object.keys(costSummary.currencyTotals).length === 1 && (
+                                <div className="bg-jarvis-accent/20 rounded-lg px-4 py-2 border border-jarvis-accent/30">
+                                    <span className="text-xs text-jarvis-muted block">Total</span>
+                                    <span className="text-lg font-bold text-jarvis-accent">
+                                        {formatCurrency(costSummary.convertedTotal, baseCurrency)}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {exchangeRates && Object.keys(costSummary.currencyTotals).length > 1 && (
+                        <div className="mt-3 pt-3 border-t border-jarvis-border/30">
+                            <p className="text-xs text-jarvis-muted">
+                                Exchange rates: {Object.entries(exchangeRates.rates).map(([curr, rate]) => (
+                                    <span key={curr} className="ml-2">1 {baseCurrency} = {rate.toFixed(4)} {curr}</span>
+                                ))}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Archived Services Section */}
             {archivedServices.length > 0 && (
