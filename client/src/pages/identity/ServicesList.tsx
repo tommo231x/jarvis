@@ -5,6 +5,7 @@ import { Input } from '../../components/Input';
 import { Badge } from '../../components/Badge';
 import { BackButton } from '../../components/BackButton';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
+import { RestoreServiceModal } from '../../components/RestoreServiceModal';
 import { Search, Plus, Globe, Edit2, Trash2, Archive, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react';
 import { ServiceForm } from '../../components/identity/ServiceForm';
 
@@ -33,6 +34,15 @@ export const ServicesList = () => {
         title: '',
         message: '',
         onConfirm: () => { },
+    });
+
+    // Restore Modal State
+    const [restoreModal, setRestoreModal] = useState<{
+        isOpen: boolean;
+        service: Service | null;
+    }>({
+        isOpen: false,
+        service: null,
     });
 
     const fetchData = async () => {
@@ -101,13 +111,24 @@ export const ServicesList = () => {
         }
     };
 
-    const handleRestore = async (service: Service) => {
-        if (!service.id) return;
-        // Optimistic update
-        setServices(prev => prev.map(s => s.id === service.id ? { ...s, isArchived: false } : s));
+    const handleRestoreClick = (service: Service) => {
+        setRestoreModal({
+            isOpen: true,
+            service: service,
+        });
+    };
+
+    const executeRestore = async (identityIds: string[]) => {
+        const service = restoreModal.service;
+        if (!service?.id) return;
+
+        setServices(prev => prev.map(s => s.id === service.id ? { ...s, isArchived: false, ownerIdentityIds: identityIds } : s));
 
         try {
-            await api.services.update(service.id, { isArchived: false });
+            await api.services.update(service.id, { 
+                isArchived: false,
+                ownerIdentityIds: identityIds
+            });
             fetchData();
         } catch (error) {
             console.error('Failed to restore service:', error);
@@ -229,7 +250,7 @@ export const ServicesList = () => {
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                onClick={() => handleRestore(service)}
+                                                onClick={() => handleRestoreClick(service)}
                                                 className="h-8 text-xs gap-1.5 border-jarvis-border"
                                             >
                                                 <RefreshCw className="w-3.5 h-3.5" />
@@ -390,6 +411,16 @@ export const ServicesList = () => {
                 confirmText={confirmationModal.confirmText}
                 variant={confirmationModal.variant}
             />
+
+            {restoreModal.service && (
+                <RestoreServiceModal
+                    isOpen={restoreModal.isOpen}
+                    onClose={() => setRestoreModal({ isOpen: false, service: null })}
+                    onConfirm={executeRestore}
+                    service={restoreModal.service}
+                    identities={identities}
+                />
+            )}
         </div>
     );
 };
