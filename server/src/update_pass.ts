@@ -4,8 +4,8 @@ import { hashPassword } from './auth';
 import { User } from './models';
 
 async function main() {
-    const email = 'tommo231@gmail.com';
-    const newPassword = 'admin231';
+    const email = 'admin@jarvis.local';
+    const newPassword = 'admin123';
 
     console.log(`Updating password for ${email}...`);
 
