@@ -133,6 +133,14 @@ The system comes pre-loaded with realistic demo data:
   - Refresh button clears cache and fetches fresh rates
   - New files: `client/src/utils/currency.ts`, `client/src/components/ExchangeRateIndicator.tsx`
 
+- **AI Data Consistency Fix:**
+  - AI chatbot now uses the same filtered data as the dashboard (excludes cancelled/archived services)
+  - Monthly cost normalization added (yearly costs divided by 12)
+  - Exchange rate conversion added to AI context (fetches from Frankfurter API)
+  - AI receives pre-computed totals by currency AND total in base currency
+  - Summary includes exchange rates used for transparency
+  - Both dashboard and AI now show identical spending figures
+
 ## Previous Changes (December 8, 2025)
 - **Mobile-Responsive UI:**
   - New MobileNav component with bottom navigation bar (Overview, Services, Projects, Emails, AI)
