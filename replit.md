@@ -123,6 +123,18 @@ The system comes pre-loaded with realistic demo data:
 **Projects (1):** Jarvis Identity Hub
 
 ## Recent Changes (December 10, 2025)
+- **Reactivation Billing Date Prompt:**
+  - When changing a service status from archived/cancelled to active/trial, a prompt appears asking about the next billing date
+  - Shows context about the original billing pattern (e.g., "billed on the 25th of each month")
+  - Offers suggested next date (calculated by rolling forward) or option to set manually
+  - Only appears when editing existing services with a previous billing date
+
+- **Next Billing Date Validation & Rollover:**
+  - Client and server-side validation ensures nextBillingDate is today or future (past dates rejected)
+  - Auto-rollover on service fetch: past billing dates for active/trial services are rolled forward by billing cycle
+  - Rollover is display-only (doesn't persist) - email scanner or manual edits can override
+  - Cancelled/archived services keep their historical dates unchanged
+
 - **Data Cleanup & Email Edit/Delete:**
   - Removed all old mock data for non-existent profiles (Fina, Leila, Lara, Tomo Connor)
   - Cleaned services.json - only services linked to real profiles remain

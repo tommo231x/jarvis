@@ -1,8 +1,8 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
 import { api, Service, Identity, Email } from '../../api';
 import { Input } from '../Input';
 import { Button } from '../Button';
-import { X, Check } from 'lucide-react';
+import { X, Check, AlertCircle } from 'lucide-react';
 
 interface ServiceFormProps {
     initialData?: Service;
@@ -47,13 +47,65 @@ const defaultService: Omit<Service, 'id'> = {
     notes: ''
 };
 
+const INACTIVE_STATUSES = ['archived', 'cancelled'];
+const ACTIVE_STATUSES = ['active', 'trial'];
+
+const getNextBillingDateRollover = (currentDate: string, billingCycle: string): string => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let nextDate = new Date(currentDate);
+    nextDate.setHours(0, 0, 0, 0);
+    
+    if (nextDate >= today) return currentDate;
+    
+    while (nextDate < today) {
+        switch (billingCycle) {
+            case 'monthly':
+                nextDate.setMonth(nextDate.getMonth() + 1);
+                break;
+            case 'yearly':
+                nextDate.setFullYear(nextDate.getFullYear() + 1);
+                break;
+            case 'quarterly':
+                nextDate.setMonth(nextDate.getMonth() + 3);
+                break;
+            case 'weekly':
+                nextDate.setDate(nextDate.getDate() + 7);
+                break;
+            default:
+                return currentDate;
+        }
+    }
+    return nextDate.toISOString().split('T')[0];
+};
+
+const formatDateForDisplay = (dateStr: string): string => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+const getOrdinalSuffix = (day: number): string => {
+    if (day > 3 && day < 21) return 'th';
+    switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+    }
+};
+
 export const ServiceForm = ({ initialData, identities, emails, currentProfileId, onClose, onSubmit }: ServiceFormProps) => {
     const [formData, setFormData] = useState<Omit<Service, 'id'>>(defaultService);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showReactivatePrompt, setShowReactivatePrompt] = useState(false);
+    const [suggestedBillingDate, setSuggestedBillingDate] = useState('');
+    const originalStatusRef = useRef<string | null>(null);
 
     useEffect(() => {
         if (initialData) {
+            originalStatusRef.current = initialData.status;
             setFormData({
                 name: initialData.name,
                 category: initialData.category,
@@ -88,6 +140,20 @@ export const ServiceForm = ({ initialData, identities, emails, currentProfileId,
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
+        
+        if (name === 'status') {
+            const wasInactive = originalStatusRef.current && INACTIVE_STATUSES.includes(originalStatusRef.current);
+            const becomingActive = ACTIVE_STATUSES.includes(value);
+            
+            if (wasInactive && becomingActive && initialData?.nextBillingDate) {
+                const suggested = getNextBillingDateRollover(initialData.nextBillingDate, formData.billingCycle);
+                setSuggestedBillingDate(suggested);
+                setShowReactivatePrompt(true);
+            }
+            setFormData(prev => ({ ...prev, status: value as Service['status'] }));
+            return;
+        }
+        
         if (name.includes('.')) {
             const [parent, child] = name.split('.');
             setFormData(prev => ({
@@ -100,6 +166,13 @@ export const ServiceForm = ({ initialData, identities, emails, currentProfileId,
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
+    };
+    
+    const handleReactivateConfirm = (useSuggested: boolean) => {
+        if (useSuggested) {
+            setFormData(prev => ({ ...prev, nextBillingDate: suggestedBillingDate }));
+        }
+        setShowReactivatePrompt(false);
     };
 
     const toggleOwner = (identityId: string) => {
@@ -184,6 +257,42 @@ export const ServiceForm = ({ initialData, identities, emails, currentProfileId,
                     {error && (
                         <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm">
                             {error}
+                        </div>
+                    )}
+
+                    {showReactivatePrompt && (
+                        <div className="p-4 bg-jarvis-accent/10 border border-jarvis-accent/30 rounded-lg space-y-3">
+                            <div className="flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 text-jarvis-accent shrink-0 mt-0.5" />
+                                <div className="space-y-1">
+                                    <p className="text-white font-medium">Reactivating Service</p>
+                                    <p className="text-sm text-jarvis-muted">
+                                        {formData.billingCycle === 'monthly' 
+                                            ? `This service was billed on the ${new Date(initialData?.nextBillingDate || '').getDate()}${getOrdinalSuffix(new Date(initialData?.nextBillingDate || '').getDate())} of each month.`
+                                            : formData.billingCycle === 'yearly'
+                                                ? `This service was billed yearly around ${formatDateForDisplay(initialData?.nextBillingDate || '')}.`
+                                                : `Last billing date was ${formatDateForDisplay(initialData?.nextBillingDate || '')}.`
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-2 ml-8">
+                                <button
+                                    type="button"
+                                    onClick={() => handleReactivateConfirm(true)}
+                                    className="text-left px-3 py-2 bg-jarvis-bg/50 hover:bg-jarvis-bg border border-jarvis-border rounded-lg transition-colors"
+                                >
+                                    <span className="text-white text-sm">Use next billing date: </span>
+                                    <span className="text-jarvis-accent font-medium">{formatDateForDisplay(suggestedBillingDate)}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleReactivateConfirm(false)}
+                                    className="text-left px-3 py-2 bg-jarvis-bg/50 hover:bg-jarvis-bg border border-jarvis-border rounded-lg transition-colors text-sm text-jarvis-muted"
+                                >
+                                    I'll set the date manually below
+                                </button>
+                            </div>
                         </div>
                     )}
 
