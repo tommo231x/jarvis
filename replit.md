@@ -123,6 +123,16 @@ The system comes pre-loaded with realistic demo data:
 **Projects (1):** Jarvis Identity Hub
 
 ## Recent Changes (December 10, 2025)
+- **Service Form & Email Display Updates:**
+  - Category field changed from free-text to dropdown with fixed options (Infrastructure, AI Tools, Development, Entertainment, Finance, Productivity, Social/Marketing, Other)
+  - Removed "Billing Email" dropdown from New Service form - loginEmail is now the only email field (free text with autocomplete suggestions)
+  - Current profile is now pre-selected and shown at top of "Linked Profiles" with "(current profile)" marker
+  - Added optional "Next Bill Due" date field with `nextBillingDate` in Service model
+  - Status options updated to: active, cancelled, trial, archived (removed expired/past_due/inactive/free_trial)
+  - Handle/username field clearly marked as optional
+  - "Primary" badge removed from email cards - now just shows email address and description/reason
+  - Email descriptions strip "Primary - " prefix automatically
+
 - **Auth Token Validation Fix:**
   - Added token verification endpoint (`GET /api/auth/verify`) to validate stored tokens on app load
   - AuthContext now validates tokens with the backend before accepting them from localStorage
