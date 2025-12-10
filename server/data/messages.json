@@ -1,127 +1,54 @@
 [
   {
     "id": "msg-mj-receipt",
-    "emailId": "email-fina-main",
+    "emailId": "email-tommo-main",
     "from": "billing@midjourney.com",
     "subject": "Your Midjourney subscription receipt - December 2024",
-    "body": "Hi Fina,\n\nYour monthly subscription of $30.00 has been processed.\n\nPlan: Standard\nBilling date: December 7, 2024\nPayment method: Visa ending in 4829\n\nThank you for being a Midjourney member!\n\nMidjourney Team",
+    "body": "Hi,\n\nYour monthly subscription of $30.00 has been processed.\n\nPlan: Standard\nBilling date: December 7, 2024\n\nThank you for being a Midjourney member!\n\nMidjourney Team",
     "date": "2024-12-07T09:00:00Z",
     "category": "receipt",
     "priority": "low",
     "read": true,
     "isRelevant": true,
-    "flags": [
-      "receipt",
-      "subscription"
-    ],
+    "flags": ["receipt", "subscription"],
     "detectedService": "Midjourney",
-    "detectedIdentities": [
-      "id-tommo"
-    ],
+    "detectedIdentities": ["id-tommo"],
     "billingInfo": {
-      "chargedTo": "Fina Feels",
       "amount": 30.00,
       "currency": "USD"
     }
   },
   {
-    "id": "msg-sd-invoice",
-    "emailId": "email-leila-creative",
-    "from": "billing@stability.ai",
-    "subject": "Stable Diffusion credits purchase - Invoice",
-    "body": "Dear Customer,\n\nYour purchase of 5000 credits has been processed.\n\nAmount: $50.00\nCharged to: Fina Feels Ltd\nAccount: leila.creative@gmail.com\n\nThank you,\nStability AI",
-    "date": "2024-12-05T14:30:00Z",
-    "category": "receipt",
-    "priority": "medium",
-    "read": false,
-    "isRelevant": true,
-    "flags": [
-      "invoice",
-      "business-billing"
-    ],
-    "detectedService": "Stable Diffusion",
-    "detectedIdentities": [
-      "id-leila",
-      "id-tommo"
-    ],
-    "billingInfo": {
-      "chargedTo": "Fina Feels Ltd",
-      "amount": 50.00,
-      "currency": "USD"
-    }
-  },
-  {
-    "id": "msg-spotify-promo",
-    "emailId": "email-lara-main",
-    "from": "no-reply@spotify.com",
-    "subject": "New releases for you, Lara!",
-    "body": "Hi Lara Feels,\n\nCheck out this week's new music picks tailored just for you!\n\n- Artist 1 - New Album\n- Artist 2 - Single Release\n\nListen now on Spotify!\n\nSpotify",
-    "date": "2024-12-06T08:00:00Z",
-    "category": "marketing",
-    "priority": "low",
-    "read": true,
-    "isRelevant": false,
-    "detectedService": "Spotify",
-    "detectedIdentities": [
-      "id-lara"
-    ],
-    "greetingName": "Lara Feels"
-  },
-  {
     "id": "msg-spotify-billing",
-    "emailId": "email-fina-main",
+    "emailId": "email-tommo-main",
     "from": "billing@spotify.com",
     "subject": "Your Spotify Premium receipt",
-    "body": "Hi,\n\nYour monthly payment of £10.99 has been processed.\n\nPayment method: Visa ending in 4829\nAccount holder: Fina Feels\n\nSpotify",
+    "body": "Hi,\n\nYour monthly payment of £10.99 has been processed.\n\nSpotify",
     "date": "2024-12-01T10:00:00Z",
     "category": "receipt",
     "priority": "low",
     "read": true,
     "isRelevant": true,
-    "flags": [
-      "receipt"
-    ],
+    "flags": ["receipt"],
     "detectedService": "Spotify",
-    "detectedIdentities": [
-      "id-tommo"
-    ],
+    "detectedIdentities": ["id-tommo"],
     "billingInfo": {
-      "chargedTo": "Fina Feels",
       "amount": 10.99,
       "currency": "GBP"
     }
   },
   {
-    "id": "msg-spotify-promo-lara",
-    "emailId": "email-lara-main",
-    "from": "community@spotify.com",
-    "subject": "Your 2024 Wrapped is here!",
-    "body": "Hi Lara Feels,\n\nYour Spotify Wrapped 2024 is ready! See your top artists, songs, and listening habits.\n\nView your Wrapped: https://spotify.com/wrapped\n\nSpotify",
-    "date": "2024-12-04T12:00:00Z",
-    "category": "notification",
-    "priority": "low",
-    "read": true,
-    "isRelevant": true,
-    "detectedService": "Spotify",
-    "detectedIdentities": [
-      "id-lara"
-    ],
-    "greetingName": "Lara Feels"
-  },
-  {
     "id": "msg-login-london",
-    "emailId": "email-fina-main",
+    "emailId": "email-tommo-main",
     "from": "security@midjourney.com",
     "subject": "New login from London",
-    "body": "Hi Fina,\n\nWe noticed a new login to your Midjourney account.\n\nLocation: London, United Kingdom\nDevice: Chrome on Windows\nTime: December 6, 2024 at 2:30 PM GMT\n\nIf this was you, no action is needed.\n\nMidjourney Security",
+    "body": "Hi,\n\nWe noticed a new login to your Midjourney account.\n\nLocation: London, United Kingdom\nDevice: Chrome on Windows\nTime: December 6, 2024 at 2:30 PM GMT\n\nIf this was you, no action is needed.\n\nMidjourney Security",
     "date": "2024-12-06T14:30:00Z",
     "category": "security",
     "priority": "medium",
     "read": true,
     "isRelevant": true,
-    "flags": [
-      "login-alert"
-    ],
+    "flags": ["login-alert"],
     "detectedService": "Midjourney",
     "securityEvent": {
       "type": "login",
@@ -130,117 +57,34 @@
     }
   },
   {
-    "id": "msg-login-spain",
-    "emailId": "email-fina-main",
-    "from": "security@midjourney.com",
-    "subject": "New login from Spain",
-    "body": "Hi Fina,\n\nWe noticed a new login to your Midjourney account.\n\nLocation: Barcelona, Spain\nDevice: Safari on macOS\nTime: December 6, 2024 at 4:15 PM GMT\n\nIf this was you, no action is needed.\n\nMidjourney Security",
-    "date": "2024-12-06T16:15:00Z",
-    "category": "security",
-    "priority": "medium",
-    "read": false,
-    "isRelevant": true,
-    "flags": [
-      "login-alert"
-    ],
-    "detectedService": "Midjourney",
-    "securityEvent": {
-      "type": "login",
-      "location": "Barcelona, Spain",
-      "device": "Safari on macOS"
-    }
-  },
-  {
-    "id": "msg-password-reset-unknown",
+    "id": "msg-password-reset",
     "emailId": "email-studio",
     "from": "no-reply@cloudflare.com",
     "subject": "Password reset requested",
-    "body": "Hello,\n\nA password reset was requested for the account associated with studio@finafeels.com.\n\nIf you didn't request this, please ignore this email.\n\nReset your password: https://cloudflare.com/reset/abc123\n\nCloudflare Security",
+    "body": "Hello,\n\nA password reset was requested for your Cloudflare account.\n\nIf you didn't request this, please ignore this email.\n\nCloudflare Security",
     "date": "2024-12-07T08:00:00Z",
     "category": "security",
     "priority": "high",
     "read": false,
     "isRelevant": true,
-    "flags": [
-      "password-reset",
-      "security-alert"
-    ],
+    "flags": ["password-reset", "security-alert"],
     "detectedService": "Cloudflare",
     "securityEvent": {
       "type": "password_reset"
     }
   },
   {
-    "id": "msg-pension-annual",
-    "emailId": "email-tomo",
-    "from": "statements@aviva.co.uk",
-    "subject": "Annual pension valuation update",
-    "body": "Dear Tomo Connor,\n\nYour annual pension statement for the Connor Pension Plan is now available.\n\nCurrent Value: £127,456.78\nContributions this year: £12,000.00\nEmployer contributions: £6,000.00\nGrowth: +8.2%\n\nProjected retirement income at age 65: £28,500/year\n\nView your full statement online.\n\nAviva Pensions",
-    "date": "2024-12-01T09:00:00Z",
-    "category": "financial",
-    "priority": "high",
-    "read": false,
-    "isRelevant": true,
-    "flags": [
-      "pension",
-      "statement",
-      "high-value"
-    ],
-    "financialType": "pension",
-    "attachments": [
-      "Pension_Statement_2024.pdf"
-    ]
-  },
-  {
-    "id": "msg-trust-reallocation",
-    "emailId": "email-tomo",
-    "from": "notifications@meridiantrust.co.uk",
-    "subject": "Trust Fund Reallocation Notice – Action Required",
-    "body": "Dear Tomo,\n\nAs part of our annual review, we are proposing a reallocation of assets in the Connor Family Trust.\n\nCurrent allocation:\n- Equities: 60%\n- Bonds: 30%\n- Cash: 10%\n\nProposed allocation:\n- Equities: 55%\n- Bonds: 35%\n- Cash: 10%\n\nPlease review and respond by December 31, 2024.\n\nTotal trust value: £854,691.34\n\nContact your relationship manager, Sarah Chen, at 020 7123 4567 for questions.\n\nMeridian Trust Management",
-    "date": "2024-12-05T11:00:00Z",
-    "category": "financial",
-    "priority": "high",
-    "read": false,
-    "isRelevant": true,
-    "flags": [
-      "trust-fund",
-      "action-required",
-      "high-value"
-    ],
-    "financialType": "trust_fund"
-  },
-  {
-    "id": "msg-isa-promo-mixed",
-    "emailId": "email-tomo",
-    "from": "marketing@investorbank.co.uk",
-    "subject": "Maximize your ISA allowance before April!",
-    "body": "Dear Tomo,\n\nDon't miss out on your £20,000 ISA allowance for 2024/25!\n\nIMPORTANT TAX INFORMATION:\nCapital gains on investments outside an ISA may be subject to tax. The CGT allowance for 2024/25 is £3,000.\n\nOpen a Stocks & Shares ISA today and enjoy:\n- No capital gains tax on profits\n- No tax on dividends\n- Flexible access to your money\n\nStart investing now: https://investorbank.co.uk/isa\n\nTerms apply. Capital at risk.\n\nInvestor Bank",
-    "date": "2024-12-06T14:00:00Z",
-    "category": "marketing",
-    "priority": "medium",
-    "read": false,
-    "isRelevant": true,
-    "flags": [
-      "isa",
-      "tax-info",
-      "investment"
-    ],
-    "financialType": "investment"
-  },
-  {
-    "id": "msg-generic-visa",
+    "id": "msg-adobe-transaction",
     "emailId": "email-generic-creative",
     "from": "alerts@visa.co.uk",
     "subject": "Transaction notification",
-    "body": "A transaction was made with your Visa card ending in 7821.\n\nMerchant: ADOBE SYSTEMS\nAmount: £54.99\nDate: December 7, 2024\n\nIf you didn't make this transaction, please contact us immediately.\n\nVisa",
+    "body": "A transaction was made with your Visa card.\n\nMerchant: ADOBE SYSTEMS\nAmount: £54.99\nDate: December 7, 2024\n\nIf you didn't make this transaction, please contact us immediately.\n\nVisa",
     "date": "2024-12-07T10:30:00Z",
     "category": "financial",
     "priority": "medium",
     "read": false,
     "isRelevant": true,
-    "flags": [
-      "transaction"
-    ],
+    "flags": ["transaction"],
     "detectedService": "Adobe",
     "billingInfo": {
       "amount": 54.99,
@@ -248,51 +92,41 @@
     }
   },
   {
-    "id": "msg-usage-change-early",
-    "emailId": "email-fina-main",
-    "from": "no-reply@runway.com",
-    "subject": "Welcome to Runway, Fina!",
-    "body": "Hi Fina,\n\nWelcome to Runway! Your account has been created successfully.\n\nGet started with AI video generation today.\n\nRunway Team",
-    "date": "2023-03-01T12:00:00Z",
-    "category": "notification",
+    "id": "msg-youtube-receipt",
+    "emailId": "email-studio",
+    "from": "payments@google.com",
+    "subject": "Your YouTube Premium receipt",
+    "body": "Hi,\n\nYour monthly payment of £12.99 for YouTube Premium has been processed.\n\nThank you,\nGoogle Payments",
+    "date": "2024-12-05T09:00:00Z",
+    "category": "receipt",
     "priority": "low",
     "read": true,
     "isRelevant": true,
-    "detectedService": "Runway",
-    "detectedIdentities": [
-      "id-tommo"
-    ]
+    "flags": ["receipt"],
+    "detectedService": "YouTube Premium",
+    "detectedIdentities": ["id-tommo-studio"],
+    "billingInfo": {
+      "amount": 12.99,
+      "currency": "GBP"
+    }
   },
   {
-    "id": "msg-usage-change-later",
-    "emailId": "email-lara-main",
-    "from": "community@runway.com",
-    "subject": "Check out Lara's latest creation!",
-    "body": "Hi Lara,\n\nYour video 'Sunset Dreams' has been featured in our community showcase!\n\nViews: 1,247\nLikes: 89\n\nKeep creating amazing content!\n\nRunway Community",
-    "date": "2024-12-05T16:00:00Z",
-    "category": "notification",
+    "id": "msg-render-invoice",
+    "emailId": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
+    "from": "billing@render.com",
+    "subject": "Your Render invoice for December",
+    "body": "Hi,\n\nYour monthly invoice of £7.99 has been processed for Easy Split backend hosting.\n\nRender Team",
+    "date": "2024-12-01T08:00:00Z",
+    "category": "receipt",
     "priority": "low",
     "read": true,
     "isRelevant": true,
-    "detectedService": "Runway",
-    "detectedIdentities": [
-      "id-lara"
-    ],
-    "greetingName": "Lara"
-  },
-  {
-    "id": "msg-new-email-first-time",
-    "emailId": "email-generic-creative",
-    "from": "welcome@newservice.ai",
-    "subject": "Welcome to NewService AI!",
-    "body": "Hello,\n\nYour account has been created with creativehubproject@gmail.com.\n\nGet started with our AI tools today!\n\nNewService AI Team",
-    "date": "2024-12-07T11:00:00Z",
-    "category": "notification",
-    "priority": "low",
-    "read": false,
-    "isRelevant": true,
-    "flags": [
-      "new-service"
-    ]
+    "flags": ["receipt", "invoice"],
+    "detectedService": "Render",
+    "detectedIdentities": ["18728d2c-336a-49d3-a40c-950c27fcb193"],
+    "billingInfo": {
+      "amount": 7.99,
+      "currency": "GBP"
+    }
   }
 ]

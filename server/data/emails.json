@@ -66,5 +66,15 @@
     "id": "email-easysplit-firebase",
     "description": "Firebase login for Easy Split frontend",
     "notes": "Frontend hosting and authentication"
+  },
+  {
+    "label": "supplier info for friends",
+    "address": "foody@gmail.com",
+    "provider": "gmail",
+    "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
+    "isPrimary": false,
+    "description": "",
+    "notes": "",
+    "id": "785d4e5c-0aba-41b3-b1ab-b96524606d2d"
   }
 ]

@@ -1,0 +1,241 @@
+
+All Billing Emails
+Monthly Total
+11 services with costs
+
+USD
+US$120.00
+GBP
+£122.95
+Converted Total (GBP)
+£213.11
+Exchange rates: 1 GBP = 1.3310 USD
+
+
+Archived Services (1)
+Service
+Owners
+Billing
+Cost
+Actions
+Midjourney
+AI Creative
+active
+TO
+-
+$30.00
+/monthly
+
+
+Tensor Art
+AI Creative
+active
+TO
+-
+$15.00
+/monthly
+
+
+Muse AI
+AI Creative
+active
+TO
+-
+$20.00
+/monthly
+
+
+Stable Diffusion (DreamStudio)
+AI Creative
+active
+-
+Free
+
+
+Runway ML
+AI Creative
+active
+-
+$35.00
+/monthly
+
+
+Adobe Creative Cloud
+Creative Tools
+active
+CR
+creativehubproject@gmail.com
+Shared Creative
+£54.99
+/monthly
+
+
+Netflix
+Entertainment
+active
+CR
+creativehubproject@gmail.com
+Shared Creative
+£15.99
+/monthly
+
+
+YouTube Premium
+Entertainment
+active
+TO
+tommo.dev@gmail.com
+Business Email
+£12.99
+/monthly
+
+
+Cloudflare
+Infrastructure
+active
+TO
+tommo.dev@gmail.com
+Business Email
+$20.00
+/monthly
+
+
+Twitch
+Streaming
+active
+TO
+tommo.dev@gmail.com
+Business Email
+Free
+
+
+Spotify Premium
+Entertainment
+active
+-
+£10.99
+/monthly
+
+
+Aviva Pension
+Finance
+active
+-
+Free
+
+
+Connor Family Trust
+Finance
+active
+-
+Free
+
+
+Render
+Infrastructure
+active
+EA
+tommo231@gmail.com
+GitHub & Render
+£7.99
+/monthly
+
+
+Firebase
+Infrastructure
+active
+EA
+finafeels@gmail.com
+Firebase Frontend
+Free
+
+
+GitHub
+Development
+active
+EA
+tommo231@gmail.com
+GitHub & Render
+Free
+
+
+bean counter
+finance
+active
+TO
+-
+£20.00
+/monthly
+
+
+Test Archive Service
+Testing
+active
+TO
+-
+Free
+
+
+Test Archive Service
+Testing
+active
+TO
+-
+Free
+
+
+Test Archive Service
+Testing
+active
+TO
+-
+Free
+
+
+Jarvis
+GPT-5.1 Powered
+
+
+
+
+what are profiles for and how are they helpful for me
+
+22:18
+Profiles are a way to tell the system **who** is actually using or connected to a service, separate from just who pays the bill or which email it’s under.
+
+In your data, you can see `profileIds` on services like Midjourney, YouTube Premium, Cloudflare, Easy Split, etc. Those `profileIds` link each service back to one or more identities (like Tommo, Tommo Dev, Easy Split). That’s what profiles are doing under the hood.
+
+How this helps you:
+
+1. **Separates “who pays” from “who uses”**  
+   - Example: Spotify Premium (for Lara) is paid by Fina but used by Lara. Profiles let us record that clearly: 
+     - Financial owner: Fina (payer)  
+     - Profile/user: Lara (listener)  
+   This makes it easy to answer questions like “What do I pay for that’s actually for other people?”
+
+2. **Gives you an identity footprint across services**  
+   Because each service has `profileIds`, I can show you, for example:  
+   - Tommo’s footprint: Midjourney, Tensor Art, Muse AI, Bean Counter, Test services, etc.  
+   - Tommo Dev’s footprint: YouTube Premium, Cloudflare, Twitch.  
+   - Easy Split’s footprint: Render, Firebase, GitHub.  
+   That helps you see which identities/brands are using which tools, and how much each “persona” costs per month.
+
+3. **Handles shared or generic accounts cleanly**  
+   - You have a shared "Creative Hub (Shared)" identity that owns Adobe and Netflix, and also new services like NewService AI.  
+   Profiles let us attach that single shared identity to multiple services instead of duplicating them per person, and still mark them as ambiguous/collective rather than personal.
+
+4. **Supports more accurate cost breakdowns**  
+   Because services know which profile(s) they’re linked to, you can ask:  
+   - “How much does Tommo spend per month?”  
+   - “What are the monthly costs attached to Easy Split?”  
+   and I can use those profile links to calculate those numbers correctly.
+
+5. **Makes future organisation and automation easier**  
+   Profiles are the hook for:  
+   - Grouping notifications, receipts, and security alerts by identity.  
+   - Spotting ownership drift (e.g., Runway started for Fina but is now clearly Lara’s tool).  
+   - Planning clean separations between personal, studio, and project spending.
+
+In short: profiles are the **identity layer** on top of your services. They let us answer “which persona / business / project is this really for?” and then slice your spending, security events, and tools around that, instead of everything just being a flat list of subscriptions under a couple of emails.
+
+If you’d like, I can walk through one of your identities (e.g., Tommo Dev or Easy Split) and show you its current profile footprint and monthly cost based on these links.

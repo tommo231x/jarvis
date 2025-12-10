@@ -123,6 +123,15 @@ The system comes pre-loaded with realistic demo data:
 **Projects (1):** Jarvis Identity Hub
 
 ## Recent Changes (December 10, 2025)
+- **Data Cleanup & Email Edit/Delete:**
+  - Removed all old mock data for non-existent profiles (Fina, Leila, Lara, Tomo Connor)
+  - Cleaned services.json - only services linked to real profiles remain
+  - Cleaned emails.json - labels updated to match profile names
+  - Cleaned messages.json - removed messages for non-existent emails
+  - EmailForm now accepts identityId prop and supports edit mode
+  - Email cards have hover edit/delete buttons
+  - Delete shows confirmation dialog before removing
+
 - **Service Form & Email Display Updates:**
   - Category field changed from free-text to dropdown with fixed options (Infrastructure, AI Tools, Development, Entertainment, Finance, Productivity, Social/Marketing, Other)
   - Removed "Billing Email" dropdown from New Service form - loginEmail is now the only email field (free text with autocomplete suggestions)
