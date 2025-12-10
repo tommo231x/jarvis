@@ -384,43 +384,5 @@
     "profileIds": [
       "id-tommo"
     ]
-  },
-  {
-    "name": "Chessapp",
-    "category": "Other",
-    "ownerIdentityIds": [
-      "id-tommo"
-    ],
-    "profileIds": [
-      "id-tommo"
-    ],
-    "identityId": "id-tommo",
-    "billingCycle": "monthly",
-    "status": "active",
-    "loginEmail": "tommo231@gmail.com",
-    "cost": {
-      "amount": 20,
-      "currency": "GBP"
-    },
-    "id": "f5f73f68-249f-438a-940c-422b80e59877"
-  },
-  {
-    "name": "Chessapp",
-    "category": "Other",
-    "ownerIdentityIds": [
-      "NEW_IDENTITY_Fina Feels"
-    ],
-    "profileIds": [
-      "NEW_IDENTITY_Fina Feels"
-    ],
-    "identityId": "NEW_IDENTITY_Fina Feels",
-    "billingCycle": "monthly",
-    "status": "active",
-    "loginEmail": "finafeels@gmail.com",
-    "cost": {
-      "amount": 20,
-      "currency": "GBP"
-    },
-    "id": "5f43684b-5d52-4012-8f0f-71cfd064988f"
   }
 ]
