@@ -123,6 +123,19 @@ The system comes pre-loaded with realistic demo data:
 **Projects (1):** Jarvis Identity Hub
 
 ## Recent Changes (December 10, 2025)
+- **AI Chatbot Service Creation Fix:**
+  - Chatbot now properly captures cost amounts (fixed "$50" being saved as free)
+  - Added `update_service` command handler (was showing "Unknown command" before)
+  - System prompt now requires collecting all essential fields before creating a service:
+    - Name, Profile, Billing Cycle, Status, Cost (if paid), Login Email
+  - Added conversational flow rules: ask one question at a time, confirm details
+  - Added friendly explanation rules for Profiles and Services (user-requested)
+
+- **Services Page UI Improvements:**
+  - Shows "No login email" indicator when loginEmail is missing (amber italic text)
+  - Added Edit button (pencil icon) that appears on hover for quick editing
+  - Both Edit and Delete buttons now only show on hover for cleaner UI
+
 - **Reactivation Billing Date Prompt:**
   - When changing a service status from archived/cancelled to active/trial, a prompt appears asking about the next billing date
   - Shows context about the original billing pattern (e.g., "billed on the 25th of each month")
