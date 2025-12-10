@@ -169,6 +169,7 @@ export const ServicesList = () => {
             (s.identityId === filterIdentity); // Legacy fallback
 
         const matchesEmail = !filterEmail ||
+            s.loginEmail === filterEmail ||
             s.billingEmailId === filterEmail ||
             s.emailId === filterEmail; // Legacy fallback
 
@@ -264,8 +265,8 @@ export const ServicesList = () => {
                         value={filterEmail}
                         onChange={(e) => setFilterEmail(e.target.value)}
                     >
-                        <option value="">All Billing Emails</option>
-                        {emails.map(e => <option key={e.id} value={e.id}>{e.address}</option>)}
+                        <option value="">All Login Emails</option>
+                        {emails.map(e => <option key={e.id} value={e.address}>{e.address}</option>)}
                     </select>
                 </div>
             </div>
@@ -346,9 +347,7 @@ export const ServicesList = () => {
 
                     {showArchived && (
                         <div className="border-t border-jarvis-border/30 divide-y divide-jarvis-border/30 animate-fade-in">
-                            {archivedServices.map(service => {
-                                const billingEmail = emails.find(e => e.id === service.billingEmailId || e.id === service.emailId);
-                                return (
+                            {archivedServices.map(service => (
                                     <div key={service.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black/20">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-jarvis-muted">
@@ -357,7 +356,7 @@ export const ServicesList = () => {
                                             <div>
                                                 <h3 className="text-sm font-medium text-jarvis-muted strike-through opacity-80">{service.name}</h3>
                                                 <p className="text-xs text-jarvis-muted opacity-60">
-                                                    {billingEmail?.address || 'No billing email'}
+                                                    {service.loginEmail || 'No login email'}
                                                 </p>
                                             </div>
                                         </div>
@@ -373,8 +372,7 @@ export const ServicesList = () => {
                                             </Button>
                                         </div>
                                     </div>
-                                );
-                            })}
+                            ))}
                         </div>
                     )}
                 </div>
@@ -385,7 +383,7 @@ export const ServicesList = () => {
                 <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-jarvis-border/50 text-xs font-medium text-jarvis-muted uppercase tracking-wider bg-white/5">
                     <div className="col-span-3">Service</div>
                     <div className="col-span-3">Owners</div>
-                    <div className="col-span-2">Billing</div>
+                    <div className="col-span-2">Login Email</div>
                     <div className="col-span-2">Cost</div>
                     <div className="col-span-2 text-right">Actions</div>
                 </div>
@@ -396,10 +394,7 @@ export const ServicesList = () => {
                     ) : filteredServices.length === 0 ? (
                         <div className="p-8 text-center text-jarvis-muted">No services found matching filters.</div>
                     ) : (
-                        filteredServices.map((service) => {
-                            const billingEmail = emails.find(e => e.id === service.billingEmailId || e.id === service.emailId);
-
-                            return (
+                        filteredServices.map((service) => (
                                 <div
                                     key={service.id}
                                     className="group grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors duration-200"
@@ -444,15 +439,12 @@ export const ServicesList = () => {
                                         )}
                                     </div>
 
-                                    {/* Billing */}
+                                    {/* Login Email */}
                                     <div className="col-span-2">
-                                        {billingEmail ? (
-                                            <div className="flex flex-col">
-                                                <span className="text-xs text-white truncate" title={billingEmail.address}>{billingEmail.address}</span>
-                                                {billingEmail.label && <span className="text-[10px] text-jarvis-muted">{billingEmail.label}</span>}
-                                            </div>
+                                        {service.loginEmail ? (
+                                            <span className="text-xs text-white truncate" title={service.loginEmail}>{service.loginEmail}</span>
                                         ) : (
-                                            <span className="text-xs text-jarvis-muted">-</span>
+                                            <span className="text-xs text-amber-500/70 italic">No login email</span>
                                         )}
                                     </div>
 
@@ -480,8 +472,7 @@ export const ServicesList = () => {
                                         </Button>
                                     </div>
                                 </div>
-                            );
-                        })
+                        ))
                     )}
                 </div>
             </div>
