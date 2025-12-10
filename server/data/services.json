@@ -16,7 +16,7 @@
     "loginUrl": "https://midjourney.com",
     "websiteUrl": "https://midjourney.com",
     "loginEmail": "tommo231@gmail.com",
-    "nextBillingDate": "2025-01-15",
+    "nextBillingDate": "2025-12-15",
     "notes": "",
     "profileIds": [
       "id-tommo"
@@ -290,7 +290,7 @@
     },
     "status": "active",
     "loginEmail": "tommo.dev@gmail.com",
-    "nextBillingDate": "2025-01-28",
+    "nextBillingDate": "2025-12-28",
     "notes": "Created from user request: service for Tommo Dev at $50/month.",
     "profileIds": [
       "id-tommo-studio"
