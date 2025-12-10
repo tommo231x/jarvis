@@ -8,9 +8,21 @@ interface ServiceFormProps {
     initialData?: Service;
     identities: Identity[];
     emails: Email[];
+    currentProfileId?: string;
     onClose: () => void;
     onSubmit: () => void;
 }
+
+const SERVICE_CATEGORIES = [
+    'Infrastructure',
+    'AI Tools',
+    'Development',
+    'Entertainment',
+    'Finance',
+    'Productivity',
+    'Social / Marketing',
+    'Other'
+];
 
 const defaultService: Omit<Service, 'id'> = {
     name: '',
@@ -30,11 +42,12 @@ const defaultService: Omit<Service, 'id'> = {
     },
     billingCycle: 'monthly',
     renewalDate: '',
+    nextBillingDate: '',
     status: 'active',
     notes: ''
 };
 
-export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit }: ServiceFormProps) => {
+export const ServiceForm = ({ initialData, identities, emails, currentProfileId, onClose, onSubmit }: ServiceFormProps) => {
     const [formData, setFormData] = useState<Omit<Service, 'id'>>(defaultService);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -58,11 +71,20 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                 cost: initialData.cost || { amount: 0, currency: 'GBP' },
                 billingCycle: initialData.billingCycle || 'monthly',
                 renewalDate: initialData.renewalDate || '',
+                nextBillingDate: initialData.nextBillingDate || '',
                 status: initialData.status,
                 notes: initialData.notes || ''
             });
+        } else if (currentProfileId) {
+            // Pre-select current profile for new services
+            setFormData(prev => ({
+                ...prev,
+                profileIds: [currentProfileId],
+                ownerIdentityIds: [currentProfileId],
+                identityId: currentProfileId
+            }));
         }
-    }, [initialData]);
+    }, [initialData, currentProfileId]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -97,15 +119,6 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
         });
     };
 
-    const handleBillingEmailChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        const emailId = e.target.value;
-        setFormData(prev => ({
-            ...prev,
-            billingEmailId: emailId,
-            emailId: emailId // Sync legacy
-        }));
-    };
-
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -125,6 +138,13 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
             setLoading(false);
         }
     };
+
+    // Sort identities: current profile first
+    const sortedIdentities = [...identities].sort((a, b) => {
+        if (a.id === currentProfileId) return -1;
+        if (b.id === currentProfileId) return 1;
+        return 0;
+    });
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -154,27 +174,43 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                             required
                             placeholder="e.g. Netflix, Spotify"
                         />
-                        <Input
-                            label="Category"
-                            name="category"
-                            value={formData.category}
-                            onChange={handleChange}
-                            required
-                            placeholder="e.g. Entertainment, Finance"
-                        />
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-jarvis-muted">Category</label>
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                required
+                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
+                            >
+                                <option value="">-- Select Category --</option>
+                                {SERVICE_CATEGORIES.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-jarvis-muted">Login Email</label>
+                            <input
+                                list="email-suggestions"
+                                name="loginEmail"
+                                value={formData.loginEmail || ''}
+                                onChange={handleChange}
+                                type="email"
+                                placeholder="email@example.com"
+                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none placeholder:text-gray-500"
+                            />
+                            <datalist id="email-suggestions">
+                                {emails.map(email => (
+                                    <option key={email.id} value={email.address} />
+                                ))}
+                            </datalist>
+                        </div>
                         <Input
-                            label="Login Email"
-                            name="loginEmail"
-                            value={formData.loginEmail || ''}
-                            onChange={handleChange}
-                            type="email"
-                            placeholder="email@example.com"
-                        />
-                        <Input
-                            label="Handle / Username"
+                            label="Handle / Username (optional)"
                             name="handleOrUsername"
                             value={formData.handleOrUsername || ''}
                             onChange={handleChange}
@@ -190,62 +226,42 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                             setFormData(prev => ({
                                 ...prev,
                                 websiteUrl: e.target.value,
-                                loginUrl: e.target.value // Sync both fields
+                                loginUrl: e.target.value
                             }));
                         }}
                         type="url"
                         placeholder="https://..."
                     />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Owners Multi-Select */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-jarvis-muted">Linked Profiles</label>
-                            <div className="bg-jarvis-bg border border-jarvis-border rounded-lg p-2 max-h-40 overflow-y-auto space-y-1">
-                                {identities.map(identity => {
-                                    const isSelected = formData.ownerIdentityIds?.includes(identity.id);
-                                    return (
-                                        <div
-                                            key={identity.id}
-                                            onClick={() => toggleOwner(identity.id)}
-                                            className={`flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors ${isSelected ? 'bg-jarvis-accent/20 text-white' : 'hover:bg-white/5 text-jarvis-muted'
-                                                }`}
-                                        >
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'border-jarvis-accent bg-jarvis-accent' : 'border-jarvis-muted'
-                                                }`}>
-                                                {isSelected && <Check className="w-3 h-3 text-black" />}
-                                            </div>
-                                            <span className="text-sm">{identity.name}</span>
+                    {/* Linked Profiles */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-jarvis-muted">Linked Profiles</label>
+                        <div className="bg-jarvis-bg border border-jarvis-border rounded-lg p-2 max-h-40 overflow-y-auto space-y-1">
+                            {sortedIdentities.map(identity => {
+                                const isSelected = formData.ownerIdentityIds?.includes(identity.id);
+                                const isCurrent = identity.id === currentProfileId;
+                                return (
+                                    <div
+                                        key={identity.id}
+                                        onClick={() => toggleOwner(identity.id)}
+                                        className={`flex items-center gap-2 p-2 rounded-md cursor-pointer transition-colors ${isSelected ? 'bg-jarvis-accent/20 text-white' : 'hover:bg-white/5 text-jarvis-muted'
+                                            }`}
+                                    >
+                                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? 'border-jarvis-accent bg-jarvis-accent' : 'border-jarvis-muted'
+                                            }`}>
+                                            {isSelected && <Check className="w-3 h-3 text-black" />}
                                         </div>
-                                    );
-                                })}
-                            </div>
-                            {(!formData.ownerIdentityIds || formData.ownerIdentityIds.length === 0) && (
-                                <p className="text-xs text-amber-400">Please select at least one owner.</p>
-                            )}
+                                        <span className="text-sm">
+                                            {identity.name}
+                                            {isCurrent && <span className="text-xs text-jarvis-accent ml-1">(current profile)</span>}
+                                        </span>
+                                    </div>
+                                );
+                            })}
                         </div>
-
-                        {/* Billing Email Selection */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-jarvis-muted">Billing Email</label>
-                            <select
-                                name="billingEmailId"
-                                value={formData.billingEmailId || ''}
-                                onChange={handleBillingEmailChange}
-                                className="w-full bg-jarvis-bg border border-jarvis-border rounded-lg px-4 py-2.5 text-white focus:border-jarvis-accent focus:ring-1 focus:ring-jarvis-accent outline-none"
-                            >
-                                <option value="">-- Select Billing Email --</option>
-                                {emails.map(email => (
-                                    <option key={email.id} value={email.id}>
-                                        {email.address}
-                                        {email.label ? ` (${email.label})` : ''}
-                                    </option>
-                                ))}
-                            </select>
-                            <p className="text-xs text-jarvis-muted">
-                                Which email account receives the invoices?
-                            </p>
-                        </div>
+                        {(!formData.ownerIdentityIds || formData.ownerIdentityIds.length === 0) && (
+                            <p className="text-xs text-amber-400">Please select at least one profile.</p>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
@@ -287,10 +303,18 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                         </div>
                     </div>
 
+                    <Input
+                        label="Next Bill Due (optional)"
+                        name="nextBillingDate"
+                        type="date"
+                        value={formData.nextBillingDate || ''}
+                        onChange={handleChange}
+                    />
+
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-jarvis-muted">Status</label>
                         <div className="flex gap-4">
-                            {['active', 'cancelled', 'trial', 'expired'].map(status => (
+                            {['active', 'cancelled', 'trial', 'archived'].map(status => (
                                 <label key={status} className="flex items-center gap-2 cursor-pointer group">
                                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${formData.status === status
                                         ? 'border-jarvis-accent bg-jarvis-accent'
@@ -316,7 +340,7 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-jarvis-muted">Notes</label>
+                        <label className="text-sm font-medium text-jarvis-muted">Additional Notes</label>
                         <textarea
                             name="notes"
                             value={formData.notes || ''}

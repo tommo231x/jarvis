@@ -1,0 +1,125 @@
+These are SMALL, incremental UI/logic tweaks.  
+Please do NOT treat this as a big refactor or migration.  
+Just adjust the existing implementation for Profiles/Services.
+
+CHANGES TO MAKE:
+
+1) EMAIL ACCOUNTS SECTION IN PROFILE CARD
+
+On the Profile (Identities → Profiles) page, in the “Email Accounts” area:
+
+- Remove the idea of a “Primary” email:
+  - Delete the "Primary" badge from email cards.
+  - Remove any special logic that marks an email as primary for a profile.
+
+- Each email in this section should simply support:
+  - email address
+  - optional description / “reason used” text underneath (e.g. "GitHub & Render", "Firebase frontend").
+
+- The existing description text (e.g. "Primary - GitHub & Render", "Firebase Frontend") should be treated as the “reason used” field.
+  - If possible, strip the word "Primary - " when it exists and keep only "GitHub & Render".
+  - Make this description editable in the UI.
+
+2) SERVICES LIST IN PROFILE CARD
+
+The current layout for Services in a Profile (e.g. Render / Firebase / GitHub with email, website, price, status) is GOOD.
+
+- Do NOT redesign this section.
+- Keep:
+  - service name
+  - login email
+  - website (domain)
+  - cost and billing cycle
+  - status
+  - delete icon
+
+Leave “Add services to this profile” behaviour as it is (linking existing services). The only changes below relate to the **New Service** form and underlying fields.
+
+3) NEW SERVICE MODAL / FORM TWEAKS
+
+In the “New Service” modal, adjust the form fields as follows.
+
+a) Category field
+- Change Category from a free-text field to a dropdown/select.
+- Use a fixed set of categories, for example:
+  - Infrastructure
+  - AI Tools
+  - Development
+  - Entertainment
+  - Finance
+  - Productivity
+  - Social / Marketing
+  - Other
+- Keep it easy to extend in code, but the UI should present a select, not a free text input.
+
+b) Handle / username
+- Keep the "handle / username" field, but make sure it is NOT required.
+- The user must be able to create a service without providing a handle/user.
+- Confirm validation allows this to be empty.
+
+c) Linked profiles
+- The “Linked Profiles” multi-select is good, but:
+  - The current profile (the one the user is on when they click “New Service”) should:
+    - be pre-selected by default
+    - appear at the top of the list, and if possible be visually marked (e.g. "(current profile)").
+  - On submit:
+    - The new service’s `profileIds` MUST include the current profile’s id by default.
+
+d) Login email vs billing email
+- Remove any “Select billing email” field from the New Service form.
+- The only email we care about here is **loginEmail**.
+- For the login email input:
+  - Allow the user to type any email address (free text).
+  - Optionally, you may provide suggestions/autocomplete based on known emails in the system, but it must NOT be restricted to a fixed dropdown.
+- Make sure the Service model and API DO NOT require a separate `billingEmail`; use `loginEmail` as the canonical email.
+
+e) Billing date field
+- Add an optional field to represent when the next bill is due.
+  - Label: “Next bill due” (or similar).
+  - This should be a date input (or date picker).
+- In the Service model, add an optional field:
+  - `nextBillingDate?: string`  // ISO date string
+- Do NOT run a destructive migration; just support this field when it is present.
+
+f) Status options
+- Update the status dropdown for a Service.
+- Valid options should be:
+  - active
+  - cancelled
+  - trial
+  - archived
+- Remove or rename any "expired" option to "archived" in both the UI and underlying types/enums.
+
+g) Notes
+- Ensure the New Service form has an “Additional notes” field (textarea).
+- This should map to the Service model’s `notes` field and be editable.
+
+4) GENERAL CLEANUP OF BILLING VS LOGIN
+
+Across the codebase related to this feature:
+
+- Search for any leftover uses of:
+  - `billingEmail`
+  - `billing_email`
+  - "billing email" copy in the UI
+
+- For this feature set, standardise on:
+  - `loginEmail` as the canonical email field on the Service model.
+- If older fields exist AND are still needed for backward compatibility, treat them as aliases:
+  - Never overwrite `loginEmail` with a billing email value.
+  - For the New Service UX specifically, do not show or require any billing-email-specific UI controls.
+
+5) BE CAREFUL NOT TO BREAK EXISTING LAYOUT
+
+- Keep the current Profiles (Identities) card aesthetic and layout.
+- Only make the changes described above:
+  - Email Accounts -> remove “Primary” and treat subtext as “reason used”.
+  - New Service modal -> adjust fields and options as specified.
+- Do NOT restructure navigation, routing, or overall page layouts.
+
+After implementing, please:
+- Confirm that:
+  - I can add a new service with only: name, category, loginEmail, website, cost, billing cycle, status, notes and linked profiles (with current profile pre-selected).
+  - Handle/username AND Next bill due are optional.
+  - “Primary” no longer appears on email accounts; instead, I just see the email address and its description.
+- Briefly summarise which files you changed.

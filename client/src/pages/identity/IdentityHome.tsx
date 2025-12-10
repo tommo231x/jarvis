@@ -291,11 +291,10 @@ export default function IdentityHome() {
                                                     <Mail className="w-4 h-4 text-gray-400 group-hover:text-blue-400 transition-colors" />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <div className="flex items-center justify-between">
-                                                        <p className="font-medium text-white truncate">{email.address}</p>
-                                                        {email.isPrimary && <Badge variant="default" className="text-[10px] h-4 py-0">Primary</Badge>}
-                                                    </div>
-                                                    <p className="text-xs text-gray-500 mt-0.5">{email.label}</p>
+                                                    <p className="font-medium text-white truncate">{email.address}</p>
+                                                    <p className="text-xs text-gray-500 mt-0.5">
+                                                        {(email.label || '').replace(/^Primary\s*[-–—]\s*/i, '')}
+                                                    </p>
                                                 </div>
                                             </Card>
                                         ))}
@@ -454,6 +453,7 @@ export default function IdentityHome() {
                         <ServiceForm
                             identities={identities}
                             emails={emails}
+                            currentProfileId={selectedIdentity.id}
                             initialData={undefined} // Add mode
                             onClose={() => setIsServiceModalOpen(false)}
                             onSubmit={async () => {

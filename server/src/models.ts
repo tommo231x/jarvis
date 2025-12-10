@@ -105,7 +105,8 @@ export interface Service {
     };
     startDate?: string;
     renewalDate?: string;
-    status: 'active' | 'cancelled' | 'trial' | 'past_due' | 'expired' | 'inactive' | 'free_trial';
+    nextBillingDate?: string;   // ISO date string for next bill due
+    status: 'active' | 'cancelled' | 'trial' | 'archived';
     loginUrl?: string;          // @deprecated use websiteUrl
     notes?: string;
     usageHistory?: {
