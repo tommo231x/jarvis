@@ -122,7 +122,32 @@ The system comes pre-loaded with realistic demo data:
 
 **Projects (1):** Jarvis Identity Hub
 
-## Recent Changes (December 9, 2025)
+## Recent Changes (December 10, 2025)
+- **Identity → Profile Refactoring:**
+  - Conceptual rename from "Identities" to "Profiles" in UI
+  - Added `loginEmail` as canonical login field for services (previously derived from billingEmailId)
+  - Added `profileIds` array for many-to-many service-to-profile relationships
+  - Added `websiteUrl` and `handleOrUsername` fields to Service model
+  - `profileIds` is now source of truth, synced to legacy `ownerIdentityIds` for backward compatibility
+  
+- **New Service Fields:**
+  - `loginEmail`: Primary login email (user-editable, not overwritten by legacy field derivation)
+  - `profileIds`: Array of profile IDs that own/use this service
+  - `websiteUrl`: Service website (synced bidirectionally with legacy `loginUrl`)
+  - `handleOrUsername`: Optional handle/username for the service
+
+- **Backend Improvements:**
+  - `syncServiceFields` now async, preserves user edits to loginEmail
+  - PUT /services fetches existing service to avoid overwriting user-edited fields
+  - Legacy fields (ownerIdentityIds, identityId, billingEmailId, loginUrl) maintained for backward compatibility
+
+- **New UI Components:**
+  - ServiceDetailsModal: Full service details with editable fields
+  - AddServicesToProfileModal: Multi-select services to link to a profile
+  - IdentityHome updated: Services section shows loginEmail and website domain
+  - Sidebar sign-out button added (door/arrow icon)
+
+## Previous Changes (December 9, 2025)
 - **Multi-Currency Conversion System:**
   - Auto-detects base currency from most common currency in user's services
   - Only fetches exchange rates when foreign currencies are present
