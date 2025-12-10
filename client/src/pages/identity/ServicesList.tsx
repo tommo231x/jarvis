@@ -465,17 +465,17 @@ export const ServicesList = () => {
                                     {/* Cost + Next Billing */}
                                     <div className="col-span-3">
                                         {service.cost && service.cost.amount > 0 ? (
-                                            <div className="flex items-baseline gap-3">
-                                                <div>
-                                                    <span className="text-sm font-medium text-white">
-                                                        {new Intl.NumberFormat('en-GB', { style: 'currency', currency: service.cost.currency }).format(service.cost.amount)}
-                                                    </span>
-                                                    <span className="text-[10px] text-jarvis-muted ml-0.5">/{service.billingCycle === 'yearly' ? 'yr' : 'mo'}</span>
-                                                </div>
-                                                {service.nextBillingDate && (
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-medium text-white">
+                                                    {new Intl.NumberFormat('en-GB', { style: 'currency', currency: service.cost.currency }).format(service.cost.amount)}
+                                                    <span className="text-[10px] text-jarvis-muted ml-0.5 font-normal">/{service.billingCycle === 'yearly' ? 'yr' : 'mo'}</span>
+                                                </span>
+                                                {service.nextBillingDate ? (
                                                     <span className="text-xs text-jarvis-muted">
-                                                        Due {new Date(service.nextBillingDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                                        Due {new Date(service.nextBillingDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                     </span>
+                                                ) : (
+                                                    <span className="text-xs text-amber-500/60 italic">No billing date</span>
                                                 )}
                                             </div>
                                         ) : (
