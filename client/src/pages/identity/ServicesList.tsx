@@ -6,7 +6,8 @@ import { Badge } from '../../components/Badge';
 import { BackButton } from '../../components/BackButton';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { RestoreServiceModal } from '../../components/RestoreServiceModal';
-import { Search, Plus, Globe, Edit2, Trash2, Archive, RefreshCw, ChevronDown, ChevronRight, Calculator } from 'lucide-react';
+import { ServiceDetailsModal } from '../../components/identity/ServiceDetailsModal';
+import { Search, Plus, Globe, Archive, RefreshCw, ChevronDown, ChevronRight, Calculator, Info } from 'lucide-react';
 import { ServiceForm } from '../../components/identity/ServiceForm';
 import {
     detectBaseCurrency,
@@ -54,6 +55,19 @@ export const ServicesList = () => {
         isOpen: false,
         service: null,
     });
+
+    // Details Modal State
+    const [detailsModal, setDetailsModal] = useState<{
+        isOpen: boolean;
+        service: Service | null;
+    }>({
+        isOpen: false,
+        service: null,
+    });
+
+    const handleViewDetails = (service: Service) => {
+        setDetailsModal({ isOpen: true, service });
+    };
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -382,10 +396,10 @@ export const ServicesList = () => {
             <div className="hidden md:block bg-jarvis-card/50 backdrop-blur-sm border border-jarvis-border/50 rounded-xl overflow-hidden">
                 <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-jarvis-border/50 text-xs font-medium text-jarvis-muted uppercase tracking-wider bg-white/5">
                     <div className="col-span-3">Service</div>
-                    <div className="col-span-3">Owners</div>
-                    <div className="col-span-2">Login Email</div>
-                    <div className="col-span-2">Cost</div>
-                    <div className="col-span-2 text-right">Actions</div>
+                    <div className="col-span-2">Owners</div>
+                    <div className="col-span-3">Login Email</div>
+                    <div className="col-span-3">Cost / Next Bill</div>
+                    <div className="col-span-1 text-right">Info</div>
                 </div>
 
                 <div className="divide-y divide-jarvis-border/30">
@@ -397,7 +411,8 @@ export const ServicesList = () => {
                         filteredServices.map((service) => (
                                 <div
                                     key={service.id}
-                                    className="group grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors duration-200"
+                                    onClick={() => handleViewDetails(service)}
+                                    className="group grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors duration-200 cursor-pointer"
                                 >
                                     {/* Service */}
                                     <div className="col-span-3 flex items-center gap-3">
@@ -416,7 +431,7 @@ export const ServicesList = () => {
                                     </div>
 
                                     {/* Owners */}
-                                    <div className="col-span-3 flex items-center -space-x-2">
+                                    <div className="col-span-2 flex items-center -space-x-2">
                                         {service.ownerIdentityIds && service.ownerIdentityIds.length > 0 ? (
                                             service.ownerIdentityIds.map(id => {
                                                 const identity = identities.find(i => i.id === id);
@@ -432,43 +447,51 @@ export const ServicesList = () => {
                                                 );
                                             })
                                         ) : (
-                                            // Fallback for legacy
                                             service.identityId && (
-                                                <span className="text-xs text-jarvis-muted italic">Legacy Owner</span>
+                                                <span className="text-xs text-jarvis-muted italic">Legacy</span>
                                             )
                                         )}
                                     </div>
 
                                     {/* Login Email */}
-                                    <div className="col-span-2">
+                                    <div className="col-span-3">
                                         {service.loginEmail ? (
-                                            <span className="text-xs text-white truncate" title={service.loginEmail}>{service.loginEmail}</span>
+                                            <span className="text-sm text-white truncate block" title={service.loginEmail}>{service.loginEmail}</span>
                                         ) : (
-                                            <span className="text-xs text-amber-500/70 italic">No login email</span>
+                                            <span className="text-sm text-amber-500/70 italic">No login email</span>
                                         )}
                                     </div>
 
-                                    {/* Cost */}
-                                    <div className="col-span-2">
+                                    {/* Cost + Next Billing */}
+                                    <div className="col-span-3">
                                         {service.cost && service.cost.amount > 0 ? (
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-medium text-white">
-                                                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: service.cost.currency }).format(service.cost.amount)}
-                                                </span>
-                                                <span className="text-[10px] text-jarvis-muted capitalize">/{service.billingCycle}</span>
+                                            <div className="flex items-baseline gap-3">
+                                                <div>
+                                                    <span className="text-sm font-medium text-white">
+                                                        {new Intl.NumberFormat('en-GB', { style: 'currency', currency: service.cost.currency }).format(service.cost.amount)}
+                                                    </span>
+                                                    <span className="text-[10px] text-jarvis-muted ml-0.5">/{service.billingCycle === 'yearly' ? 'yr' : 'mo'}</span>
+                                                </div>
+                                                {service.nextBillingDate && (
+                                                    <span className="text-xs text-jarvis-muted">
+                                                        Due {new Date(service.nextBillingDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                                    </span>
+                                                )}
                                             </div>
                                         ) : (
                                             <span className="text-sm text-jarvis-muted">Free</span>
                                         )}
                                     </div>
 
-                                    {/* Actions */}
-                                    <div className="col-span-2 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon" onClick={() => handleEdit(service)} className="h-8 w-8 text-jarvis-muted hover:text-white">
-                                            <Edit2 className="w-4 h-4" />
-                                        </Button>
-                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(service)} className="h-8 w-8 text-jarvis-muted hover:text-red-400">
-                                            <Trash2 className="w-4 h-4" />
+                                    {/* Info Button */}
+                                    <div className="col-span-1 flex justify-end">
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            onClick={(e) => { e.stopPropagation(); handleViewDetails(service); }} 
+                                            className="h-8 w-8 text-jarvis-muted hover:text-jarvis-accent"
+                                        >
+                                            <Info className="w-4 h-4" />
                                         </Button>
                                     </div>
                                 </div>
@@ -480,7 +503,11 @@ export const ServicesList = () => {
             {/* Mobile List View (Simplified Card) */}
             <div className="md:hidden space-y-3">
                 {filteredServices.map((service) => (
-                    <div key={service.id} className="bg-jarvis-card/50 backdrop-blur-sm border border-jarvis-border/50 rounded-xl p-4">
+                    <div 
+                        key={service.id} 
+                        onClick={() => handleViewDetails(service)}
+                        className="bg-jarvis-card/50 backdrop-blur-sm border border-jarvis-border/50 rounded-xl p-4 cursor-pointer active:bg-white/5"
+                    >
                         <div className="flex justify-between items-start mb-2">
                             <div>
                                 <h3 className="text-white font-medium">{service.name}</h3>
@@ -490,9 +517,15 @@ export const ServicesList = () => {
                                 {service.status}
                             </Badge>
                         </div>
-                        {/* Mobile Actions */}
-                        <div className="flex gap-2 justify-end mt-2">
-                            <Button variant="ghost" size="sm" onClick={() => handleEdit(service)}>Edit</Button>
+                        <div className="flex justify-between items-center mt-2 text-xs">
+                            <span className="text-jarvis-muted truncate max-w-[50%]">{service.loginEmail || 'No login email'}</span>
+                            {service.cost && service.cost.amount > 0 ? (
+                                <span className="text-white font-medium">
+                                    {new Intl.NumberFormat('en-GB', { style: 'currency', currency: service.cost.currency }).format(service.cost.amount)}
+                                </span>
+                            ) : (
+                                <span className="text-jarvis-muted">Free</span>
+                            )}
                         </div>
                     </div>
                 ))}
@@ -525,6 +558,23 @@ export const ServicesList = () => {
                     onConfirm={executeRestore}
                     service={restoreModal.service}
                     identities={identities}
+                />
+            )}
+
+            {detailsModal.service && (
+                <ServiceDetailsModal
+                    service={detailsModal.service}
+                    identities={identities}
+                    isOpen={detailsModal.isOpen}
+                    onClose={() => setDetailsModal({ isOpen: false, service: null })}
+                    onEdit={() => {
+                        setDetailsModal({ isOpen: false, service: null });
+                        handleEdit(detailsModal.service!);
+                    }}
+                    onDelete={() => {
+                        setDetailsModal({ isOpen: false, service: null });
+                        handleDeleteClick(detailsModal.service!);
+                    }}
                 />
             )}
         </div>
