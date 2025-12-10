@@ -106,5 +106,15 @@
     "id": "email-easysplit-firebase",
     "description": "Firebase login for Easy Split frontend",
     "notes": "Frontend hosting and authentication"
+  },
+  {
+    "label": "primary e-mail",
+    "address": "tommo231@gmail.com",
+    "provider": "gmail",
+    "identityId": "cb8ef24e-89b6-43fd-a9cc-1983ef9c3768",
+    "isPrimary": true,
+    "description": "",
+    "notes": "",
+    "id": "8ec6e2d6-ec17-4fa0-a862-4ef664add4e1"
   }
 ]
