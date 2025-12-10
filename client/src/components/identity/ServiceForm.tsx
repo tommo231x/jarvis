@@ -119,10 +119,32 @@ export const ServiceForm = ({ initialData, identities, emails, currentProfileId,
         });
     };
 
+    const validateNextBillingDate = (dateStr: string | undefined): string | null => {
+        if (!dateStr) return null; // Empty is allowed
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const inputDate = new Date(dateStr);
+        inputDate.setHours(0, 0, 0, 0);
+        
+        if (inputDate < today) {
+            return 'Next bill due must be today or a future date.';
+        }
+        return null;
+    };
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+
+        // Validate nextBillingDate
+        const dateError = validateNextBillingDate(formData.nextBillingDate);
+        if (dateError) {
+            setError(dateError);
+            setLoading(false);
+            return;
+        }
 
         try {
             if (initialData) {

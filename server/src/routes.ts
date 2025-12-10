@@ -145,9 +145,72 @@ router.delete('/emails/:id', async (req, res) => {
 });
 
 // --- Services ---
+
+// Validate nextBillingDate is not in the past
+const validateNextBillingDate = (dateStr: string | undefined | null): string | null => {
+    if (!dateStr) return null; // Empty is allowed
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const inputDate = new Date(dateStr);
+    inputDate.setHours(0, 0, 0, 0);
+    
+    if (inputDate < today) {
+        return 'Next bill due must be today or a future date.';
+    }
+    return null;
+};
+
+// Get next billing date moved forward by one cycle
+const getNextBillingDate = (currentDate: Date, billingCycle: string): Date => {
+    const next = new Date(currentDate);
+    switch (billingCycle) {
+        case 'monthly':
+            next.setMonth(next.getMonth() + 1);
+            break;
+        case 'yearly':
+            next.setFullYear(next.getFullYear() + 1);
+            break;
+        case 'quarterly':
+            next.setMonth(next.getMonth() + 3);
+            break;
+        case 'weekly':
+            next.setDate(next.getDate() + 7);
+            break;
+        default:
+            // For 'one-time', 'none', or unknown, don't advance
+            break;
+    }
+    return next;
+};
+
+// Ensure billing date is in the future for active/trial services
+const ensureFutureBillingDate = (service: Service): Service => {
+    if (!service.nextBillingDate) return service;
+    if (service.status !== 'active' && service.status !== 'trial') return service;
+    if (!service.billingCycle || service.billingCycle === 'one-time' || service.billingCycle === 'none') return service;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let nextDate = new Date(service.nextBillingDate);
+    nextDate.setHours(0, 0, 0, 0);
+    
+    // Keep advancing until the date is in the future
+    while (nextDate < today) {
+        nextDate = getNextBillingDate(nextDate, service.billingCycle);
+    }
+    
+    return {
+        ...service,
+        nextBillingDate: nextDate.toISOString().split('T')[0]
+    };
+};
+
 router.get('/services', async (req, res) => {
     const services = await db.collection<Service>('services').find();
-    res.json(services);
+    // Apply rollover logic to ensure billing dates are in the future for active/trial services
+    const servicesWithRollover = services.map(ensureFutureBillingDate);
+    res.json(servicesWithRollover);
 });
 
 const syncServiceFields = async (data: any, existingService?: any) => {
@@ -200,12 +263,24 @@ const syncServiceFields = async (data: any, existingService?: any) => {
 };
 
 router.post('/services', async (req, res) => {
+    // Validate nextBillingDate
+    const dateError = validateNextBillingDate(req.body.nextBillingDate);
+    if (dateError) {
+        return res.status(400).json({ error: dateError });
+    }
+    
     const serviceData = await syncServiceFields(req.body);
     const newService = await db.collection<Service>('services').add(serviceData);
     res.status(201).json(newService);
 });
 
 router.put('/services/:id', async (req, res) => {
+    // Validate nextBillingDate
+    const dateError = validateNextBillingDate(req.body.nextBillingDate);
+    if (dateError) {
+        return res.status(400).json({ error: dateError });
+    }
+    
     const services = await db.collection<Service>('services').find();
     const existingService = services.find((s: Service) => s.id === req.params.id);
     const serviceData = await syncServiceFields(req.body, existingService);

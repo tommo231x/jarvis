@@ -1,0 +1,77 @@
+These are SMALL behavioural tweaks to the Service model and New Service form.
+Please do NOT treat this as a big refactor.
+
+FOCUS: next bill date validation and automatic rollover based on billing cycle.
+
+1) NEXT BILL DUE VALIDATION (CREATE + EDIT)
+
+We already have a `nextBillingDate` (or "Next bill due") field on the Service.
+
+I want the following behaviour when creating or editing a Service:
+
+- If the user provides a `nextBillingDate`:
+  - It must be today or a future date.
+  - If it is in the past (before today), show a validation error in the form and prevent submit.
+    - Example error message: “Next bill due must be today or a future date.”
+
+- If the user leaves `nextBillingDate` empty:
+  - That’s allowed (field is optional).
+  - Do not auto-generate a date on create; just store it as null/undefined.
+
+Please implement this validation:
+- On the client side in the New Service / Edit Service form.
+- And also enforce it server-side in the relevant API handler so invalid data cannot be saved via API calls.
+
+2) ROLLOVER LOGIC FOR NEXT BILL DATE
+
+I want `nextBillingDate` to move forward over time based on the billing cycle, **as long as the service is active or trial**.
+
+We already have a billing cycle field (e.g. "monthly", "yearly", etc). Use whatever enum or string values we already have configured.
+
+Implement a small utility (or functions) something like:
+
+- `getNextBillingDate(currentDate, billingCycle)`:
+  - Given a Date and a cycle ("monthly", "yearly", etc),
+  - returns a new Date moved forward by one cycle.
+  - e.g. monthly = +1 month; yearly = +1 year.
+
+- `ensureFutureBillingDate(service)`:
+  - If `service.nextBillingDate` is set AND
+  - `service.status` is "active" or "trial":
+    - While `nextBillingDate` is before today:
+      - move it forward one cycle using `getNextBillingDate`.
+    - Save or return the updated service.
+
+For now, I’m OK with you calling this rollover logic in whichever place is simplest, for example:
+- Before returning services to any “upcoming bills” / “subscriptions” view, or
+- In a periodic job/function if we already have one.
+
+Key behaviour in plain language:
+
+- As long as a service is `active` or `trial`, its `nextBillingDate` keeps jumping forward in billingCycle steps until it’s in the future.
+- If the status is `cancelled` or `archived`, do NOT roll the date forward anymore.
+
+3) STATUS HANDLING (NO BIG CHANGES)
+
+The valid statuses currently include `active`, `trial`, `cancelled`, `archived` (and possibly others like `inactive`).
+
+Do NOT change the statuses in the data model right now.
+
+However:
+
+- Make sure the rollover logic only runs for:
+  - `status === "active"` or `status === "trial"`.
+- For `cancelled` and `archived`, `nextBillingDate` should remain whatever it was; do not move it forward.
+
+4) QUICK SANITY CHECKS AFTER IMPLEMENTATION
+
+After you’ve implemented these changes, please:
+
+- Confirm:
+  - I cannot save a Service with `nextBillingDate` in the past.
+  - I can still save a Service with no `nextBillingDate`.
+- Demonstrate (in your summary) that:
+  - For an `active` monthly service whose `nextBillingDate` was yesterday, your helper moves it forward to next month.
+  - For a `cancelled` or `archived` service, `nextBillingDate` stays unchanged.
+
+Also, please list the files you changed at the end of your work.
