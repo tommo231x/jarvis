@@ -8,9 +8,11 @@ import {
     Command,
     Search,
     Settings,
-    Bell
+    Bell,
+    LogOut
 } from 'lucide-react';
 import { MobileNav } from './MobileNav';
+import { useAuth } from '../context/AuthContext';
 
 interface LayoutProps {
     children: ReactNode;
@@ -19,6 +21,7 @@ interface LayoutProps {
 export const Layout = ({ children }: LayoutProps) => {
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
+    const { logout } = useAuth();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Overview', path: '/' },
@@ -67,9 +70,19 @@ export const Layout = ({ children }: LayoutProps) => {
                         ))}
                     </nav>
 
-                    <div className="flex flex-col gap-4 mt-auto">
-                        <button className="p-3 text-jarvis-muted hover:text-white transition-colors">
+                    <div className="flex flex-col gap-3 mt-auto">
+                        <button 
+                            className="p-3 text-jarvis-muted hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                            title="Settings"
+                        >
                             <Settings className="w-5 h-5" />
+                        </button>
+                        <button 
+                            onClick={logout}
+                            className="p-3 text-jarvis-muted hover:text-jarvis-danger transition-colors rounded-lg hover:bg-red-500/10"
+                            title="Sign Out"
+                        >
+                            <LogOut className="w-5 h-5" />
                         </button>
                         <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 ring-2 ring-jarvis-border" />
                     </div>
