@@ -47,6 +47,11 @@ router.post('/auth/login', async (req, res) => {
     }
 });
 
+router.get('/auth/verify', authenticateToken, async (req, res) => {
+    // Token is valid if we reach this point (authenticateToken passed)
+    res.json({ valid: true });
+});
+
 // Initialize OpenAI - supports Jarvis API key or Replit AI Integrations
 // Priority: JARVIS_OPENAI_API_KEY > Replit AI Integrations
 const useJarvisKey = !!process.env.JARVIS_OPENAI_API_KEY;

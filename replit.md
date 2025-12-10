@@ -123,6 +123,13 @@ The system comes pre-loaded with realistic demo data:
 **Projects (1):** Jarvis Identity Hub
 
 ## Recent Changes (December 10, 2025)
+- **Auth Token Validation Fix:**
+  - Added token verification endpoint (`GET /api/auth/verify`) to validate stored tokens on app load
+  - AuthContext now validates tokens with the backend before accepting them from localStorage
+  - Stale/invalid tokens are automatically cleared, forcing fresh login on app reload
+  - Fixes preview mode issue where stale tokens from previous sessions were loading the home page with no data
+  - Login page now correctly shows on initial load in both preview and webview
+
 - **Identity → Profile Refactoring:**
   - Conceptual rename from "Identities" to "Profiles" in UI
   - Added `loginEmail` as canonical login field for services (previously derived from billingEmailId)

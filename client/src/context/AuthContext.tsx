@@ -28,16 +28,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!DEV_MODE) {
-            const storedToken = localStorage.getItem('token');
-            const storedUser = localStorage.getItem('user');
+        const initializeAuth = async () => {
+            if (!DEV_MODE) {
+                const storedToken = localStorage.getItem('token');
+                const storedUser = localStorage.getItem('user');
 
-            if (storedToken && storedUser) {
-                setToken(storedToken);
-                setUser(JSON.parse(storedUser));
+                if (storedToken && storedUser) {
+                    try {
+                        // Validate token by making a simple API call
+                        const response = await fetch('/api/auth/verify', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${storedToken}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            // Token is valid
+                            setToken(storedToken);
+                            setUser(JSON.parse(storedUser));
+                        } else {
+                            // Token is invalid, clear localStorage
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                        }
+                    } catch (err) {
+                        // Network error or invalid token, clear localStorage to be safe
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                    }
+                }
             }
-        }
-        setIsLoading(false);
+            setIsLoading(false);
+        };
+
+        initializeAuth();
     }, []);
 
     const login = (newToken: string, newUser: User) => {
