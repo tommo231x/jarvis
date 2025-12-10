@@ -117,20 +117,55 @@ export const useAICommandExecutor = () => {
                     if (!cmd.payload.identityId) {
                         return { success: false, message: 'No identity ID provided for service' };
                     }
-                    const service = await api.services.create({
+                    const serviceData: any = {
                         name: cmd.payload.name || 'New Service',
-                        category: cmd.payload.category || 'other',
+                        category: cmd.payload.category || 'Other',
                         ownerIdentityIds: cmd.payload.identityId ? [cmd.payload.identityId] : [],
+                        profileIds: cmd.payload.identityId ? [cmd.payload.identityId] : [],
                         identityId: cmd.payload.identityId,
                         billingEmailId: cmd.payload.emailId,
                         emailId: cmd.payload.emailId,
                         billingCycle: cmd.payload.billingCycle || 'monthly',
-                        status: 'active',
+                        status: cmd.payload.status || 'active',
                         notes: cmd.payload.notes,
-                    });
+                        loginEmail: cmd.payload.loginEmail || cmd.payload.email,
+                        websiteUrl: cmd.payload.websiteUrl || cmd.payload.url,
+                    };
+                    if (cmd.payload.cost) {
+                        serviceData.cost = cmd.payload.cost;
+                    } else if (cmd.payload.amount !== undefined) {
+                        serviceData.cost = {
+                            amount: cmd.payload.amount,
+                            currency: cmd.payload.currency || 'GBP'
+                        };
+                    }
+                    const service = await api.services.create(serviceData);
                     return {
                         success: true,
                         message: `Added service "${service.name}"`,
+                        data: service
+                    };
+                }
+
+                case 'update_service': {
+                    if (!cmd.payload.serviceId) {
+                        return { success: false, message: 'No service ID provided' };
+                    }
+                    const updates = cmd.payload.updates || {};
+                    if (cmd.payload.name) updates.name = cmd.payload.name;
+                    if (cmd.payload.status) updates.status = cmd.payload.status;
+                    if (cmd.payload.loginEmail) updates.loginEmail = cmd.payload.loginEmail;
+                    if (cmd.payload.cost) updates.cost = cmd.payload.cost;
+                    if (cmd.payload.amount !== undefined) {
+                        updates.cost = {
+                            amount: cmd.payload.amount,
+                            currency: cmd.payload.currency || 'GBP'
+                        };
+                    }
+                    const service = await api.services.update(cmd.payload.serviceId, updates);
+                    return {
+                        success: true,
+                        message: `Updated service`,
                         data: service
                     };
                 }

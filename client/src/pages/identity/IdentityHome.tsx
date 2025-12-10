@@ -391,10 +391,12 @@ export default function IdentityHome() {
                                                                     </p>
                                                                 </div>
                                                                 <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
-                                                                    {service.loginEmail && (
+                                                                    {service.loginEmail ? (
                                                                         <span className="truncate" title={service.loginEmail}>
                                                                             {service.loginEmail}
                                                                         </span>
+                                                                    ) : (
+                                                                        <span className="text-amber-500/70 italic">No login email</span>
                                                                     )}
                                                                     {websiteDomain && (
                                                                         <a 
@@ -424,9 +426,19 @@ export default function IdentityHome() {
                                                             <button
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
+                                                                    setSelectedService(service);
+                                                                }}
+                                                                className="text-gray-500 hover:text-jarvis-accent transition-colors opacity-0 group-hover:opacity-100"
+                                                                title="Edit Service"
+                                                            >
+                                                                <Pencil className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
                                                                     handleTrashClick(service);
                                                                 }}
-                                                                className="text-gray-500 hover:text-red-400 transition-colors"
+                                                                className="text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                                                                 title="Archive Service"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
