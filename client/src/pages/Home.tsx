@@ -381,20 +381,37 @@ export const HomePage = () => {
                     <Card className="divide-y divide-jarvis-border">
                         {(() => {
                             const now = new Date();
+                            now.setHours(0, 0, 0, 0);
+                            
+                            const getDaysUntil = (dateStr: string | undefined) => {
+                                if (!dateStr) return Infinity;
+                                const date = new Date(dateStr);
+                                date.setHours(0, 0, 0, 0);
+                                return Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                            };
+                            
                             const urgentServices = services.filter(s => {
-                                if (s.status === 'trial') return true;
-                                if (s.renewalDate) {
-                                    const renewal = new Date(s.renewalDate);
-                                    const diffTime = renewal.getTime() - now.getTime();
-                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                                    return diffDays >= 0 && diffDays <= 5;
+                                if (s.status === 'cancelled' || s.status === 'archived' || s.isArchived) return false;
+                                
+                                if (s.status === 'trial') {
+                                    const days = getDaysUntil(s.nextBillingDate);
+                                    return days >= 0 && days <= 5;
+                                }
+                                
+                                if (s.status === 'active' && s.nextBillingDate) {
+                                    const days = getDaysUntil(s.nextBillingDate);
+                                    return days >= 0 && days <= 5;
                                 }
                                 return false;
-                            }).sort((a, b) => {
-                                // Sort by urgency (trial first, then date)
+                            }).map(s => ({
+                                ...s,
+                                daysUntil: getDaysUntil(s.nextBillingDate)
+                            })).sort((a, b) => {
+                                if (a.daysUntil <= 1 && b.daysUntil > 1) return -1;
+                                if (b.daysUntil <= 1 && a.daysUntil > 1) return 1;
                                 if (a.status === 'trial' && b.status !== 'trial') return -1;
                                 if (b.status === 'trial' && a.status !== 'trial') return 1;
-                                return (new Date(a.renewalDate || '').getTime()) - (new Date(b.renewalDate || '').getTime());
+                                return a.daysUntil - b.daysUntil;
                             });
 
                             if (urgentServices.length === 0) {
@@ -407,33 +424,46 @@ export const HomePage = () => {
                                 );
                             }
 
-                            return urgentServices.slice(0, 5).map((service) => (
-                                <div
-                                    key={service.id}
-                                    className="p-3 md:p-4 flex items-center justify-between hover:bg-jarvis-border/20 active:bg-jarvis-border/30 transition cursor-pointer"
-                                    onClick={() => navigate('/apps/identity/services')}
-                                >
-                                    <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-                                        <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${service.status === 'trial' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>
-                                            {service.status === 'trial' ? <Zap className="w-4 h-4" /> : <CreditCard className="w-4 h-4" />}
+                            return urgentServices.slice(0, 5).map((service) => {
+                                const isUrgent = service.daysUntil <= 1;
+                                const isTrial = service.status === 'trial';
+                                const daysText = service.daysUntil === 0 ? 'Today' : 
+                                                 service.daysUntil === 1 ? 'Tomorrow' : 
+                                                 `In ${service.daysUntil} days`;
+                                
+                                return (
+                                    <div
+                                        key={service.id}
+                                        className={`p-3 md:p-4 flex items-center justify-between hover:bg-jarvis-border/20 active:bg-jarvis-border/30 transition cursor-pointer ${isUrgent ? 'bg-red-500/5 border-l-2 border-l-red-500' : ''}`}
+                                        onClick={() => navigate('/apps/identity/services')}
+                                    >
+                                        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+                                            <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                                isUrgent ? 'bg-red-500/20 text-red-400 animate-pulse' : 
+                                                isTrial ? 'bg-amber-500/10 text-amber-400' : 
+                                                'bg-orange-500/10 text-orange-400'
+                                            }`}>
+                                                {isTrial ? <Zap className="w-4 h-4" /> : <CreditCard className="w-4 h-4" />}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className={`text-sm font-medium truncate ${isUrgent ? 'text-red-300' : 'text-white'}`}>{service.name}</p>
+                                                <p className="text-xs text-jarvis-muted truncate">
+                                                    {isTrial ? `Trial ends ${daysText.toLowerCase()}` : `Payment due ${daysText.toLowerCase()}`}
+                                                    {service.cost && service.cost.amount > 0 && ` • ${new Intl.NumberFormat('en-GB', { style: 'currency', currency: service.cost.currency }).format(service.cost.amount)}`}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="min-w-0">
-                                            <p className="text-sm font-medium text-white truncate">{service.name}</p>
-                                            <p className="text-xs text-jarvis-muted truncate">
-                                                {service.status === 'trial' ? 'Trial Ending Soon' : `Payment Due: ${new Date(service.renewalDate!).toLocaleDateString()}`}
-                                            </p>
+                                        <div className="text-right flex-shrink-0 ml-2">
+                                            <Badge
+                                                variant={isUrgent ? 'danger' : isTrial ? 'warning' : 'outline'}
+                                                className={`text-[10px] md:text-xs ${isUrgent ? 'animate-pulse' : ''}`}
+                                            >
+                                                {isUrgent ? (service.daysUntil === 0 ? 'TODAY' : 'TOMORROW') : isTrial ? 'Trial' : daysText}
+                                            </Badge>
                                         </div>
                                     </div>
-                                    <div className="text-right flex-shrink-0 ml-2">
-                                        <Badge
-                                            variant={service.status === 'trial' ? 'warning' : 'danger'}
-                                            className="text-[10px] md:text-xs"
-                                        >
-                                            {service.status === 'trial' ? 'Trial' : 'Due Soon'}
-                                        </Badge>
-                                    </div>
-                                </div>
-                            ));
+                                );
+                            });
                         })()}
                     </Card>
                 </div>
