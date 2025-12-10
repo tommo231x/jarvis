@@ -1,100 +1,60 @@
 [
   {
-    "id": "email-fina-main",
+    "id": "email-tommo-main",
     "identityId": "id-tommo",
-    "label": "Fina Main",
+    "label": "Main Gmail",
     "address": "tommo231@gmail.com",
     "provider": "gmail",
-    "isPrimary": true,
-    "description": "Fina's primary email - owner of Midjourney account",
-    "notes": "Login email for shared Midjourney subscription",
-    "sharedWithIdentityIds": [
-      "id-leila",
-      "id-lara"
-    ]
-  },
-  {
-    "id": "email-leila-creative",
-    "identityId": "id-leila",
-    "label": "Leila Creative",
-    "address": "leila.creative@gmail.com",
-    "provider": "gmail",
-    "isPrimary": true,
-    "description": "Leila's creative work email",
-    "notes": "Used for Stable Diffusion login"
-  },
-  {
-    "id": "email-lara-main",
-    "identityId": "id-lara",
-    "label": "Lara Main",
-    "address": "lara@feels.family",
-    "provider": "other",
-    "isPrimary": true,
-    "description": "Lara's primary email",
-    "notes": "Personal and shared service communications"
+    "isPrimary": false,
+    "description": "Personal email for accounts and services",
+    "notes": ""
   },
   {
     "id": "email-studio",
     "identityId": "id-tommo-studio",
-    "label": "Studio Business",
+    "label": "Business Email",
     "address": "tommo.dev@gmail.com",
-    "provider": "other",
-    "isPrimary": true,
-    "description": "Business email for Fina Feels Studio",
-    "notes": "Billing, YouTube Premium, Cloudflare, Twitch - shared by multiple personas",
-    "sharedWithIdentityIds": [
-      "id-tommo",
-      "id-leila",
-      "id-lara"
-    ],
-    "isAmbiguous": false
+    "provider": "gmail",
+    "isPrimary": false,
+    "description": "Business email for Tommo Dev studio",
+    "notes": "Billing, hosting services, business subscriptions"
   },
   {
     "id": "email-generic-creative",
     "identityId": "id-generic-creative",
-    "label": "Creative Hub Generic",
+    "label": "Shared Creative",
     "address": "creativehubproject@gmail.com",
     "provider": "gmail",
-    "isPrimary": true,
-    "description": "Generic shared creative account",
-    "notes": "Used for multiple services - ownership unclear",
-    "isAmbiguous": true,
-    "confidenceScore": 0.3
-  },
-  {
-    "id": "email-tomo",
-    "identityId": "id-tomo",
-    "label": "Tomo Main",
-    "address": "tomo.connor@outlook.com",
-    "provider": "outlook",
-    "isPrimary": true,
-    "description": "Tomo's main email for financial correspondence",
-    "notes": "Pension and trust fund communications"
+    "isPrimary": false,
+    "description": "Shared creative project account",
+    "notes": "Used for multiple services - shared ownership"
   },
   {
     "identityId": "cb8ef24e-89b6-43fd-a9cc-1983ef9c3768",
     "address": "fishdips@gmail.com",
-    "label": "Primary",
+    "label": "Business Email",
     "provider": "gmail",
-    "isPrimary": true,
+    "isPrimary": false,
+    "description": "Fish and Dips business email",
     "id": "4a1ae98d-860f-40ef-bb84-bbd799e2635e"
   },
   {
     "identityId": "00e2f27b-dd4b-4a05-9846-4fd5d531c73f",
     "address": "doughnutty@gmail.com",
-    "label": "Primary",
+    "label": "Business Email",
     "provider": "gmail",
-    "isPrimary": true,
+    "isPrimary": false,
+    "description": "Doughnutty business email",
     "id": "45eca3bb-3936-42ae-a4f8-49d8aa4b8230"
   },
   {
     "identityId": "18728d2c-336a-49d3-a40c-950c27fcb193",
     "address": "tommo231@gmail.com",
-    "label": "Primary - GitHub & Render",
+    "label": "GitHub & Render",
     "provider": "gmail",
-    "isPrimary": true,
+    "isPrimary": false,
     "id": "4e535971-19f0-4bff-9b1b-49aed51dd11f",
-    "description": "Primary email for Easy Split backend services",
+    "description": "Backend services login",
     "notes": "Used for GitHub repo and Render deployment"
   },
   {
@@ -106,15 +66,5 @@
     "id": "email-easysplit-firebase",
     "description": "Firebase login for Easy Split frontend",
     "notes": "Frontend hosting and authentication"
-  },
-  {
-    "label": "primary e-mail",
-    "address": "tommo231@gmail.com",
-    "provider": "gmail",
-    "identityId": "cb8ef24e-89b6-43fd-a9cc-1983ef9c3768",
-    "isPrimary": true,
-    "description": "",
-    "notes": "",
-    "id": "8ec6e2d6-ec17-4fa0-a862-4ef664add4e1"
   }
 ]

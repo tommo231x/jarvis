@@ -11,7 +11,7 @@ import { ConfirmationModal } from '../../components/ConfirmationModal';
 import {
     User, Building2, Code, Plus, Mail, Shield,
     LayoutGrid, CreditCard,
-    Loader2, Trash2, Globe
+    Loader2, Trash2, Globe, Pencil
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -24,6 +24,7 @@ export default function IdentityHome() {
 
     // Modal States
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [editingEmail, setEditingEmail] = useState<Email | null>(null);
     const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
     const [isAddServicesModalOpen, setIsAddServicesModalOpen] = useState(false);
     const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -286,7 +287,7 @@ export default function IdentityHome() {
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         {identityEmails.map(email => (
-                                            <Card key={email.id} className="p-4 flex items-start gap-3 hover:bg-white/5 transition-colors cursor-pointer group">
+                                            <Card key={email.id} className="p-4 flex items-start gap-3 hover:bg-white/5 transition-colors group">
                                                 <div className="mt-1">
                                                     <Mail className="w-4 h-4 text-gray-400 group-hover:text-blue-400 transition-colors" />
                                                 </div>
@@ -295,6 +296,42 @@ export default function IdentityHome() {
                                                     <p className="text-xs text-gray-500 mt-0.5">
                                                         {(email.label || '').replace(/^Primary\s*[-–—]\s*/i, '')}
                                                     </p>
+                                                </div>
+                                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingEmail(email);
+                                                            setIsEmailModalOpen(true);
+                                                        }}
+                                                        className="p-1.5 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                                        title="Edit email"
+                                                    >
+                                                        <Pencil className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setConfirmationModal({
+                                                                isOpen: true,
+                                                                title: 'Delete Email',
+                                                                message: `Are you sure you want to delete "${email.address}"? This cannot be undone.`,
+                                                                confirmText: 'Delete',
+                                                                variant: 'danger',
+                                                                onConfirm: async () => {
+                                                                    try {
+                                                                        await api.emails.delete(email.id);
+                                                                        await refreshData();
+                                                                    } catch (err) {
+                                                                        console.error('Failed to delete email:', err);
+                                                                    }
+                                                                    setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+                                                                }
+                                                            });
+                                                        }}
+                                                        className="p-1.5 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors"
+                                                        title="Delete email"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
                                                 </div>
                                             </Card>
                                         ))}
@@ -441,12 +478,20 @@ export default function IdentityHome() {
                 <>
                     <EmailForm
                         isOpen={isEmailModalOpen}
-                        onClose={() => setIsEmailModalOpen(false)}
+                        onClose={() => {
+                            setIsEmailModalOpen(false);
+                            setEditingEmail(null);
+                        }}
                         onSubmit={async (data) => {
-                            await api.emails.create({ ...data, identityId: selectedIdentity.id });
+                            if (editingEmail) {
+                                await api.emails.update(editingEmail.id, data);
+                            } else {
+                                await api.emails.create({ ...data, identityId: selectedIdentity.id });
+                            }
                             await refreshData();
                         }}
-                        initialData={undefined} // Add mode
+                        initialData={editingEmail || undefined}
+                        identityId={selectedIdentity.id}
                     />
 
                     {isServiceModalOpen && (
