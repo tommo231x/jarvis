@@ -208,8 +208,21 @@ const ensureFutureBillingDate = (service: Service): Service => {
 
 router.get('/services', async (req, res) => {
     const services = await db.collection<Service>('services').find();
-    // Apply rollover logic to ensure billing dates are in the future for active/trial services
-    const servicesWithRollover = services.map(ensureFutureBillingDate);
+    
+    // Apply rollover logic and persist changes back to database
+    const servicesWithRollover = await Promise.all(services.map(async (service) => {
+        const updated = ensureFutureBillingDate(service);
+        
+        // If the date was rolled forward, persist it to the canonical record
+        if (updated.nextBillingDate !== service.nextBillingDate) {
+            await db.collection<Service>('services').update(service.id, {
+                nextBillingDate: updated.nextBillingDate
+            });
+        }
+        
+        return updated;
+    }));
+    
     res.json(servicesWithRollover);
 });
 

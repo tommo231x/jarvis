@@ -1,0 +1,105 @@
+Please make the following SMALL but important logic updates to ensure that billing information for each Service uses a single source of truth everywhere in the system.
+
+This is NOT a refactor.  
+Do NOT restructure files or rename major components.  
+Just unify how billing fields are stored and referenced.
+
+----------------------------------------------
+1. DEFINE THE SINGLE SOURCE OF TRUTH
+----------------------------------------------
+
+Each Service object must have ONE authoritative set of billing fields:
+
+- cost
+- currency
+- billingCycle  (monthly/yearly/weekly/etc)
+- nextBillingDate
+
+These fields on the Service model must be the ONLY place that billing information is stored and updated.
+
+This means:
+- Manual edits in the UI update these fields.
+- Email scanning (when implemented later) must update these same fields.
+- The "Upcoming bills" logic must read from these same fields.
+- ANY function or UI component that needs billing info must read from these fields.
+
+No duplicate billing fields should exist in:
+- Profiles
+- Email accounts
+- Local UI copies
+- Legacy service fields (if any)
+
+----------------------------------------------
+2. WHEN EDITING A SERVICE (ANYWHERE)
+----------------------------------------------
+
+All edits to billing fields must update the SAME service model fields:
+
+- Editing cost → updates service.cost
+- Editing cycle → updates service.billingCycle
+- Editing next bill date → updates service.nextBillingDate
+
+Do NOT store temporary or local versions of these fields outside of the canonical Service object.
+
+----------------------------------------------
+3. WHEN DISPLAYING BILLING INFO
+----------------------------------------------
+
+All UI components must read billing info from the Service model only.
+
+Examples:
+- Profile → Services list
+- ServiceDetailsModal
+- Upcoming subscriptions widget
+- Any future billing summaries
+
+Ensure all of them read from:
+- service.cost
+- service.billingCycle
+- service.nextBillingDate
+- service.currency
+
+Do NOT reconstruct billing info or fetch it from other places.
+
+----------------------------------------------
+4. WHEN ROLLING FORWARD `nextBillingDate`
+----------------------------------------------
+
+When you apply billing cycle rollover logic:
+
+- The rollover must update `service.nextBillingDate` directly.
+- No UI-level copies.
+- No shadow fields.
+- The updated value must be persisted back to the canonical Service record.
+
+----------------------------------------------
+5. HANDLING MULTIPLE SERVICE INSTANCES
+----------------------------------------------
+
+If there are multiple Service entries for the same provider but different login emails:
+
+Example:
+- Midjourney + tommo231@gmail.com
+- Midjourney + finafeels@gmail.com
+
+Each combination must have its own independent canonical billing fields.
+
+The source of truth is:
+(service name + loginEmail)
+
+NOT:
+(service name alone)
+
+----------------------------------------------
+6. AFTER IMPLEMENTATION, PLEASE CONFIRM:
+----------------------------------------------
+
+1. All components fetch billing info from Service model fields.
+2. Editing a service updates the same canonical fields used everywhere.
+3. No duplicate copies of cost/cycle/nextBillingDate exist in UI or backend.
+4. Rollover logic writes back to the same canonical fields.
+5. New services created through the UI store all billing info in the same place.
+
+----------------------------------------------
+END OF INSTRUCTIONS
+----------------------------------------------

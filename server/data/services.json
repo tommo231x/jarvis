@@ -100,7 +100,7 @@
     },
     "status": "active",
     "loginEmail": "creativehubproject@gmail.com",
-    "nextBillingDate": "2025-01-12",
+    "nextBillingDate": "2025-12-12",
     "notes": "Shared account",
     "profileIds": [
       "id-generic-creative"
@@ -205,7 +205,7 @@
     "loginUrl": "https://render.com",
     "websiteUrl": "https://render.com",
     "loginEmail": "tommo231@gmail.com",
-    "nextBillingDate": "2025-01-10",
+    "nextBillingDate": "2025-12-10",
     "notes": "Backend hosting for Easy Split",
     "profileIds": [
       "18728d2c-336a-49d3-a40c-950c27fcb193"
