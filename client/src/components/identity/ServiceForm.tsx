@@ -16,9 +16,12 @@ const defaultService: Omit<Service, 'id'> = {
     name: '',
     category: '',
     loginUrl: '',
+    websiteUrl: '',
+    loginEmail: '',
+    handleOrUsername: '',
+    profileIds: [],
     ownerIdentityIds: [],
     billingEmailId: '',
-    // Legacy fields for type safety, though we primarily set the new ones
     identityId: '',
     emailId: '',
     cost: {
@@ -42,16 +45,16 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                 name: initialData.name,
                 category: initialData.category,
                 loginUrl: initialData.loginUrl || '',
-                // Prefer new fields, fallback to legacy
+                websiteUrl: initialData.websiteUrl || initialData.loginUrl || '',
+                loginEmail: initialData.loginEmail || '',
+                handleOrUsername: initialData.handleOrUsername || '',
+                profileIds: initialData.profileIds || initialData.ownerIdentityIds || [],
                 ownerIdentityIds: initialData.ownerIdentityIds && initialData.ownerIdentityIds.length > 0
                     ? initialData.ownerIdentityIds
                     : (initialData.identityId ? [initialData.identityId] : []),
                 billingEmailId: initialData.billingEmailId || initialData.emailId || '',
-
-                // Keep legacy fields populated for internal consistency if needed
                 identityId: initialData.identityId || '',
                 emailId: initialData.emailId || '',
-
                 cost: initialData.cost || { amount: 0, currency: 'GBP' },
                 billingCycle: initialData.billingCycle || 'monthly',
                 renewalDate: initialData.renewalDate || '',
@@ -88,7 +91,7 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
             return {
                 ...prev,
                 ownerIdentityIds: newOwners,
-                // Update legacy singular field to the first selected owner (or empty)
+                profileIds: newOwners,
                 identityId: newOwners.length > 0 ? newOwners[0] : ''
             };
         });
@@ -161,11 +164,35 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                         />
                     </div>
 
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input
+                            label="Login Email"
+                            name="loginEmail"
+                            value={formData.loginEmail || ''}
+                            onChange={handleChange}
+                            type="email"
+                            placeholder="email@example.com"
+                        />
+                        <Input
+                            label="Handle / Username"
+                            name="handleOrUsername"
+                            value={formData.handleOrUsername || ''}
+                            onChange={handleChange}
+                            placeholder="@username"
+                        />
+                    </div>
+
                     <Input
-                        label="Login URL"
-                        name="loginUrl"
-                        value={formData.loginUrl}
-                        onChange={handleChange}
+                        label="Website URL"
+                        name="websiteUrl"
+                        value={formData.websiteUrl || ''}
+                        onChange={(e) => {
+                            setFormData(prev => ({
+                                ...prev,
+                                websiteUrl: e.target.value,
+                                loginUrl: e.target.value // Sync both fields
+                            }));
+                        }}
                         type="url"
                         placeholder="https://..."
                     />
@@ -173,7 +200,7 @@ export const ServiceForm = ({ initialData, identities, emails, onClose, onSubmit
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Owners Multi-Select */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-jarvis-muted">Owned By (Identities)</label>
+                            <label className="text-sm font-medium text-jarvis-muted">Linked Profiles</label>
                             <div className="bg-jarvis-bg border border-jarvis-border rounded-lg p-2 max-h-40 overflow-y-auto space-y-1">
                                 {identities.map(identity => {
                                     const isSelected = formData.ownerIdentityIds?.includes(identity.id);

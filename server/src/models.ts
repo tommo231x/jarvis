@@ -49,6 +49,15 @@ export interface Identity {
     vatNumber?: string;
 }
 
+// Profile extends Identity with new fields for the evolved data model
+export interface Profile extends Identity {
+    type?: 'personal' | 'business' | 'brand' | 'project' | 'client' | 'event' | 'other';
+    referenceEmails?: string[];      // Emails relevant to this profile (not identity-defining)
+    reasonUsed?: string;             // Why this profile exists
+    serviceIds?: string[];           // Services linked to this profile
+    workspaceIds?: string[];         // Workspaces linked to this profile
+}
+
 export interface Email {
     id: string;
     identityId: string;
@@ -75,14 +84,18 @@ export interface Service {
     name: string;
     category: string;
 
-    // New Fields
-    ownerIdentityIds: string[]; // Supports multiple owners
-    billingEmailId?: string;    // Explicit billing email relation
-    isArchived?: boolean;       // Soft delete support
+    // Primary Fields (New Model)
+    loginEmail?: string;        // Canonical email used to log in (primary field)
+    profileIds?: string[];      // Profiles this service is attached to
+    websiteUrl?: string;        // Full URL e.g. "https://www.midjourney.com"
+    handleOrUsername?: string;  // e.g. "@finafeels" for Twitter/IG
 
-    // Deprecated / Legacy Support
-    identityId?: string;        // @deprecated use ownerIdentityIds[0]
-    emailId?: string;          // @deprecated use billingEmailId
+    // Legacy Fields (kept for backward compatibility)
+    ownerIdentityIds?: string[]; // Supports multiple owners (legacy)
+    billingEmailId?: string;    // Explicit billing email relation (legacy)
+    isArchived?: boolean;       // Soft delete support
+    identityId?: string;        // @deprecated use profileIds
+    emailId?: string;           // @deprecated use loginEmail
 
     ownership?: ServiceOwnership;
     billingCycle: 'monthly' | 'yearly' | 'none' | 'one-time';
@@ -92,8 +105,8 @@ export interface Service {
     };
     startDate?: string;
     renewalDate?: string;
-    status: 'active' | 'cancelled' | 'trial' | 'past_due' | 'expired';
-    loginUrl?: string;
+    status: 'active' | 'cancelled' | 'trial' | 'past_due' | 'expired' | 'inactive' | 'free_trial';
+    loginUrl?: string;          // @deprecated use websiteUrl
     notes?: string;
     usageHistory?: {
         identityId: string;

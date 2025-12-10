@@ -145,32 +145,65 @@ router.get('/services', async (req, res) => {
     res.json(services);
 });
 
-const syncServiceFields = (data: any) => {
-    // 1. Sync Owners -> Legacy Identity
-    if (data.ownerIdentityIds && data.ownerIdentityIds.length > 0 && !data.identityId) {
+const syncServiceFields = async (data: any, existingService?: any) => {
+    // 1. profileIds is the source of truth - sync to legacy fields
+    // If profileIds provided, use it; otherwise try legacy fields
+    if (data.profileIds && data.profileIds.length > 0) {
+        data.ownerIdentityIds = [...data.profileIds];
+        data.identityId = data.profileIds[0];
+    } else if (data.ownerIdentityIds && data.ownerIdentityIds.length > 0) {
+        data.profileIds = [...data.ownerIdentityIds];
         data.identityId = data.ownerIdentityIds[0];
-    } else if (data.identityId && (!data.ownerIdentityIds || data.ownerIdentityIds.length === 0)) {
+    } else if (data.identityId) {
         data.ownerIdentityIds = [data.identityId];
+        data.profileIds = [data.identityId];
+    } else if (existingService?.profileIds) {
+        // Preserve existing profileIds if no new ones provided
+        data.profileIds = existingService.profileIds;
+        data.ownerIdentityIds = existingService.profileIds;
     }
 
-    // 2. Sync Billing Email -> Legacy Email
+    // 2. Sync websiteUrl <-> loginUrl (prefer websiteUrl if provided)
+    if (data.websiteUrl) {
+        data.loginUrl = data.websiteUrl;
+    } else if (data.loginUrl && !data.websiteUrl) {
+        data.websiteUrl = data.loginUrl;
+    } else if (existingService?.websiteUrl || existingService?.loginUrl) {
+        // Preserve existing URLs if no new ones provided
+        data.websiteUrl = data.websiteUrl || existingService.websiteUrl || existingService.loginUrl;
+        data.loginUrl = data.loginUrl || existingService.loginUrl || existingService.websiteUrl;
+    }
+
+    // 3. Sync Billing Email -> Legacy Email (keep for backward compat)
     if (data.billingEmailId && !data.emailId) {
         data.emailId = data.billingEmailId;
     } else if (data.emailId && !data.billingEmailId) {
         data.billingEmailId = data.emailId;
     }
 
+    // 4. loginEmail is user-editable - only derive from billingEmailId if not explicitly set
+    // and if there's no existing loginEmail
+    if (data.loginEmail === undefined && !existingService?.loginEmail && data.billingEmailId) {
+        const emails = await db.collection<Email>('emails').find();
+        const email = emails.find((e: Email) => e.id === data.billingEmailId);
+        if (email) {
+            data.loginEmail = email.address;
+        }
+    }
+
     return data;
 };
 
 router.post('/services', async (req, res) => {
-    const serviceData = syncServiceFields(req.body);
+    const serviceData = await syncServiceFields(req.body);
     const newService = await db.collection<Service>('services').add(serviceData);
     res.status(201).json(newService);
 });
 
 router.put('/services/:id', async (req, res) => {
-    const serviceData = syncServiceFields(req.body);
+    const services = await db.collection<Service>('services').find();
+    const existingService = services.find((s: Service) => s.id === req.params.id);
+    const serviceData = await syncServiceFields(req.body, existingService);
     const updated = await db.collection<Service>('services').update(req.params.id, serviceData);
     res.json(updated);
 });

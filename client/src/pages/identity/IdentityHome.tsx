@@ -5,11 +5,13 @@ import { Card } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { ServiceForm } from '../../components/identity/ServiceForm';
 import { EmailForm } from '../../components/identity/EmailForm';
+import { ServiceDetailsModal } from '../../components/identity/ServiceDetailsModal';
+import { AddServicesToProfileModal } from '../../components/identity/AddServicesToProfileModal';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import {
     User, Building2, Code, Plus, Mail, Shield,
     LayoutGrid, CreditCard,
-    Loader2, Trash2
+    Loader2, Trash2, Globe
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -23,6 +25,8 @@ export default function IdentityHome() {
     // Modal States
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
     const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+    const [isAddServicesModalOpen, setIsAddServicesModalOpen] = useState(false);
+    const [selectedService, setSelectedService] = useState<Service | null>(null);
 
     // Confirmation Modal State
     const [confirmationModal, setConfirmationModal] = useState<{
@@ -89,7 +93,8 @@ export default function IdentityHome() {
     const identityServices = useMemo(() =>
         selectedIdentity ? services.filter(s =>
             !s.isArchived && // Filter out archived
-            ((s.ownerIdentityIds && s.ownerIdentityIds.includes(selectedIdentity.id)) ||
+            ((s.profileIds && s.profileIds.includes(selectedIdentity.id)) ||
+                (s.ownerIdentityIds && s.ownerIdentityIds.includes(selectedIdentity.id)) ||
                 s.identityId === selectedIdentity.id)
         ) : [],
         [services, selectedIdentity]);
@@ -144,8 +149,8 @@ export default function IdentityHome() {
                 <div className="lg:col-span-4 xl:col-span-3 flex flex-col gap-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-2xl font-bold text-white tracking-tight">Identities</h1>
-                            <p className="text-sm text-jarvis-muted">Manage your entities</p>
+                            <h1 className="text-2xl font-bold text-white tracking-tight">Profiles</h1>
+                            <p className="text-sm text-jarvis-muted">Manage your identities</p>
                         </div>
                         <Link to="/identities/create">
                             <Button size="sm" className="bg-jarvis-accent/10 text-jarvis-accent hover:bg-jarvis-accent/20 border-jarvis-accent/10">
@@ -305,12 +310,18 @@ export default function IdentityHome() {
                                 <div className="flex items-center justify-between">
                                     <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                                         <Shield className="w-5 h-5 text-gray-400" />
-                                        Linked Services
+                                        Services
                                     </h2>
-                                    <Button size="sm" variant="ghost" className="text-xs gap-1" onClick={() => setIsServiceModalOpen(true)}>
-                                        <Plus className="w-3.5 h-3.5" />
-                                        Link Service
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button size="sm" variant="ghost" className="text-xs gap-1" onClick={() => setIsAddServicesModalOpen(true)}>
+                                            <Plus className="w-3.5 h-3.5" />
+                                            Add services to this profile
+                                        </Button>
+                                        <Button size="sm" variant="ghost" className="text-xs gap-1" onClick={() => setIsServiceModalOpen(true)}>
+                                            <Plus className="w-3.5 h-3.5" />
+                                            New Service
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 {identityServices.length === 0 ? (
@@ -320,40 +331,75 @@ export default function IdentityHome() {
                                     </div>
                                 ) : (
                                     <Card className="divide-y divide-white/5">
-                                        {identityServices.map(service => (
-                                            <div key={service.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors group">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${service.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-800 text-gray-400'}`}>
-                                                        {service.name.charAt(0)}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-medium text-white text-sm">{service.name}</p>
-                                                        <p className="text-xs text-gray-500">{service.category}</p>
+                                        {identityServices.map(service => {
+                                            const websiteDomain = service.websiteUrl ? 
+                                                new URL(service.websiteUrl.startsWith('http') ? service.websiteUrl : `https://${service.websiteUrl}`).hostname.replace('www.', '') : 
+                                                (service.loginUrl ? new URL(service.loginUrl.startsWith('http') ? service.loginUrl : `https://${service.loginUrl}`).hostname.replace('www.', '') : null);
+                                            
+                                            return (
+                                                <div 
+                                                    key={service.id} 
+                                                    className="p-4 hover:bg-white/5 transition-colors group cursor-pointer"
+                                                    onClick={() => setSelectedService(service)}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${service.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-800 text-gray-400'}`}>
+                                                                {service.name.charAt(0)}
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <p className="font-medium text-white text-sm truncate hover:text-jarvis-accent transition-colors">
+                                                                        {service.name}
+                                                                        {service.handleOrUsername && <span className="text-jarvis-muted ml-1">({service.handleOrUsername})</span>}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
+                                                                    {service.loginEmail && (
+                                                                        <span className="truncate" title={service.loginEmail}>
+                                                                            {service.loginEmail}
+                                                                        </span>
+                                                                    )}
+                                                                    {websiteDomain && (
+                                                                        <a 
+                                                                            href={service.websiteUrl || service.loginUrl} 
+                                                                            target="_blank" 
+                                                                            rel="noopener noreferrer"
+                                                                            className="flex items-center gap-1 text-jarvis-accent/70 hover:text-jarvis-accent transition-colors shrink-0"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        >
+                                                                            <Globe className="w-3 h-3" />
+                                                                            {websiteDomain}
+                                                                        </a>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-3 shrink-0 ml-2">
+                                                            {service.cost && service.cost.amount > 0 && (
+                                                                <span className="text-sm text-gray-300">
+                                                                    {service.cost.currency === 'GBP' ? '£' : '$'}{service.cost.amount}
+                                                                    <span className="text-xs text-gray-500">/{service.billingCycle === 'yearly' ? 'yr' : 'mo'}</span>
+                                                                </span>
+                                                            )}
+                                                            <Badge variant={service.status === 'active' ? 'success' : 'outline'} className="text-[10px]">
+                                                                {service.status}
+                                                            </Badge>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleTrashClick(service);
+                                                                }}
+                                                                className="text-gray-500 hover:text-red-400 transition-colors"
+                                                                title="Archive Service"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-3">
-                                                    {service.cost && (
-                                                        <span className="text-sm text-gray-300">
-                                                            £{service.cost.amount}
-                                                            <span className="text-xs text-gray-500">/{service.billingCycle === 'yearly' ? 'yr' : 'mo'}</span>
-                                                        </span>
-                                                    )}
-                                                    <Badge variant={service.status === 'active' ? 'success' : 'outline'} className="text-[10px]">
-                                                        {service.status}
-                                                    </Badge>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleTrashClick(service);
-                                                        }}
-                                                        className="text-gray-500 hover:text-red-400 transition-colors"
-                                                        title="Archive Service"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </Card>
                                 )}
                             </div>
@@ -428,6 +474,27 @@ export default function IdentityHome() {
                 confirmText={confirmationModal.confirmText}
                 variant={confirmationModal.variant}
             />
+
+            {selectedService && (
+                <ServiceDetailsModal
+                    service={selectedService}
+                    identities={identities}
+                    isOpen={!!selectedService}
+                    onClose={() => setSelectedService(null)}
+                    onUpdate={refreshData}
+                />
+            )}
+
+            {selectedIdentity && (
+                <AddServicesToProfileModal
+                    profileId={selectedIdentity.id}
+                    currentServiceIds={identityServices.map(s => s.id)}
+                    allServices={services}
+                    isOpen={isAddServicesModalOpen}
+                    onClose={() => setIsAddServicesModalOpen(false)}
+                    onUpdate={refreshData}
+                />
+            )}
         </div>
     );
 }

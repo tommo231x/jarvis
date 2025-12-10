@@ -1,0 +1,231 @@
+High-level goals:
+1. Keep the current “Identities” card layout and styling as much as reasonably possible (title, sections, general structure).
+2. Evolve “Identities” into **Profiles**, with clearer logic and data model.
+3. Introduce a clean Services section inside each Profile, driven by the services detected in Layer 1.
+4. Treat **login email as the canonical email for each service account** (for now, login email = billing email).
+5. Make everything manually editable (profiles and services can be edited by the user).
+6. Avoid confusion between “billing”, “billable”, and “login” fields in both UI and code.
+
+--------------------------------
+DATA MODEL CHANGES / CLARIFICATION
+--------------------------------
+
+### 1. Service object
+
+Each individual service account is defined by: (service name + login email).
+
+Example:
+- “Midjourney + tommo231@yahoo.com” = one service account.
+- “Midjourney + finafeels@gmail.com” = a separate service account.
+
+Please ensure we have a **Service** model with at least:
+
+- id: string
+- name: string              // e.g. "Midjourney", "X (Twitter)", "Cloudflare"
+- loginEmail: string        // canonical email used to log in; also used as billingEmail for now
+- status: "active" | "inactive" | "free_trial" | "cancelled" | etc.
+- websiteUrl: string        // e.g. "https://www.midjourney.com/app"
+- sourceEmailAccountId?: string  // which inbox we scanned this from (if applicable)
+- profileIds: string[]      // which Profiles this service is attached to (often 1, but allow >1)
+- handleOrUsername?: string // e.g. "@finafeels" for X/Twitter, IG handle, etc.
+- notes?: string            // free text, manually editable
+
+IMPORTANT:
+- **loginEmail is the main email we care about.**
+- For now, **assume loginEmail = billing email.**
+- If older code uses `billingEmail`, `billable`, etc., update the logic so `loginEmail` is the canonical field.
+- If both `billingEmail` and `loginEmail` exist, prefer `loginEmail` and migrate data if needed.
+
+### 2. Profile object (formerly Identity)
+
+We are conceptually renaming Identities → Profiles.
+
+A Profile is a container representing a part of my world:
+
+- Person (e.g. "Tommo")
+- Business (e.g. "Tommo Dev")
+- Brand (e.g. "FinaFeels")
+- Project/app (e.g. "EasySplit")
+- Client (e.g. "London Mosaic – Tile Issues")
+- Event (e.g. "Sarah & Mark’s Wedding")
+
+Each Profile should support:
+
+- id: string
+- name: string                    // e.g. "FinaFeels", "Tommo Dev"
+- type?: "personal" | "business" | "brand" | "project" | "client" | "event" | "other"
+- referenceEmails?: string[]      // optional; emails that are relevant to this profile, but NOT required
+- reasonUsed?: string             // why this profile exists, e.g. "Used for AI model brand & collabs"
+- serviceIds: string[]            // services linked to this profile
+- workspaceIds?: string[]         // existing Workspaces linked to this profile (do not break existing links)
+- notes?: string
+
+Key rule:
+- A Profile is **NOT** defined by a single email.
+- Emails are **attributes**, not the identity itself.
+- The same email can appear in multiple services and multiple profiles.
+
+All of this should remain **manually editable** in the UI.
+
+--------------------------------
+UI REQUIREMENTS – PROFILE CARD
+--------------------------------
+
+We want to keep the existing Identities/Profile card layout and styling as much as possible, but with updated content and logic.
+
+The Profile card should look like this conceptually:
+
+TOP SECTION:
+- Profile name
+- Email (optional)
+- Reason used (optional)
+
+Under that, we show **Services**, and then **Workspaces**.
+
+### A) Profile header section
+
+Keep the current layout, but ensure it supports:
+
+- Profile name (editable)
+- A list of “reference emails” (optional, editable)  
+  - Can be displayed as a simple list or pills.
+- “Reason used” / description (optional, editable)
+
+If the current UI only supports a single email, you can keep that for now but internally treat it as the first item in `referenceEmails`.
+
+### B) Services section inside a Profile
+
+We want a section like:
+
+Services
+- Midjourney – login email – status – website
+- Tensor Art – login email – status – website
+- Stable Diffusion Host – login email – status – website
+- Instagram (@handle) – login email – status – website
+- X (Twitter) (@handle) – login email – status – website
+...
+
+Each row should show at minimum:
+
+- Service name
+- loginEmail (label it as “Email used” or similar)
+- status (Active / Inactive / Free trial, etc.)
+- website (domain only is fine, e.g. “midjourney.com”)
+
+BEHAVIOUR:
+
+- Clicking the **service name** opens a **Service Details** view (can be a modal, drawer, or side panel) for that specific service account.
+  - Service Details should show:
+    - name
+    - loginEmail
+    - status
+    - websiteUrl (full)
+    - handle/username (if any)
+    - which Profiles it’s linked to
+    - notes (editable)
+
+- Clicking the website (or a small globe icon) opens the websiteUrl in a new tab.
+
+- There should be a button in the Services section:  
+  **“Add services to this profile”**
+
+### “Add services to this profile” flow:
+
+When clicked:
+- Show a list of all services known in the system (from Overview / global Service store).
+- For each service row, display:
+  - name
+  - loginEmail
+  - status
+  - website (domain)
+  - handle/username if available
+
+Allow multi-select and attach them to the current profile by:
+
+- Adding the profile’s id to the Service’s `profileIds` array.
+- Adding the service’s id to the Profile’s `serviceIds` array.
+
+This way, if there are multiple Midjourney accounts, the user will see:
+
+- Midjourney – `tommo231@yahoo.com` – Active – midjourney.com
+- Midjourney – `finafeels@gmail.com` – Active – midjourney.com
+
+and can choose which ones belong to this Profile.
+
+All of this MUST be manually editable; the user should be able to:
+
+- Detach a service from a profile.
+- Edit the service’s loginEmail, status, notes, websiteUrl.
+- Edit the Profile’s referenceEmails and reasonUsed.
+
+--------------------------------
+OVERVIEW / SEARCH BEHAVIOUR (EMAIL LOGIC)
+--------------------------------
+
+VERY IMPORTANT LOGIC:
+
+- For now, **loginEmail is the canonical email for a service**.
+- Do NOT keep separate “billing email” logic that confuses things.
+- If there are old fields or methods named around “billing” or “billable”, update them so:
+  - `loginEmail` is the main field.
+  - `billingEmail` is either removed or treated as an alias to `loginEmail`.
+
+When the user asks or searches:
+
+- “What email did I use for Midjourney?”
+  - Return all Service entries where `name = Midjourney`, listing `loginEmail`.
+
+- “What services are on tommo231@yahoo.com?”
+  - Filter Services by `loginEmail = "tommo231@yahoo.com"` and list them.
+
+The system should NOT require a separate billing email field for any core behaviour at this stage.
+
+--------------------------------
+WORKSPACES LINK
+--------------------------------
+
+At the bottom of the Profile card, keep the **Workspaces** section as it already exists in the UI:
+
+- List existing Workspaces linked to this Profile.
+- Provide a button like “Add workspace”.
+
+We are NOT redesigning Workspaces in this task.
+Just make sure existing workspace links (Profile → Workspaces) are preserved when you change “Identities” → “Profiles”.
+
+--------------------------------
+STYLE / LAYOUT CONSTRAINTS
+--------------------------------
+
+- Keep the existing Identity/Profiles card styling and basic layout.  
+  I’m happy with the current aesthetic and general structure.
+- You can rearrange sections inside the card (header, services, workspaces) to support the new behaviour, but:
+  - Don’t completely redesign the look and feel.
+  - Only adjust as much as necessary to support Profiles + Services linking.
+- All new elements (service rows, add services button, service details view) should visually match the existing UI style.
+
+--------------------------------
+SUMMARY
+--------------------------------
+
+Implement the following:
+
+1. Refine the data model so:
+   - Services are defined as (service name + loginEmail).
+   - loginEmail is the canonical email; billingEmail is not required.
+   - Services can link to multiple Profiles via profileIds.
+
+2. Rename/repurpose “Identities” into Profiles logically (naming in code and UI where appropriate), keeping the card layout and styling largely intact.
+
+3. Add a Services section inside each Profile card:
+   - List service rows with: name, loginEmail, status, website.
+   - Clicking a service opens a detailed Service view.
+   - Add an “Add services to this profile” flow which shows all known services (from Overview) with name, loginEmail, status, website, and allows multi-select attach.
+
+4. Ensure everything is manually editable:
+   - Profile fields: name, referenceEmails, reasonUsed, notes.
+   - Service fields: loginEmail, websiteUrl, status, notes, handle.
+
+5. Clean up any old “billing / billable” logic:
+   - Standardise on loginEmail for search, UI labels, and core functionality.
+
+Before making large changes, inspect the current code for Identities/Profiles and Services implementation, then adapt it to match this spec with minimal disruption to existing UI styling.

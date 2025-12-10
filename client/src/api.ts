@@ -3,12 +3,21 @@ const API_BASE = '/api';
 export interface Identity {
     id: string;
     name: string;
-    category: 'personal' | 'work' | 'business' | 'project' | 'alias' | 'organization' | 'shared';
+    category: 'personal' | 'work' | 'business' | 'project' | 'alias' | 'organization' | 'shared' | 'event';
     description?: string;
     avatar?: string;
     notes?: string;
     isOrganization?: boolean;
     parentIdentityId?: string;
+}
+
+// Profile extends Identity with new fields for the evolved data model
+export interface Profile extends Identity {
+    type?: 'personal' | 'business' | 'brand' | 'project' | 'client' | 'event' | 'other';
+    referenceEmails?: string[];
+    reasonUsed?: string;
+    serviceIds?: string[];
+    workspaceIds?: string[];
 }
 
 export interface Email {
@@ -37,12 +46,16 @@ export interface Service {
     name: string;
     category: string;
 
-    // New Fields
-    ownerIdentityIds: string[];
-    billingEmailId?: string;
-    isArchived?: boolean; // New field for soft delete
+    // Primary Fields (New Model)
+    loginEmail?: string;        // Canonical email used to log in
+    profileIds?: string[];      // Profiles this service is attached to
+    websiteUrl?: string;        // Full URL e.g. "https://www.midjourney.com"
+    handleOrUsername?: string;  // e.g. "@finafeels" for Twitter/IG
 
-    // Deprecated / Legacy
+    // Legacy Fields (kept for backward compatibility)
+    ownerIdentityIds?: string[];
+    billingEmailId?: string;
+    isArchived?: boolean;
     identityId?: string;
     emailId?: string;
 
@@ -54,7 +67,7 @@ export interface Service {
     };
     startDate?: string;
     renewalDate?: string;
-    status: 'active' | 'cancelled' | 'trial' | 'past_due' | 'expired';
+    status: 'active' | 'cancelled' | 'trial' | 'past_due' | 'expired' | 'inactive' | 'free_trial';
     loginUrl?: string;
     notes?: string;
     usageHistory?: {

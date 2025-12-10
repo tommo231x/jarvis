@@ -45,6 +45,11 @@
         "lastSeen": "2024-12-06",
         "isActive": true
       }
+    ],
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": "https://midjourney.com",
+    "profileIds": [
+      "id-tommo"
     ]
   },
   {
@@ -63,7 +68,12 @@
       "currency": "USD"
     },
     "status": "active",
-    "notes": "Only used by Fina"
+    "notes": "Only used by Fina",
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo"
+    ]
   },
   {
     "id": "svc-muse-ai",
@@ -81,7 +91,12 @@
       "currency": "USD"
     },
     "status": "active",
-    "notes": "Only used by Fina"
+    "notes": "Only used by Fina",
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo"
+    ]
   },
   {
     "id": "svc-stable-diffusion",
@@ -103,7 +118,12 @@
         "id-lara"
       ],
       "financialOwnerId": "id-fina"
-    }
+    },
+    "loginEmail": "leila.creative@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-leila"
+    ]
   },
   {
     "id": "svc-runway",
@@ -121,7 +141,12 @@
       "currency": "USD"
     },
     "status": "active",
-    "notes": "Only used by Lara"
+    "notes": "Only used by Lara",
+    "loginEmail": "lara@feels.family",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-lara"
+    ]
   },
   {
     "id": "svc-adobe",
@@ -139,7 +164,12 @@
       "currency": "GBP"
     },
     "status": "active",
-    "notes": "Generic creative account - unclear owner"
+    "notes": "Generic creative account - unclear owner",
+    "loginEmail": "creativehubproject@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-generic-creative"
+    ]
   },
   {
     "id": "svc-netflix-generic",
@@ -157,7 +187,12 @@
       "currency": "GBP"
     },
     "status": "active",
-    "notes": "Registered to generic email - ownership ambiguous"
+    "notes": "Registered to generic email - ownership ambiguous",
+    "loginEmail": "creativehubproject@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-generic-creative"
+    ]
   },
   {
     "id": "svc-youtube-premium",
@@ -175,7 +210,12 @@
       "currency": "GBP"
     },
     "status": "active",
-    "notes": "Studio account - used by all personas"
+    "notes": "Studio account - used by all personas",
+    "loginEmail": "tommo.dev@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo-studio"
+    ]
   },
   {
     "id": "svc-cloudflare",
@@ -193,7 +233,12 @@
       "currency": "USD"
     },
     "status": "active",
-    "notes": "Business infrastructure - studio managed"
+    "notes": "Business infrastructure - studio managed",
+    "loginEmail": "tommo.dev@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo-studio"
+    ]
   },
   {
     "id": "svc-twitch",
@@ -207,7 +252,12 @@
     "emailId": "email-studio",
     "billingCycle": "none",
     "status": "active",
-    "notes": "Studio streaming channel"
+    "notes": "Studio streaming channel",
+    "loginEmail": "tommo.dev@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo-studio"
+    ]
   },
   {
     "id": "svc-spotify-lara",
@@ -229,7 +279,12 @@
     "ownership": {
       "primaryOwnerId": "id-lara",
       "financialOwnerId": "id-fina"
-    }
+    },
+    "loginEmail": "lara@feels.family",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-lara"
+    ]
   },
   {
     "id": "svc-pension-tomo",
@@ -243,7 +298,12 @@
     "emailId": "email-tomo",
     "billingCycle": "none",
     "status": "active",
-    "notes": "Tomo's workplace pension"
+    "notes": "Tomo's workplace pension",
+    "loginEmail": "tomo.connor@outlook.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tomo"
+    ]
   },
   {
     "id": "svc-trust-tomo",
@@ -257,7 +317,12 @@
     "emailId": "email-tomo",
     "billingCycle": "none",
     "status": "active",
-    "notes": "Trust fund managed by Meridian Trust"
+    "notes": "Trust fund managed by Meridian Trust",
+    "loginEmail": "tomo.connor@outlook.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tomo"
+    ]
   },
   {
     "id": "svc-easysplit-render",
@@ -276,7 +341,12 @@
     },
     "status": "active",
     "loginUrl": "https://render.com",
-    "notes": "Backend hosting for Easy Split"
+    "notes": "Backend hosting for Easy Split",
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": "https://render.com",
+    "profileIds": [
+      "18728d2c-336a-49d3-a40c-950c27fcb193"
+    ]
   },
   {
     "id": "svc-easysplit-firebase",
@@ -295,7 +365,12 @@
     },
     "status": "active",
     "loginUrl": "https://firebase.google.com",
-    "notes": "Frontend hosting for Easy Split (free tier)"
+    "notes": "Frontend hosting for Easy Split (free tier)",
+    "loginEmail": "finafeels@gmail.com",
+    "websiteUrl": "https://firebase.google.com",
+    "profileIds": [
+      "18728d2c-336a-49d3-a40c-950c27fcb193"
+    ]
   },
   {
     "id": "svc-easysplit-github",
@@ -315,7 +390,12 @@
     "status": "active",
     "loginUrl": "https://github.com",
     "notes": "Source code repository for Easy Split",
-    "isArchived": false
+    "isArchived": false,
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": "https://github.com",
+    "profileIds": [
+      "18728d2c-336a-49d3-a40c-950c27fcb193"
+    ]
   },
   {
     "name": "bean counter",
@@ -335,7 +415,12 @@
     "renewalDate": "",
     "status": "active",
     "notes": "i might cancel ",
-    "id": "1ab25655-46a6-498a-8696-e9db8f6593c2"
+    "id": "1ab25655-46a6-498a-8696-e9db8f6593c2",
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo"
+    ]
   },
   {
     "name": "Test Archive Service",
@@ -356,7 +441,11 @@
     "status": "active",
     "notes": "",
     "id": "0ad4c41b-cd40-45ec-beae-79202beb98b8",
-    "isArchived": false
+    "isArchived": false,
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo"
+    ]
   },
   {
     "name": "Test Archive Service",
@@ -377,7 +466,12 @@
     "status": "active",
     "notes": "",
     "id": "9b6f6975-9a05-4e52-ae0f-06f671cdc3b3",
-    "isArchived": false
+    "isArchived": false,
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo"
+    ]
   },
   {
     "name": "Test Archive Service",
@@ -398,7 +492,12 @@
     "status": "active",
     "notes": "",
     "id": "51e911aa-cb88-40d1-9cff-a9fe5ab35e0d",
-    "isArchived": false
+    "isArchived": false,
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo"
+    ]
   },
   {
     "name": "Test Archive Service",
@@ -419,6 +518,11 @@
     "status": "active",
     "notes": "",
     "id": "0f0e0dd0-1fe1-439a-aa7b-1fbb146dcc93",
-    "isArchived": true
+    "isArchived": true,
+    "loginEmail": "tommo231@gmail.com",
+    "websiteUrl": null,
+    "profileIds": [
+      "id-tommo"
+    ]
   }
 ]
