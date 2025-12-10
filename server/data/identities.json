@@ -39,5 +39,11 @@
     "category": "business",
     "notes": "Web business to help split the bill at dinner, with plans to scale for restaurant use. Uses Firebase for frontend (login via finafeels@gmail.com) and Render for backend (login via tommo231@gmail.com). GitHub repo under tommo231@gmail.com. Render plan costs 7.99/month. No physical location address yet.",
     "id": "18728d2c-336a-49d3-a40c-950c27fcb193"
+  },
+  {
+    "name": "Fina Feels",
+    "category": "personal",
+    "notes": "Created for Chessapp subscription using email finafeels@gmail.com",
+    "id": "c88286c1-beca-4773-99f7-cfd2a1316824"
   }
 ]

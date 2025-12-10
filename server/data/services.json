@@ -301,7 +301,9 @@
     "id": "svc-test-active-tomorrow",
     "name": "Notion Pro",
     "category": "Productivity",
-    "ownerIdentityIds": ["id-tommo"],
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
     "identityId": "id-tommo",
     "billingCycle": "monthly",
     "cost": {
@@ -313,13 +315,17 @@
     "websiteUrl": "https://notion.so",
     "nextBillingDate": "2025-12-11",
     "notes": "TEST: Active service due TOMORROW",
-    "profileIds": ["id-tommo"]
+    "profileIds": [
+      "id-tommo"
+    ]
   },
   {
     "id": "svc-test-active-3days",
     "name": "Linear",
     "category": "Development",
-    "ownerIdentityIds": ["id-tommo-studio"],
+    "ownerIdentityIds": [
+      "id-tommo-studio"
+    ],
     "identityId": "id-tommo-studio",
     "billingCycle": "monthly",
     "cost": {
@@ -331,13 +337,17 @@
     "websiteUrl": "https://linear.app",
     "nextBillingDate": "2025-12-13",
     "notes": "TEST: Active service due in 3 days",
-    "profileIds": ["id-tommo-studio"]
+    "profileIds": [
+      "id-tommo-studio"
+    ]
   },
   {
     "id": "svc-test-trial-today",
     "name": "Figma Pro",
     "category": "Productivity",
-    "ownerIdentityIds": ["id-tommo-studio"],
+    "ownerIdentityIds": [
+      "id-tommo-studio"
+    ],
     "identityId": "id-tommo-studio",
     "billingCycle": "monthly",
     "cost": {
@@ -349,13 +359,17 @@
     "websiteUrl": "https://figma.com",
     "nextBillingDate": "2025-12-10",
     "notes": "TEST: Trial ending TODAY - should be most urgent",
-    "profileIds": ["id-tommo-studio"]
+    "profileIds": [
+      "id-tommo-studio"
+    ]
   },
   {
     "id": "svc-test-trial-4days",
     "name": "Canva Pro",
     "category": "Productivity",
-    "ownerIdentityIds": ["id-tommo"],
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
     "identityId": "id-tommo",
     "billingCycle": "monthly",
     "cost": {
@@ -367,6 +381,46 @@
     "websiteUrl": "https://canva.com",
     "nextBillingDate": "2025-12-14",
     "notes": "TEST: Trial ending in 4 days",
-    "profileIds": ["id-tommo"]
+    "profileIds": [
+      "id-tommo"
+    ]
+  },
+  {
+    "name": "Chessapp",
+    "category": "Other",
+    "ownerIdentityIds": [
+      "id-tommo"
+    ],
+    "profileIds": [
+      "id-tommo"
+    ],
+    "identityId": "id-tommo",
+    "billingCycle": "monthly",
+    "status": "active",
+    "loginEmail": "tommo231@gmail.com",
+    "cost": {
+      "amount": 20,
+      "currency": "GBP"
+    },
+    "id": "f5f73f68-249f-438a-940c-422b80e59877"
+  },
+  {
+    "name": "Chessapp",
+    "category": "Other",
+    "ownerIdentityIds": [
+      "NEW_IDENTITY_Fina Feels"
+    ],
+    "profileIds": [
+      "NEW_IDENTITY_Fina Feels"
+    ],
+    "identityId": "NEW_IDENTITY_Fina Feels",
+    "billingCycle": "monthly",
+    "status": "active",
+    "loginEmail": "finafeels@gmail.com",
+    "cost": {
+      "amount": 20,
+      "currency": "GBP"
+    },
+    "id": "5f43684b-5d52-4012-8f0f-71cfd064988f"
   }
 ]
