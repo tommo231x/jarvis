@@ -114,15 +114,16 @@ export const useAICommandExecutor = () => {
 
                 case 'add_service':
                 case 'create_service': {
-                    if (!cmd.payload.identityId) {
-                        return { success: false, message: 'No identity ID provided for service' };
-                    }
+                    // Services can exist without being linked to any profile
+                    const profileIds = cmd.payload.profileIds || 
+                        (cmd.payload.identityId ? [cmd.payload.identityId] : []);
+                    
                     const serviceData: any = {
                         name: cmd.payload.name || 'New Service',
                         category: cmd.payload.category || 'Other',
-                        ownerIdentityIds: cmd.payload.identityId ? [cmd.payload.identityId] : [],
-                        profileIds: cmd.payload.identityId ? [cmd.payload.identityId] : [],
-                        identityId: cmd.payload.identityId,
+                        ownerIdentityIds: profileIds,
+                        profileIds: profileIds,
+                        identityId: profileIds[0] || undefined,
                         billingEmailId: cmd.payload.emailId,
                         emailId: cmd.payload.emailId,
                         billingCycle: cmd.payload.billingCycle || 'monthly',
@@ -130,6 +131,7 @@ export const useAICommandExecutor = () => {
                         notes: cmd.payload.notes,
                         loginEmail: cmd.payload.loginEmail || cmd.payload.email,
                         websiteUrl: cmd.payload.websiteUrl || cmd.payload.url,
+                        nextBillingDate: cmd.payload.nextBillingDate,
                     };
                     if (cmd.payload.cost) {
                         serviceData.cost = cmd.payload.cost;
@@ -155,6 +157,10 @@ export const useAICommandExecutor = () => {
                     if (cmd.payload.name) updates.name = cmd.payload.name;
                     if (cmd.payload.status) updates.status = cmd.payload.status;
                     if (cmd.payload.loginEmail) updates.loginEmail = cmd.payload.loginEmail;
+                    if (cmd.payload.nextBillingDate) updates.nextBillingDate = cmd.payload.nextBillingDate;
+                    if (cmd.payload.billingCycle) updates.billingCycle = cmd.payload.billingCycle;
+                    if (cmd.payload.category) updates.category = cmd.payload.category;
+                    if (cmd.payload.profileIds) updates.profileIds = cmd.payload.profileIds;
                     if (cmd.payload.cost) updates.cost = cmd.payload.cost;
                     if (cmd.payload.amount !== undefined) {
                         updates.cost = {
