@@ -254,6 +254,14 @@ The system comes pre-loaded with realistic demo data:
 - Added Message model with emailId and isRelevant flag
 - ChatWidget with enhanced UX and GPT-5.1 model support
 
+## Technical Debt / Future Improvements
+- **Type Safety**: Replace `any` types in forms (ServiceForm, EmailForm) and AI hooks (useAICommandExecutor) with proper TypeScript interfaces
+- **Component Decomposition**: Break down long components into smaller subcomponents:
+  - `IdentityHome.tsx` (500+ lines) - extract service cards, email cards into separate components
+  - `ServicesList.tsx` - extract filter controls, service card rendering
+  - `Home.tsx` - extract stats cards, priority alerts into reusable components
+- **LSP Warning**: IdentityHome.tsx has a minor diagnostic (likely unused variable or similar)
+
 ## User Preferences
 - Dark "Jarvis" theme with violet/indigo gradients
 - Identity-centric workflow (Identity → Emails → Messages)
