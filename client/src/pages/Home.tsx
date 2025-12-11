@@ -239,7 +239,7 @@ export const HomePage = () => {
                 <Card
                     hover
                     className="p-3 md:p-5 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
-                    onClick={() => navigate('/apps/identity/emails')}
+                    onClick={() => navigate('/identities')}
                 >
                     <div className="min-w-0">
                         <p className="text-xs md:text-sm text-jarvis-muted mb-0.5 md:mb-1 truncate">Identities</p>
@@ -318,7 +318,7 @@ export const HomePage = () => {
                                     >
                                         <div
                                             className="flex items-center justify-between cursor-pointer"
-                                            onClick={() => navigate('/identities')}
+                                            onClick={() => navigate(`/identities?selected=${identity.id}`)}
                                         >
                                             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
                                                 <div className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${getIdentityColor(identity.category)}`}>

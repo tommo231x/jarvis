@@ -14,10 +14,11 @@ import {
     LayoutGrid, CreditCard,
     Loader2, Trash2, Globe, Pencil
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 export default function IdentityHome() {
     const { refreshKey } = useDataRefresh();
+    const [searchParams] = useSearchParams();
     const [identities, setIdentities] = useState<Identity[]>([]);
     const [emails, setEmails] = useState<Email[]>([]);
     const [services, setServices] = useState<Service[]>([]);
@@ -58,7 +59,10 @@ export default function IdentityHome() {
                 setEmails(emailsData);
                 setServices(servicesData);
 
-                if (identitiesData.length > 0 && !selectedIdentityId) {
+                const selectedParam = searchParams.get('selected');
+                if (selectedParam && identitiesData.some(i => i.id === selectedParam)) {
+                    setSelectedIdentityId(selectedParam);
+                } else if (identitiesData.length > 0 && !selectedIdentityId) {
                     setSelectedIdentityId(identitiesData[0].id);
                 }
             } catch (error) {
@@ -68,7 +72,7 @@ export default function IdentityHome() {
             }
         };
         fetchData();
-    }, [refreshKey]);
+    }, [refreshKey, searchParams]);
 
     const refreshData = async () => {
         try {
