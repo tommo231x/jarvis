@@ -236,7 +236,9 @@ export default function IdentityHome() {
                                         </div>
                                     </div>
                                     {/* Edit Action */}
-                                    <Button variant="ghost" size="sm" onClick={() => window.alert("Edit Identity implementation pending - CreateIdentity is a full page. Will refactor in next step.")}>Edit</Button>
+                                    <Link to={`/identities/edit/${selectedIdentity.id}`}>
+                                        <Button variant="ghost" size="sm">Edit</Button>
+                                    </Link>
                                 </div>
 
                                 {/* Summary Card (Reusing Global Widget Style) */}
@@ -544,7 +546,6 @@ export default function IdentityHome() {
                     identities={identities}
                     isOpen={!!selectedService}
                     onClose={() => setSelectedService(null)}
-                    onUpdate={refreshData}
                 />
             )}
 

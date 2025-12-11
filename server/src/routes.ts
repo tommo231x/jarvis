@@ -108,6 +108,14 @@ router.get('/identities', async (req, res) => {
     res.json(identities);
 });
 
+router.get('/identities/:id', async (req, res) => {
+    const identity = await db.collection<Identity>('identities').findById(req.params.id);
+    if (!identity) {
+        return res.status(404).json({ error: 'Identity not found' });
+    }
+    res.json(identity);
+});
+
 router.post('/identities', async (req, res) => {
     const newIdentity = await db.collection<Identity>('identities').add(req.body);
     res.status(201).json(newIdentity);

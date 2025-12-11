@@ -46,6 +46,7 @@ function App() {
                                                 {/* Identity System Routes */}
                                                 <Route path="/identities" element={<IdentityHome />} />
                                                 <Route path="/identities/create" element={<CreateIdentity />} />
+                                                <Route path="/identities/edit/:id" element={<CreateIdentity />} />
                                                 <Route path="/identities/:id" element={<IdentityDashboard />} />
 
                                                 {/* Legacy/Existing Routes - Keeping /apps/identity as alias to IdentityHome if needed, or removing if replaced */}

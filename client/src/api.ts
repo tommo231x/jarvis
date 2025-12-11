@@ -151,6 +151,7 @@ export const api = {
     },
     identities: {
         list: () => request<Identity[]>('/identities'),
+        get: (id: string) => request<Identity>(`/identities/${id}`),
         create: (data: Omit<Identity, 'id'>) => request<Identity>('/identities', { method: 'POST', body: JSON.stringify(data) }),
         update: (id: string, data: Partial<Identity>) => request<Identity>(`/identities/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
         delete: (id: string) => request<{ success: boolean }>(`/identities/${id}`, { method: 'DELETE' }),
