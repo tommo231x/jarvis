@@ -384,5 +384,20 @@
     "profileIds": [
       "id-tommo"
     ]
+  },
+  {
+    "name": "Chess ap",
+    "category": "Entertainment",
+    "ownerIdentityIds": [],
+    "profileIds": [],
+    "billingCycle": "monthly",
+    "status": "active",
+    "loginEmail": "tommo231@gmail.com",
+    "nextBillingDate": "2025-12-20",
+    "cost": {
+      "amount": 20,
+      "currency": "GBP"
+    },
+    "id": "9476ed14-fa2f-4830-a73c-df3bfba9c9f3"
   }
 ]

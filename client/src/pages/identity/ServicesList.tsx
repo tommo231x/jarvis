@@ -9,6 +9,7 @@ import { RestoreServiceModal } from '../../components/RestoreServiceModal';
 import { ServiceDetailsModal } from '../../components/identity/ServiceDetailsModal';
 import { Search, Plus, Globe, Archive, RefreshCw, ChevronDown, ChevronRight, Calculator, Info } from 'lucide-react';
 import { ServiceForm } from '../../components/identity/ServiceForm';
+import { useDataRefresh } from '../../context/DataRefreshContext';
 import {
     detectBaseCurrency,
     detectForeignCurrencies,
@@ -19,6 +20,7 @@ import {
 } from '../../utils/currency';
 
 export const ServicesList = () => {
+    const { refreshKey } = useDataRefresh();
     const [services, setServices] = useState<Service[]>([]);
     const [identities, setIdentities] = useState<Identity[]>([]);
     const [emails, setEmails] = useState<Email[]>([]);
@@ -98,7 +100,7 @@ export const ServicesList = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [refreshKey]);
 
     const handleEdit = (service: Service) => {
         setSelectedService(service);

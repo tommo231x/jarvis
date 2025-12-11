@@ -6,8 +6,10 @@ import { Input } from '../../components/Input';
 import { BackButton } from '../../components/BackButton';
 import { Search, Plus, Folder, Trash2, Edit2, MoreVertical } from 'lucide-react';
 import { ProjectForm } from '../../components/identity/ProjectForm';
+import { useDataRefresh } from '../../context/DataRefreshContext';
 
 export const ProjectsList = () => {
+    const { refreshKey } = useDataRefresh();
     const [projects, setProjects] = useState<Project[]>([]);
     const [services, setServices] = useState<Service[]>([]);
     const [identities, setIdentities] = useState<Identity[]>([]);
@@ -37,7 +39,7 @@ export const ProjectsList = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [refreshKey]);
 
     const handleEdit = (project: Project) => {
         setSelectedProject(project);

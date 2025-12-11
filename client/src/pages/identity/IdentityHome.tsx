@@ -8,6 +8,7 @@ import { EmailForm } from '../../components/identity/EmailForm';
 import { ServiceDetailsModal } from '../../components/identity/ServiceDetailsModal';
 import { AddServicesToProfileModal } from '../../components/identity/AddServicesToProfileModal';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
+import { useDataRefresh } from '../../context/DataRefreshContext';
 import {
     User, Building2, Code, Plus, Mail, Shield,
     LayoutGrid, CreditCard,
@@ -16,6 +17,7 @@ import {
 import { Link } from 'react-router-dom';
 
 export default function IdentityHome() {
+    const { refreshKey } = useDataRefresh();
     const [identities, setIdentities] = useState<Identity[]>([]);
     const [emails, setEmails] = useState<Email[]>([]);
     const [services, setServices] = useState<Service[]>([]);
@@ -66,7 +68,7 @@ export default function IdentityHome() {
             }
         };
         fetchData();
-    }, []);
+    }, [refreshKey]);
 
     const refreshData = async () => {
         try {

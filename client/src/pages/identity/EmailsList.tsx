@@ -6,8 +6,10 @@ import { Input } from '../../components/Input';
 import { Card } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { BackButton } from '../../components/BackButton';
+import { useDataRefresh } from '../../context/DataRefreshContext';
 
 export const EmailsList = () => {
+    const { refreshKey } = useDataRefresh();
     const [identities, setIdentities] = useState<Identity[]>([]);
     const [emails, setEmails] = useState<Email[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -47,7 +49,7 @@ export const EmailsList = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [refreshKey]);
 
     const getEmailsForIdentity = (identityId: string) => {
         return emails.filter(e => e.identityId === identityId);
