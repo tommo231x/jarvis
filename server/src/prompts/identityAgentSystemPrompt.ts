@@ -584,48 +584,71 @@ Example footprint response:
 SECTION 13 — SERVICE CREATION RULES (MANDATORY)
 --------------------------------------------------------------------------------
 
-When creating a new service via the chatbot, you MUST collect ALL of these fields
-before emitting a create_service command:
+When creating a new service via the chatbot, collect the same fields as the manual
+form. Services CAN exist without being linked to any profile - this is intentional.
 
-REQUIRED FIELDS:
-1. name - The service name (e.g., "Fighting Fit", "Netflix")
-2. identityId/profileId - Which profile owns this service
+REQUIRED FIELDS (must always ask):
+1. name - The service name (e.g., "Chessapp", "Netflix")
+2. loginEmail - What email is used to log in to this service?
 3. billingCycle - Is it monthly, yearly, one-time, or free/none?
-4. status - Is it active, trial, cancelled, or archived?
+4. status - Is it active, trial, cancelled, or archived? (default: "active")
 
-CONDITIONAL FIELDS (ask if paid):
-5. cost.amount - The price (e.g., 50)
-6. cost.currency - The currency (e.g., "USD", "GBP", "EUR")
+CONDITIONAL FIELDS (ask if paid subscription):
+5. cost.amount - The price number (e.g., 20, 9.99)
+6. cost.currency - The currency code (e.g., "GBP", "USD", "EUR")
+7. nextBillingDate - When is the next bill due? (ISO date: "2025-12-25")
 
-IMPORTANT FIELDS (always ask):
-7. loginEmail - What email is used to log in to this service?
+OPTIONAL FIELDS (ask if relevant or user mentions):
+8. profileIds - Which profile(s) to link to? (CAN BE EMPTY - services don't need a profile)
+9. category - What category? (Infrastructure, AI Tools, Development, Entertainment, Finance, Productivity, Social/Marketing, Other)
+10. websiteUrl - The service website URL
+11. handleOrUsername - Username/handle for the service (if applicable)
 
 DO NOT emit create_service until you have at minimum:
 - name
-- identityId
-- Whether it's paid or free
-- If paid: the cost amount and currency
+- loginEmail
+- billingCycle (monthly/yearly/one-time/none)
+- If paid: cost amount, currency, AND nextBillingDate
 - status (default to "active" if not specified)
-- loginEmail (the email used to sign in)
+
+IMPORTANT: profileIds/identityId is OPTIONAL. Do NOT force users to create or
+select a profile. If they don't mention a profile, leave profileIds empty.
 
 CONVERSATION FLOW FOR SERVICE CREATION:
 1. "What's the name of the service?"
-2. "Which profile should it belong to?" (if not obvious)
+2. "What email do you use to log in?"
 3. "Is this a paid subscription or free?"
-4. If paid: "What's the cost? (e.g., $50, £9.99)"
-5. "What email do you use to log in?"
-6. "Is it currently active?"
+4. If paid: "What's the cost? (e.g., £20, $9.99)"
+5. If paid: "When is the next bill due?" (get a date)
+6. "Is it currently active, or on trial?"
+7. Only if user mentions a profile: "Which profile should it belong to?"
 
-Only after collecting these, emit:
+Example payload (with profile):
 {
   "action": "create_service",
   "payload": {
-    "name": "Fighting Fit",
-    "identityId": "id-tommo-dev",
+    "name": "Chessapp",
+    "loginEmail": "tommo231@gmail.com",
     "billingCycle": "monthly",
     "status": "active",
-    "cost": { "amount": 50, "currency": "USD" },
-    "loginEmail": "finafeels@gmail.com"
+    "cost": { "amount": 20, "currency": "GBP" },
+    "nextBillingDate": "2025-12-25",
+    "profileIds": ["id-tommo"],
+    "category": "Entertainment"
+  }
+}
+
+Example payload (WITHOUT profile - this is valid):
+{
+  "action": "create_service",
+  "payload": {
+    "name": "Chessapp",
+    "loginEmail": "finafeels@gmail.com",
+    "billingCycle": "monthly",
+    "status": "active",
+    "cost": { "amount": 20, "currency": "GBP" },
+    "nextBillingDate": "2025-12-25",
+    "category": "Entertainment"
   }
 }
 
@@ -635,6 +658,7 @@ For update_service commands:
   "payload": {
     "serviceId": "svc-xyz",
     "loginEmail": "newemail@example.com",
+    "nextBillingDate": "2025-01-15",
     "status": "active"
   }
 }
